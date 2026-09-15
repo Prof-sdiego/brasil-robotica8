@@ -410,7 +410,7 @@ basic.forever(function () {
     }
 
     let y: number = (input.acceleration(Dimension.Y) - zeroY) * -1
-    let x: number = input.acceleration(Dimension.X) - zeroX
+    let x: number = (input.acceleration(Dimension.X) - zeroX) * -1
 
     // zona morta subtrativa: o lado tem faixa maior, para a inclinação
     // lateral acidental não virar curva quando você só quer ir reto
@@ -747,12 +747,21 @@ input.onButtonPressed(Button.A, function () {
 })
 
 // Botão B do robô = cronometrar o GIRO360
-// Ele dá uma volta com o tempo programado. Se parar exatamente onde
-// começou, o número está certo. Girou demais? Diminua. De menos? Aumente.
+// Aperte, tire a mão e espere a contagem. Ele dá uma volta com o tempo
+// programado. Parou exatamente onde começou? O número está certo.
+// Girou demais? Diminua. De menos? Aumente.
 input.onButtonPressed(Button.B, function () {
     if (coreo) { return }
     coreo = true
     setaAtual = -1
+    // 2 segundos para tirar a mão e o robô assentar antes de girar
+    basic.showNumber(2)
+    music.playTone(523, 80)
+    basic.pause(1000)
+    basic.showNumber(1)
+    music.playTone(523, 80)
+    basic.pause(1000)
+    music.playTone(784, 120)
     basic.showIcon(IconNames.Diamond)
     mover(VEL_COREO, -VEL_COREO)
     basic.pause(GIRO360)
