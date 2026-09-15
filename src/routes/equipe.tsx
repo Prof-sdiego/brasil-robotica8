@@ -31,6 +31,22 @@ function TelaEquipe() {
   const [nome, setNome] = useState("");
   const [papel, setPapel] = useState<Papel | "">("");
   const [aberto, setAberto] = useState(false);
+  const [festa, setFesta] = useState(false);
+  const eraCompleta = useRef<boolean | null>(null);
+
+  const faltantes = equipe ? papeisFaltantes(equipe.integrantes) : [];
+  const completa = Boolean(equipe) && faltantes.length === 0;
+
+  useEffect(() => {
+    if (!equipe) return;
+    if (eraCompleta.current === false && completa) {
+      setFesta(true);
+      const t = setTimeout(() => setFesta(false), 2600);
+      eraCompleta.current = completa;
+      return () => clearTimeout(t);
+    }
+    eraCompleta.current = completa;
+  }, [completa, equipe]);
 
   if (carregando || !equipe) {
     return <p className="p-8 text-center text-lg font-bold">Carregando...</p>;
