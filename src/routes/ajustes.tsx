@@ -34,10 +34,37 @@ const PASSOS_CALIBRACAO = [
   "Gerem o código de novo e repitam até fechar.",
 ];
 
+const DICAS_PROBLEMAS = [
+  {
+    problema: "Uma roda gira mais rápido que a outra quando vou reto",
+    solucao:
+      "Aumente a zona morta para os lados. Se continuar, baixe a força do motor mais rápido.",
+  },
+  {
+    problema: "As rodas giram em sentidos opostos quando deveriam ir juntas",
+    solucao:
+      "Mesma coisa: zona morta para os lados. Sua mão está inclinando de lado sem perceber.",
+  },
+  {
+    problema: "O robô gira no lugar em vez de andar reto",
+    solucao: 'Marque "inverter motor esquerdo". Se piorar, desmarque e marque o direito.',
+  },
+  {
+    problema: "O robô anda sozinho sem ninguém mexer",
+    solucao:
+      "Desligue e ligue o controle, segurando ele parado enquanto aparece o bonequinho dormindo. Se continuar, aumente a zona morta de frente e trás.",
+  },
+  {
+    problema: "O robô anda ao contrário do que eu inclino",
+    solucao: 'Marque os dois "inverter motor".',
+  },
+];
+
 function TelaAjustes() {
   const { equipe, carregando, salvar, salvando } = useAluno({ exigirEquipeCompleta: true });
   const [avancadosAbertos, setAvancadosAbertos] = useState(false);
   const [calibrando, setCalibrando] = useState(false);
+  const [dicasAbertas, setDicasAbertas] = useState(false);
 
   if (carregando || !equipe) {
     return <p className="p-8 text-center text-lg font-bold">Carregando...</p>;
@@ -199,6 +226,31 @@ function TelaAjustes() {
             )}
           </section>
         ))}
+
+        <section className="cartao-toque mb-5 p-5">
+          <button
+            onClick={() => setDicasAbertas(!dicasAbertas)}
+            aria-expanded={dicasAbertas}
+            className="flex w-full items-center justify-between gap-2 text-left"
+          >
+            <span className="flex items-center gap-2 font-display text-2xl font-bold">
+              <span aria-hidden>🤔</span> O robô está estranho?
+            </span>
+            <ChevronDown
+              className={`size-7 shrink-0 transition-transform ${dicasAbertas ? "rotate-180" : ""}`}
+            />
+          </button>
+          {dicasAbertas && (
+            <ul className="mt-4 space-y-3">
+              {DICAS_PROBLEMAS.map((dica) => (
+                <li key={dica.problema} className="rounded-2xl border-2 border-input p-4">
+                  <p className="text-lg font-extrabold">{dica.problema}</p>
+                  <p className="mt-1 font-semibold text-muted-foreground">{dica.solucao}</p>
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
       </main>
     </>
   );

@@ -21,11 +21,14 @@ export const MARCADORES = [
   "GRUPO",
   "SENSIBILIDADE",
   "VEL_NORMAL",
-  "ZONA",
+  "ZONA_FRENTE",
+  "ZONA_CURVA",
   "GIRO",
   "RITMO",
   "INV_ESQ",
   "INV_DIR",
+  "TRIM_ESQ",
+  "TRIM_DIR",
   "DEADMAN",
   "MOVER_PILOTAGEM",
   "GIRO360",
@@ -285,7 +288,8 @@ let VEL_NORMAL: number = {{VEL_NORMAL}}
 
 let VEL: number = VEL_NORMAL
 let GIRO: number = {{GIRO}}
-let ZONA: number = {{ZONA}}
+let ZONA_FRENTE: number = {{ZONA_FRENTE}}
+let ZONA_CURVA: number = {{ZONA_CURVA}}
 let MAXFRENTE: number = 450 - SENSIBILIDADE * 30
 let MAXCURVA: number = MAXFRENTE * 2
 
@@ -414,8 +418,8 @@ basic.forever(function () {
     let y: number = (input.acceleration(Dimension.Y) - zeroY) * -1
     let x: number = input.acceleration(Dimension.X) - zeroX
 
-    if (Math.abs(y) < ZONA) { y = 0 }
-    if (Math.abs(x) < ZONA) { x = 0 }
+    if (Math.abs(y) < ZONA_FRENTE) { y = 0 }
+    if (Math.abs(x) < ZONA_CURVA) { x = 0 }
 
     if (y > MAXFRENTE) { y = MAXFRENTE }
     if (y < -MAXFRENTE) { y = -MAXFRENTE }
@@ -467,6 +471,10 @@ let VEL_COREO: number = {{VEL_COREO}}
 let INV_ESQ: number = {{INV_ESQ}}
 let INV_DIR: number = {{INV_DIR}}
 
+// Compensação de força de cada motor (70 a 100 por cento)
+let TRIM_ESQ: number = {{TRIM_ESQ}}
+let TRIM_DIR: number = {{TRIM_DIR}}
+
 // Depois de quantos ms sem sinal do controle o robô para sozinho
 let DEADMAN: number = {{DEADMAN}}
 
@@ -485,8 +493,8 @@ basic.showIcon(IconNames.SmallSquare)
 {{ROBO_SETUP}}
 
 function mover(esq: number, dir: number) {
-    robotbit.MotorRun(robotbit.Motors.M1A, esq * INV_ESQ)
-    robotbit.MotorRun(robotbit.Motors.M1B, dir * INV_DIR)
+    robotbit.MotorRun(robotbit.Motors.M1A, esq * INV_ESQ * TRIM_ESQ / 100)
+    robotbit.MotorRun(robotbit.Motors.M1B, dir * INV_DIR * TRIM_DIR / 100)
 }
 
 function parar() {
@@ -829,11 +837,14 @@ export function montarCodigo(equipe: Equipe): CodigoGerado {
         ? numeroAjusteMelhoria(equipe.ajustesMelhorias, "turbo", "velocidade_normal")
         : velocidadeMaxima,
     ),
-    ZONA: String(numeroAjuste(ajustes, "zona_morta")),
+    ZONA_FRENTE: String(numeroAjuste(ajustes, "zona_frente")),
+    ZONA_CURVA: String(numeroAjuste(ajustes, "zona_curva")),
     GIRO: String(numeroAjuste(ajustes, "forca_giro")),
     RITMO: String(numeroAjuste(ajustes, "ritmo_envio")),
     INV_ESQ: ligadoAjuste(ajustes, "inverter_motor_esquerdo") ? "-1" : "1",
     INV_DIR: ligadoAjuste(ajustes, "inverter_motor_direito") ? "-1" : "1",
+    TRIM_ESQ: String(numeroAjuste(ajustes, "forca_motor_esquerdo")),
+    TRIM_DIR: String(numeroAjuste(ajustes, "forca_motor_direito")),
     DEADMAN: String(numeroAjuste(ajustes, "parada_perda_sinal")),
     GIRO360: String(numeroAjuste(ajustes, "giro360")),
     VEL_COREO: String(numeroAjuste(ajustes, "velocidade_coreografia")),
