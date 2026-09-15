@@ -98,15 +98,23 @@ function Painel() {
             </p>
             <h1 className="text-3xl sm:text-4xl">{equipe.nomeEquipe}</h1>
           </div>
-          <button
-            onClick={() => {
-              sairDaEquipe();
-              window.location.href = "/";
-            }}
-            className="flex items-center gap-1 rounded-full bg-card/25 px-3 py-2 text-sm font-bold active:scale-95"
-          >
-            <LogOut className="size-4" /> Sair
-          </button>
+          <div className="flex shrink-0 flex-col items-end gap-2">
+            <Link
+              to="/tutorial"
+              className="flex items-center gap-1 rounded-full bg-card/25 px-3 py-2 text-sm font-bold active:scale-95"
+            >
+              <HelpCircle className="size-4" /> Como funciona
+            </Link>
+            <button
+              onClick={() => {
+                sairDaEquipe();
+                window.location.href = "/";
+              }}
+              className="flex items-center gap-1 rounded-full bg-card/25 px-3 py-2 text-sm font-bold active:scale-95"
+            >
+              <LogOut className="size-4" /> Sair
+            </button>
+          </div>
         </div>
 
         <div className="mt-5 rounded-2xl bg-card/20 p-4 backdrop-blur-sm">
