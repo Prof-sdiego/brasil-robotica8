@@ -42,10 +42,18 @@ export type Melhoria = {
 
 export const MELHORIAS: Melhoria[] = [
   {
+    id: "farol",
+    nome: "Farol de LED",
+    icone: "💡",
+    frase: "As 4 luzes da placa mudam de cor conforme o robô se move.",
+    batalha: "pouco",
+    demonstracao: "muito",
+  },
+  {
     id: "turbo",
     nome: "Turbo",
     icone: "🚀",
-    frase: "Um botão dá um empurrão extra de velocidade por alguns instantes.",
+    frase: "Aperta B e o robô ganha 2 segundos de velocidade máxima.",
     batalha: "muito",
     demonstracao: "pouco",
   },
@@ -53,41 +61,33 @@ export const MELHORIAS: Melhoria[] = [
     id: "marcha_lenta",
     nome: "Marcha Lenta",
     icone: "🐢",
-    frase: "Um botão reduz a velocidade para manobras de precisão.",
-    batalha: "pouco",
+    frase: "Aperta B e o robô anda na metade da velocidade, para manobras de precisão.",
+    batalha: "muito",
     demonstracao: "muito",
   },
   {
     id: "som_abertura",
     nome: "Som de abertura",
     icone: "🎵",
-    frase: "O robô toca uma melodia quando é ligado.",
+    frase: "O robô toca uma melodia curta ao ser ligado.",
     batalha: "nada",
     demonstracao: "muito",
   },
   {
-    id: "farol",
-    nome: "Farol de LED",
-    icone: "💡",
-    frase: "As luzes da placa acendem em padrão quando o robô se move.",
-    batalha: "pouco",
+    id: "bipe_re",
+    nome: "Bipe de ré",
+    icone: "📢",
+    frase: "Quando o robô anda para trás, apita repetidamente como um caminhão.",
+    batalha: "nada",
     demonstracao: "muito",
   },
   {
-    id: "antibloqueio",
-    nome: "Antibloqueio",
-    icone: "🛡️",
-    frase: "Se o robô travar empurrando, ele recua sozinho e tenta de novo.",
-    batalha: "muito",
-    demonstracao: "nada",
-  },
-  {
-    id: "placar",
-    nome: "Placar no display",
-    icone: "🔢",
-    frase: "O display mostra ícones do que o robô está fazendo agora.",
+    id: "contador_tempo",
+    nome: "Contador de tempo",
+    icone: "⏱️",
+    frase: "O robô soma quanto tempo ficou em movimento; A+B no robô mostra o total.",
     batalha: "pouco",
-    demonstracao: "pouco",
+    demonstracao: "muito",
   },
 ];
 
@@ -95,11 +95,11 @@ export const MELHORIAS_EXCLUSIVAS = ["turbo", "marcha_lenta"];
 export const MAXIMO_MELHORIAS = 3;
 
 export const MELODIAS: { id: string; nome: string; icone: string }[] = [
-  { id: "dadadadum", nome: "Abertura heroica", icone: "🎺" },
-  { id: "entertainer", nome: "Circo", icone: "🎪" },
-  { id: "power_up", nome: "Ligando os motores", icone: "⚡" },
-  { id: "birthday", nome: "Parabéns", icone: "🎂" },
-  { id: "nyan", nome: "Gatinho espacial", icone: "🐱" },
+  { id: "fanfarra", nome: "Fanfarra", icone: "🎺" },
+  { id: "alerta_combate", nome: "Alerta de combate", icone: "🚨" },
+  { id: "robozinho", nome: "Robozinho", icone: "🤖" },
+  { id: "descida_grave", nome: "Descida grave", icone: "🎻" },
+  { id: "sirene", nome: "Sirene", icone: "🚓" },
 ];
 
 export type Movimento = {
