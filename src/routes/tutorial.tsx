@@ -29,6 +29,11 @@ function TelaTutorial() {
   const navigate = useNavigate();
   const { equipe, carregando, codigo } = useAluno({ pularConferencias: true });
   const [passo, setPasso] = useState(0);
+  const semProgramador = Boolean(equipe) && !temProgramador(equipe!.integrantes);
+
+  useEffect(() => {
+    if (semProgramador) navigate({ to: "/programador" });
+  }, [semProgramador, navigate]);
 
   if (carregando || !equipe) {
     return <p className="p-8 text-center text-lg font-bold">Carregando...</p>;
