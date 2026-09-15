@@ -327,12 +327,6 @@ function calibrar() {
 
 calibrar()
 
-function limita(v: number): number {
-    if (v > 255) return 255
-    if (v < -255) return -255
-    return v
-}
-
 function mostrar(estado: number) {
     if (estado == ultimaSeta) { return }
     ultimaSeta = estado
@@ -418,8 +412,23 @@ basic.forever(function () {
     let y: number = (input.acceleration(Dimension.Y) - zeroY) * -1
     let x: number = input.acceleration(Dimension.X) - zeroX
 
-    if (Math.abs(y) < ZONA_FRENTE) { y = 0 }
-    if (Math.abs(x) < ZONA_CURVA) { x = 0 }
+    // zona morta subtrativa: o lado tem faixa maior, para a inclinação
+    // lateral acidental não virar curva quando você só quer ir reto
+    if (Math.abs(y) < ZONA_FRENTE) {
+        y = 0
+    } else if (y > 0) {
+        y = y - ZONA_FRENTE
+    } else {
+        y = y + ZONA_FRENTE
+    }
+
+    if (Math.abs(x) < ZONA_CURVA) {
+        x = 0
+    } else if (x > 0) {
+        x = x - ZONA_CURVA
+    } else {
+        x = x + ZONA_CURVA
+    }
 
     if (y > MAXFRENTE) { y = MAXFRENTE }
     if (y < -MAXFRENTE) { y = -MAXFRENTE }
@@ -429,8 +438,21 @@ basic.forever(function () {
     let frente: number = Math.map(y, -MAXFRENTE, MAXFRENTE, -VEL, VEL)
     let curva: number = Math.map(x, -MAXCURVA, MAXCURVA, -GIRO, GIRO)
 
-    let esq: number = limita(Math.round(frente + curva))
-    let dir: number = limita(Math.round(frente - curva))
+    // andando forte para frente, a curva perde força: prioriza o reto
+    if (frente != 0) {
+        let peso: number = 100 - Math.idiv(Math.abs(frente) * 45, 255)
+        curva = Math.idiv(curva * peso, 100)
+    }
+
+    let esq: number = Math.round(frente + curva)
+    let dir: number = Math.round(frente - curva)
+
+    // passou do teto? reduz os DOIS proporcionalmente em vez de cortar um só
+    let maior: number = Math.max(Math.abs(esq), Math.abs(dir))
+    if (maior > 255) {
+        esq = Math.idiv(esq * 255, maior)
+        dir = Math.idiv(dir * 255, maior)
+    }
 
     let pacote: number = (esq + 255) * 1000 + (dir + 255)
     radio.sendNumber(pacote)
@@ -451,8 +473,7 @@ basic.forever(function () {
     }
 
     basic.pause({{RITMO}})
-})
-`;
+})`;
 
 export const MODELO_ROBO = `// ═══════════════════════════════════════════
 //   ROBÔ — Equipe {{NOME_EQUIPE}}
@@ -471,7 +492,8 @@ let VEL_COREO: number = {{VEL_COREO}}
 let INV_ESQ: number = {{INV_ESQ}}
 let INV_DIR: number = {{INV_DIR}}
 
-// Compensação de força de cada motor (70 a 100 por cento)
+// Compensação de motor: se um lado for mais rápido que o outro, baixe o dele.
+// 100 = força total. 90 = 10% mais fraco.
 let TRIM_ESQ: number = {{TRIM_ESQ}}
 let TRIM_DIR: number = {{TRIM_DIR}}
 
@@ -493,8 +515,8 @@ basic.showIcon(IconNames.SmallSquare)
 {{ROBO_SETUP}}
 
 function mover(esq: number, dir: number) {
-    robotbit.MotorRun(robotbit.Motors.M1A, esq * INV_ESQ * TRIM_ESQ / 100)
-    robotbit.MotorRun(robotbit.Motors.M1B, dir * INV_DIR * TRIM_DIR / 100)
+    robotbit.MotorRun(robotbit.Motors.M1A, Math.idiv(esq * TRIM_ESQ, 100) * INV_ESQ)
+    robotbit.MotorRun(robotbit.Motors.M1B, Math.idiv(dir * TRIM_DIR, 100) * INV_DIR)
 }
 
 function parar() {
@@ -732,7 +754,7 @@ input.onButtonPressed(Button.B, function () {
     coreo = true
     setaAtual = -1
     basic.showIcon(IconNames.Diamond)
-    mover(255, -255)
+    mover(VEL_COREO, -VEL_COREO)
     basic.pause(GIRO360)
     parar()
     coreo = false
@@ -748,8 +770,7 @@ basic.forever(function () {
     }
     basic.pause(20)
 })
-{{ROBO_LOOPS}}
-`;
+{{ROBO_LOOPS}}`;
 
 // ---------------------------------------------------------------------
 // Montagem
