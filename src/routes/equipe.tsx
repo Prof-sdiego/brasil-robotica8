@@ -90,7 +90,22 @@ function TelaEquipe() {
   return (
     <>
       <Cabecalho titulo="Equipe" icone={<Users className="size-6" />} salvando={salvando} />
+      {festa && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/50 p-6 animate-in fade-in">
+          <div className="cartao-toque flex animate-in flex-col items-center gap-3 p-8 text-center zoom-in-50 duration-500">
+            <PartyPopper className="size-16 animate-bounce text-primary" />
+            <p className="font-display text-3xl font-extrabold">Equipe completa!</p>
+            <p className="text-xl font-bold text-sucesso">Tudo liberado.</p>
+          </div>
+        </div>
+      )}
       <main className="mx-auto max-w-3xl px-4 py-5 pb-16">
+        {!completa && (
+          <p className="mb-4 flex items-start gap-2 rounded-2xl bg-alerta px-4 py-4 font-bold text-alerta-foreground">
+            <Lock className="mt-0.5 size-5 shrink-0" /> Faltam: {listarFaltantes(faltantes)}.
+            Cadastre a equipe completa para liberar o resto do site.
+          </p>
+        )}
         <div className="cartao-toque mb-5 p-4">
           <p className="text-base font-bold">
             {integrantes.length} de {MAXIMO_INTEGRANTES} pessoas na equipe
