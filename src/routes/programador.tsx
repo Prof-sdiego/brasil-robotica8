@@ -39,11 +39,13 @@ function TelaProgramador() {
     return <p className="p-8 text-center text-lg font-bold">Carregando...</p>;
   }
 
-  function confirmar(evento: React.FormEvent) {
+  async function confirmar(evento: React.FormEvent) {
     evento.preventDefault();
-    if (!nome.trim()) return;
+    if (!nome.trim() || !codigo) return;
     const novo: Integrante = { id: crypto.randomUUID(), nome: nome.trim(), papel: "Programador" };
-    salvar({ integrantes: [...(equipe?.integrantes ?? []), novo] });
+    const integrantes = [...(equipe?.integrantes ?? []), novo];
+    salvar({ integrantes });
+    await salvarEquipeAgora(codigo, { integrantes });
     navigate({ to: "/painel" });
   }
 
