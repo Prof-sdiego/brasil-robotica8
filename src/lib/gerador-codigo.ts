@@ -218,7 +218,7 @@ let daRe: boolean = false`,
       SETA_EXTRA: `    daRe = (estado == 2)`,
       ROBO_LOOPS: `
 basic.forever(function () {
-    if (daRe) {
+    if (daRe && !coreo) {
         music.playTone(RE_ALTURA, 90)
         basic.pause(RE_INTERVALO)
     } else {
