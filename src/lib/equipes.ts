@@ -61,16 +61,20 @@ function paraEquipe(linha: LinhaEquipe): Equipe {
 }
 
 function paraLinha(dados: EquipeEditavel) {
-  const linha: Record<string, unknown> = {};
-  if (dados.sensibilidade !== undefined) linha.sensibilidade = dados.sensibilidade;
-  if (dados.melhorias !== undefined) linha.melhorias = dados.melhorias;
-  if (dados.melodiaAbertura !== undefined) linha.melodia_abertura = dados.melodiaAbertura;
-  if (dados.coreografias !== undefined) linha.coreografias = dados.coreografias;
-  if (dados.integrantes !== undefined) linha.integrantes = dados.integrantes;
-  if (dados.checklist !== undefined) linha.checklist = dados.checklist;
-  if (dados.justificativa !== undefined) linha.justificativa = dados.justificativa;
-  if (dados.codigoGerado !== undefined) linha.codigo_gerado = dados.codigoGerado;
-  return linha;
+  return {
+    ...(dados.sensibilidade !== undefined ? { sensibilidade: dados.sensibilidade } : {}),
+    ...(dados.melhorias !== undefined ? { melhorias: dados.melhorias } : {}),
+    ...(dados.melodiaAbertura !== undefined ? { melodia_abertura: dados.melodiaAbertura } : {}),
+    ...(dados.coreografias !== undefined
+      ? { coreografias: dados.coreografias as unknown as never }
+      : {}),
+    ...(dados.integrantes !== undefined
+      ? { integrantes: dados.integrantes as unknown as never }
+      : {}),
+    ...(dados.checklist !== undefined ? { checklist: dados.checklist as unknown as never } : {}),
+    ...(dados.justificativa !== undefined ? { justificativa: dados.justificativa } : {}),
+    ...(dados.codigoGerado !== undefined ? { codigo_gerado: dados.codigoGerado } : {}),
+  };
 }
 
 const CAMPOS =
