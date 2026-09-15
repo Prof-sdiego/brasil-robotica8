@@ -848,10 +848,10 @@ export function montarCodigo(equipe: Equipe): CodigoGerado {
   const robo: Partial<Record<Marcador, string>> = { ...base };
 
   for (const marcador of marcadoresControle) {
-    controle[marcador] = juntarTrechos(equipe.melhorias, "controle", marcador);
+    controle[marcador] = juntarTrechos(equipe, "controle", marcador);
   }
   for (const marcador of marcadoresRobo) {
-    robo[marcador] = juntarTrechos(equipe.melhorias, "robo", marcador);
+    robo[marcador] = juntarTrechos(equipe, "robo", marcador);
   }
 
   // Se nenhum módulo ocupou o botão B, ele chama a segunda coreografia.
@@ -868,7 +868,7 @@ export function montarCodigo(equipe: Equipe): CodigoGerado {
   // A+B chama a última coreografia da equipe.
   const codigoAB = botaoBOcupado ? 900002 : 900003;
   const letraAB = botaoBOcupado ? "2" : "3";
-  const trechoAB = juntarTrechos(equipe.melhorias, "controle", "CTRL_BOTAO_AB");
+  const trechoAB = juntarTrechos(equipe, "controle", "CTRL_BOTAO_AB");
   controle.CTRL_BOTAO_AB = trechoAB.trim()
     ? trechoAB
     : identar([
