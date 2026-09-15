@@ -67,7 +67,13 @@ const CARTOES = [
 ];
 
 function Painel() {
-  const { equipe, carregando } = useAluno();
+  const navigate = useNavigate();
+  const { equipe, carregando, codigo } = useAluno();
+  const { pronto: tutorialPronto, visto: tutorialVisto } = useTutorialVisto(codigo);
+
+  useEffect(() => {
+    if (tutorialPronto && !tutorialVisto) navigate({ to: "/tutorial" });
+  }, [tutorialPronto, tutorialVisto, navigate]);
 
   if (carregando || !equipe) {
     return <p className="p-8 text-center text-lg font-bold">Carregando...</p>;
