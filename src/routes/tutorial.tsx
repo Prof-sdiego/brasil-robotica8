@@ -1,8 +1,8 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { ArrowLeft, ArrowRight } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
-import { equipeCompleta } from "@/lib/equipeStatus";
+import { equipeCompleta, temProgramador } from "@/lib/equipeStatus";
 import { marcarTutorialVisto } from "@/lib/sessao";
 import { TELAS_TUTORIAL } from "@/lib/tutorial";
 import { useAluno } from "@/lib/useAluno";
