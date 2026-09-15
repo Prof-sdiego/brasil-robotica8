@@ -133,40 +133,86 @@ function Painel() {
         <BarraProgresso feitos={feitos} total={equipe.checklist.length} />
       </div>
 
+      {travado && (
+        <p className="mt-4 flex items-start gap-2 rounded-2xl bg-alerta px-4 py-4 font-bold text-alerta-foreground">
+          <Lock className="mt-0.5 size-5 shrink-0" /> {avisoTrava}
+        </p>
+      )}
+
       <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2">
-        {CARTOES.map((cartao) => (
-          <Link
-            key={cartao.para}
-            to={cartao.para}
-            className="cartao-toque flex items-center gap-4 p-5 active:cartao-toque-ativo"
-          >
-            <span className={`flex size-16 items-center justify-center rounded-2xl ${cartao.cor}`}>
-              <cartao.icone className="size-8" />
-            </span>
-            <span>
-              <span className="block font-display text-2xl font-bold">{cartao.titulo}</span>
-              <span className="block text-sm font-semibold text-muted-foreground">
-                {cartao.descricao}
+        {CARTOES.map((cartao) => {
+          const bloqueado = travado && cartao.para !== "/equipe";
+          if (bloqueado) {
+            return (
+              <div
+                key={cartao.para}
+                aria-disabled
+                className="cartao-toque flex items-center gap-4 p-5 opacity-50 grayscale"
+              >
+                <span className="flex size-16 items-center justify-center rounded-2xl bg-muted text-muted-foreground">
+                  <Lock className="size-8" />
+                </span>
+                <span>
+                  <span className="block font-display text-2xl font-bold">{cartao.titulo}</span>
+                  <span className="block text-sm font-semibold text-muted-foreground">
+                    Bloqueado até a equipe estar completa
+                  </span>
+                </span>
+              </div>
+            );
+          }
+          return (
+            <Link
+              key={cartao.para}
+              to={cartao.para}
+              className="cartao-toque flex items-center gap-4 p-5 active:cartao-toque-ativo"
+            >
+              <span className={`flex size-16 items-center justify-center rounded-2xl ${cartao.cor}`}>
+                <cartao.icone className="size-8" />
               </span>
-            </span>
-          </Link>
-        ))}
+              <span>
+                <span className="block font-display text-2xl font-bold">{cartao.titulo}</span>
+                <span className="block text-sm font-semibold text-muted-foreground">
+                  {cartao.descricao}
+                </span>
+              </span>
+            </Link>
+          );
+        })}
       </div>
 
-      <Link
-        to="/checklist"
-        className="cartao-toque mt-4 flex items-center gap-4 p-5 active:cartao-toque-ativo"
-      >
-        <span className="flex size-16 items-center justify-center rounded-2xl bg-sucesso text-sucesso-foreground">
-          <CheckSquare className="size-8" />
-        </span>
-        <span>
-          <span className="block font-display text-2xl font-bold">Checklist</span>
-          <span className="block text-sm font-semibold text-muted-foreground">
-            {feitos} de {equipe.checklist.length} itens prontos
+      {travado ? (
+        <div
+          aria-disabled
+          className="cartao-toque mt-4 flex items-center gap-4 p-5 opacity-50 grayscale"
+        >
+          <span className="flex size-16 items-center justify-center rounded-2xl bg-muted text-muted-foreground">
+            <Lock className="size-8" />
           </span>
-        </span>
-      </Link>
+          <span>
+            <span className="block font-display text-2xl font-bold">Checklist</span>
+            <span className="block text-sm font-semibold text-muted-foreground">
+              Bloqueado até a equipe estar completa
+            </span>
+          </span>
+        </div>
+      ) : (
+        <Link
+          to="/checklist"
+          className="cartao-toque mt-4 flex items-center gap-4 p-5 active:cartao-toque-ativo"
+        >
+          <span className="flex size-16 items-center justify-center rounded-2xl bg-sucesso text-sucesso-foreground">
+            <CheckSquare className="size-8" />
+          </span>
+          <span>
+            <span className="block font-display text-2xl font-bold">Checklist</span>
+            <span className="block text-sm font-semibold text-muted-foreground">
+              {feitos} de {equipe.checklist.length} itens prontos
+            </span>
+          </span>
+        </Link>
+      )}
+
 
       <p className="mt-6 text-center text-sm font-semibold text-muted-foreground">
         Última atualização: {atualizado}
