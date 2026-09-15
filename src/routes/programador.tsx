@@ -2,6 +2,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { Laptop } from "lucide-react";
 import { useEffect, useState } from "react";
 
+import { salvarEquipeAgora } from "@/lib/equipes";
 import { temProgramador } from "@/lib/equipeStatus";
 import type { Integrante } from "@/lib/tipos";
 import { useAluno } from "@/lib/useAluno";
@@ -26,7 +27,7 @@ export const Route = createFileRoute("/programador")({
 
 function TelaProgramador() {
   const navigate = useNavigate();
-  const { equipe, carregando, salvar } = useAluno({ pularConferencias: true });
+  const { equipe, carregando, salvar, codigo } = useAluno({ pularConferencias: true });
   const [nome, setNome] = useState("");
 
   const jaTem = equipe ? temProgramador(equipe.integrantes) : false;
