@@ -6,11 +6,8 @@
 //   2. junta os trechos na ordem definida em ORDEM_MODULOS
 //   3. substitui os marcadores {{NOME}} dos modelos pelos textos resultantes
 //
-// O QUE AINDA FALTA PREENCHER (textos que o professor vai enviar):
-//   - TRECHOS_MELHORIAS: para cada módulo, o texto exato que ele insere
-//     em cada marcador (do controle e do robô).
+// O QUE AINDA FALTA PREENCHER (texto que o professor vai enviar):
 //   - LINHAS_MOVIMENTOS: a linha de código que cada movimento gera.
-//   - TRECHOS_MELODIAS: o trecho de cada melodia de abertura.
 // Nenhuma tela precisa ser alterada quando esses textos mudarem.
 // =====================================================================
 
@@ -691,7 +688,8 @@ function juntarTrechos(
   const trechos = escolhidasEmOrdem
     .map((id) => TRECHOS_MELHORIAS[id]?.[lado]?.[marcador])
     .filter((trecho): trecho is string => Boolean(trecho && trecho.trim()));
-  return trechos.join("\n");
+  // Linha em branco entre os módulos, conforme a ordem de encaixe do catálogo.
+  return trechos.join("\n\n");
 }
 
 function coreografiaPorGatilho(coreografias: Coreografia[], gatilho: Coreografia["gatilho"]) {
