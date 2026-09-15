@@ -6,6 +6,7 @@ import { BarraProgresso } from "@/components/BarraProgresso";
 import { Etiqueta } from "@/components/Etiqueta";
 import { MELHORIAS, PAPEIS_OBRIGATORIOS } from "@/lib/catalogo";
 import { useEquipes } from "@/lib/equipes";
+import { MODOS, modoDe } from "@/lib/modos";
 import type { Equipe } from "@/lib/tipos";
 
 export const Route = createFileRoute("/professor/")({
@@ -80,6 +81,10 @@ function VisaoGeral() {
       concluidas: todas.filter((e) => e.checklist.every((i) => i.marcado)).length,
       comCodigo: todas.filter((e) => e.codigoGerado).length,
       melhorias: [...contagemMelhorias.entries()].sort((a, b) => b[1] - a[1]),
+      modos: MODOS.map((modo) => ({
+        ...modo,
+        quantidade: todas.filter((e) => (e.modoPilotagem || "inclinacao") === modo.id).length,
+      })),
     };
   }, [equipes]);
 
@@ -107,6 +112,17 @@ function VisaoGeral() {
           </div>
         ))}
       </section>
+
+      <div className="cartao-toque mt-4 p-4">
+        <p className="mb-2 font-bold">Modo de pilotagem das equipes</p>
+        <div className="flex flex-wrap gap-2">
+          {resumo.modos.map((modo) => (
+            <Etiqueta key={modo.id} tom="info">
+              {modo.icone} {modo.nome} · {modo.quantidade}
+            </Etiqueta>
+          ))}
+        </div>
+      </div>
 
       {resumo.melhorias.length > 0 && (
         <div className="cartao-toque mt-4 p-4">
@@ -169,6 +185,9 @@ function VisaoGeral() {
                 </span>
                 <Etiqueta tom={radioRepetido ? "alerta" : "info"}>
                   <Radio className="size-3" /> rádio {equipe.grupoRadio}
+                </Etiqueta>
+                <Etiqueta tom="primaria">
+                  {modoDe(equipe.modoPilotagem).icone} {modoDe(equipe.modoPilotagem).nome}
                 </Etiqueta>
                 <Etiqueta tom={equipe.codigoGerado ? "sucesso" : "neutra"}>
                   {equipe.codigoGerado ? "código gerado" : "sem código ainda"}
