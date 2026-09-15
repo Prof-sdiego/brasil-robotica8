@@ -16,6 +16,8 @@ import { Route as CoreografiasRouteImport } from './routes/coreografias'
 import { Route as EquipeRouteImport } from './routes/equipe'
 import { Route as MelhoriasRouteImport } from './routes/melhorias'
 import { Route as PainelRouteImport } from './routes/painel'
+import { Route as ProfessorRouteImport } from './routes/professor'
+import { Route as ProfessorIndexRouteImport } from './routes/professor.index'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -52,6 +54,16 @@ const PainelRoute = PainelRouteImport.update({
   path: '/painel',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ProfessorRoute = ProfessorRouteImport.update({
+  id: '/professor',
+  path: '/professor',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProfessorIndexRoute = ProfessorIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => ProfessorRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -61,6 +73,8 @@ export interface FileRoutesByFullPath {
   '/equipe': typeof EquipeRoute
   '/melhorias': typeof MelhoriasRoute
   '/painel': typeof PainelRoute
+  '/professor': typeof ProfessorRouteWithChildren
+  '/professor/': typeof ProfessorIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -70,6 +84,7 @@ export interface FileRoutesByTo {
   '/equipe': typeof EquipeRoute
   '/melhorias': typeof MelhoriasRoute
   '/painel': typeof PainelRoute
+  '/professor': typeof ProfessorIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -80,6 +95,8 @@ export interface FileRoutesById {
   '/equipe': typeof EquipeRoute
   '/melhorias': typeof MelhoriasRoute
   '/painel': typeof PainelRoute
+  '/professor': typeof ProfessorRouteWithChildren
+  '/professor/': typeof ProfessorIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -91,6 +108,8 @@ export interface FileRouteTypes {
     | '/equipe'
     | '/melhorias'
     | '/painel'
+    | '/professor'
+    | '/professor/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -100,6 +119,7 @@ export interface FileRouteTypes {
     | '/equipe'
     | '/melhorias'
     | '/painel'
+    | '/professor'
   id:
     | '__root__'
     | '/'
@@ -109,6 +129,8 @@ export interface FileRouteTypes {
     | '/equipe'
     | '/melhorias'
     | '/painel'
+    | '/professor'
+    | '/professor/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -119,6 +141,7 @@ export interface RootRouteChildren {
   EquipeRoute: typeof EquipeRoute
   MelhoriasRoute: typeof MelhoriasRoute
   PainelRoute: typeof PainelRoute
+  ProfessorRoute: typeof ProfessorRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
@@ -172,8 +195,34 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PainelRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/professor': {
+      id: '/professor'
+      path: '/professor'
+      fullPath: '/professor'
+      preLoaderRoute: typeof ProfessorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/professor/': {
+      id: '/professor/'
+      path: '/'
+      fullPath: '/professor/'
+      preLoaderRoute: typeof ProfessorIndexRouteImport
+      parentRoute: typeof ProfessorRoute
+    }
   }
 }
+
+interface ProfessorRouteChildren {
+  ProfessorIndexRoute: typeof ProfessorIndexRoute
+}
+
+const ProfessorRouteChildren: ProfessorRouteChildren = {
+  ProfessorIndexRoute: ProfessorIndexRoute,
+}
+
+const ProfessorRouteWithChildren = ProfessorRoute._addFileChildren(
+  ProfessorRouteChildren,
+)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
@@ -183,6 +232,7 @@ const rootRouteChildren: RootRouteChildren = {
   EquipeRoute: EquipeRoute,
   MelhoriasRoute: MelhoriasRoute,
   PainelRoute: PainelRoute,
+  ProfessorRoute: ProfessorRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
