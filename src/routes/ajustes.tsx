@@ -226,6 +226,31 @@ function TelaAjustes() {
             )}
           </section>
         ))}
+
+        <section className="cartao-toque mb-5 p-5">
+          <button
+            onClick={() => setDicasAbertas(!dicasAbertas)}
+            aria-expanded={dicasAbertas}
+            className="flex w-full items-center justify-between gap-2 text-left"
+          >
+            <span className="flex items-center gap-2 font-display text-2xl font-bold">
+              <span aria-hidden>🤔</span> O robô está estranho?
+            </span>
+            <ChevronDown
+              className={`size-7 shrink-0 transition-transform ${dicasAbertas ? "rotate-180" : ""}`}
+            />
+          </button>
+          {dicasAbertas && (
+            <ul className="mt-4 space-y-3">
+              {DICAS_PROBLEMAS.map((dica) => (
+                <li key={dica.problema} className="rounded-2xl border-2 border-input p-4">
+                  <p className="text-lg font-extrabold">{dica.problema}</p>
+                  <p className="mt-1 font-semibold text-muted-foreground">{dica.solucao}</p>
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
       </main>
     </>
   );
