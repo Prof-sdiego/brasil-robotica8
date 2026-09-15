@@ -29,7 +29,7 @@ export const PAPEIS: { papel: Papel; vagas: number; descricao: string; icone: st
 export const PAPEIS_OBRIGATORIOS: Papel[] = ["Piloto", "Copiloto", "Engenheiro", "Programador"];
 export const MAXIMO_INTEGRANTES = 7;
 
-export type Intensidade = "muito" | "pouco" | "nada";
+export type Intensidade = "muito" | "medio" | "pouco" | "nada";
 
 export type Melhoria = {
   id: string;
@@ -38,32 +38,46 @@ export type Melhoria = {
   frase: string;
   batalha: Intensidade;
   demonstracao: Intensidade;
+  /** Botão do controle que a melhoria ocupa, quando ocupa algum. */
+  botao?: "B";
 };
 
 export const MELHORIAS: Melhoria[] = [
   {
-    id: "farol",
-    nome: "Farol de LED",
-    icone: "💡",
-    frase: "As 4 luzes da placa mudam de cor conforme o robô se move.",
-    batalha: "pouco",
-    demonstracao: "muito",
-  },
-  {
     id: "turbo",
     nome: "Turbo",
     icone: "🚀",
-    frase: "Aperta B e o robô ganha 2 segundos de velocidade máxima.",
+    frase: "Aperta B e o robô ganha alguns segundos de velocidade máxima.",
     batalha: "muito",
     demonstracao: "pouco",
+    botao: "B",
   },
   {
     id: "marcha_lenta",
     nome: "Marcha Lenta",
     icone: "🐢",
-    frase: "Aperta B e o robô anda na metade da velocidade, para manobras de precisão.",
+    frase: "Aperta B e o robô anda bem devagar, para manobras de precisão.",
     batalha: "muito",
-    demonstracao: "muito",
+    demonstracao: "medio",
+    botao: "B",
+  },
+  {
+    id: "contra_ataque",
+    nome: "Contra-ataque automático",
+    icone: "💥",
+    frase:
+      "O robô sente quando leva uma batida e reage sozinho: recua e gira, tirando o balão da linha de frente do adversário.",
+    batalha: "muito",
+    demonstracao: "medio",
+  },
+  {
+    id: "arranque_suave",
+    nome: "Arranque suave",
+    icone: "🎚️",
+    frase:
+      "Em vez de sair de uma vez na velocidade máxima, o robô acelera aos poucos. Acaba o coice da largada e fica muito mais fácil de pilotar com precisão.",
+    batalha: "muito",
+    demonstracao: "pouco",
   },
   {
     id: "som_abertura",
@@ -79,27 +93,74 @@ export const MELHORIAS: Melhoria[] = [
     icone: "📢",
     frase: "Quando o robô anda para trás, apita repetidamente como um caminhão.",
     batalha: "nada",
-    demonstracao: "muito",
-  },
-  {
-    id: "contador_tempo",
-    nome: "Contador de tempo",
-    icone: "⏱️",
-    frase: "O robô soma quanto tempo ficou em movimento; A+B no robô mostra o total.",
-    batalha: "pouco",
-    demonstracao: "muito",
+    demonstracao: "medio",
   },
 ];
 
 export const MELHORIAS_EXCLUSIVAS = ["turbo", "marcha_lenta"];
 export const MAXIMO_MELHORIAS = 3;
 
-export const MELODIAS: { id: string; nome: string; icone: string }[] = [
-  { id: "fanfarra", nome: "Fanfarra", icone: "🎺" },
-  { id: "alerta_combate", nome: "Alerta de combate", icone: "🚨" },
-  { id: "robozinho", nome: "Robozinho", icone: "🤖" },
-  { id: "descida_grave", nome: "Descida grave", icone: "🎻" },
-  { id: "sirene", nome: "Sirene", icone: "🚓" },
+/** Melhorias que saíram do catálogo: se a equipe tinha uma delas, precisa escolher de novo. */
+export const MELHORIAS_REMOVIDAS = ["farol", "contador_tempo"];
+
+/** notas = pares [altura em Hz, duração em ms], só para ouvir aqui no site. */
+export const MELODIAS: { id: string; nome: string; icone: string; notas: [number, number][] }[] = [
+  {
+    id: "fanfarra",
+    nome: "Fanfarra",
+    icone: "🎺",
+    notas: [
+      [523, 140],
+      [659, 140],
+      [784, 140],
+      [1047, 320],
+    ],
+  },
+  {
+    id: "alerta_combate",
+    nome: "Alerta de combate",
+    icone: "🚨",
+    notas: [
+      [880, 160],
+      [587, 160],
+      [880, 160],
+      [587, 260],
+    ],
+  },
+  {
+    id: "robozinho",
+    nome: "Robozinho",
+    icone: "🤖",
+    notas: [
+      [392, 90],
+      [523, 90],
+      [659, 90],
+      [523, 90],
+      [784, 200],
+    ],
+  },
+  {
+    id: "descida_grave",
+    nome: "Descida grave",
+    icone: "🎻",
+    notas: [
+      [440, 150],
+      [349, 150],
+      [294, 150],
+      [220, 350],
+    ],
+  },
+  {
+    id: "sirene",
+    nome: "Sirene",
+    icone: "🚓",
+    notas: [
+      [700, 220],
+      [1000, 220],
+      [700, 220],
+      [1000, 300],
+    ],
+  },
 ];
 
 export type Movimento = {

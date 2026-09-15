@@ -16,8 +16,13 @@ export type Database = {
     Tables: {
       equipes: {
         Row: {
+          ajustes: Json
+          ajustes_atualizados_em: string | null
+          ajustes_melhorias: Json
+          aviso_catalogo: boolean
           checklist: Json
           codigo_acesso: string
+          codigo_copiado_em: string | null
           codigo_gerado: boolean
           coreografias: Json
           created_at: string
@@ -33,8 +38,13 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          ajustes?: Json
+          ajustes_atualizados_em?: string | null
+          ajustes_melhorias?: Json
+          aviso_catalogo?: boolean
           checklist?: Json
           codigo_acesso: string
+          codigo_copiado_em?: string | null
           codigo_gerado?: boolean
           coreografias?: Json
           created_at?: string
@@ -50,8 +60,13 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          ajustes?: Json
+          ajustes_atualizados_em?: string | null
+          ajustes_melhorias?: Json
+          aviso_catalogo?: boolean
           checklist?: Json
           codigo_acesso?: string
+          codigo_copiado_em?: string | null
           codigo_gerado?: boolean
           coreografias?: Json
           created_at?: string

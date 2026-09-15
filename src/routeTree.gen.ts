@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AjustesRouteImport } from './routes/ajustes'
 import { Route as ChecklistRouteImport } from './routes/checklist'
 import { Route as CodigoRouteImport } from './routes/codigo'
 import { Route as CoreografiasRouteImport } from './routes/coreografias'
@@ -26,6 +27,11 @@ import { Route as ProfessorEquipeIdRouteImport } from './routes/professor.equipe
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AjustesRoute = AjustesRouteImport.update({
+  id: '/ajustes',
+  path: '/ajustes',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ChecklistRoute = ChecklistRouteImport.update({
@@ -91,6 +97,7 @@ const ProfessorEquipeIdRoute = ProfessorEquipeIdRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/ajustes': typeof AjustesRoute
   '/checklist': typeof ChecklistRoute
   '/codigo': typeof CodigoRoute
   '/coreografias': typeof CoreografiasRoute
@@ -106,6 +113,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/ajustes': typeof AjustesRoute
   '/checklist': typeof ChecklistRoute
   '/codigo': typeof CodigoRoute
   '/coreografias': typeof CoreografiasRoute
@@ -121,6 +129,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/ajustes': typeof AjustesRoute
   '/checklist': typeof ChecklistRoute
   '/codigo': typeof CodigoRoute
   '/coreografias': typeof CoreografiasRoute
@@ -138,6 +147,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/ajustes'
     | '/checklist'
     | '/codigo'
     | '/coreografias'
@@ -153,6 +163,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/ajustes'
     | '/checklist'
     | '/codigo'
     | '/coreografias'
@@ -167,6 +178,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/ajustes'
     | '/checklist'
     | '/codigo'
     | '/coreografias'
@@ -183,6 +195,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AjustesRoute: typeof AjustesRoute
   ChecklistRoute: typeof ChecklistRoute
   CodigoRoute: typeof CodigoRoute
   CoreografiasRoute: typeof CoreografiasRoute
@@ -201,6 +214,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/ajustes': {
+      id: '/ajustes'
+      path: '/ajustes'
+      fullPath: '/ajustes'
+      preLoaderRoute: typeof AjustesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/checklist': {
@@ -308,6 +328,7 @@ const ProfessorRouteWithChildren = ProfessorRoute._addFileChildren(
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AjustesRoute: AjustesRoute,
   ChecklistRoute: ChecklistRoute,
   CodigoRoute: CodigoRoute,
   CoreografiasRoute: CoreografiasRoute,

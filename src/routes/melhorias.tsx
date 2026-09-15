@@ -1,10 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Music, Sparkles } from "lucide-react";
+import { Music, Play, Sparkles } from "lucide-react";
 import { useState } from "react";
 
 import { Cabecalho } from "@/components/Cabecalho";
+import { Deslizante } from "@/components/Deslizante";
 import { EtiquetaIntensidade } from "@/components/Etiqueta";
+import { AJUSTES_MELHORIAS, valorDe, type CampoAjuste } from "@/lib/ajustes";
 import { MAXIMO_MELHORIAS, MELHORIAS, MELODIAS } from "@/lib/catalogo";
+import { tocarNotas } from "@/lib/tocar";
 import { useAluno } from "@/lib/useAluno";
 
 export const Route = createFileRoute("/melhorias")({
@@ -34,6 +37,17 @@ function TelaMelhorias() {
   }
 
   const escolhidas = equipe.melhorias;
+  const ajustesMelhorias = equipe.ajustesMelhorias;
+
+  function mudarAjuste(melhoriaId: string, campo: CampoAjuste, novo: number | boolean) {
+    salvar({
+      ajustesMelhorias: {
+        ...ajustesMelhorias,
+        [melhoriaId]: { ...(ajustesMelhorias[melhoriaId] ?? {}), [campo.id]: novo },
+      },
+      ajustesAtualizadosEm: new Date().toISOString(),
+    });
+  }
 
   function alternar(id: string) {
     setAviso("");
@@ -41,6 +55,7 @@ function TelaMelhorias() {
       const novas = escolhidas.filter((m) => m !== id);
       salvar({
         melhorias: novas,
+        ajustesAtualizadosEm: new Date().toISOString(),
         ...(id === "som_abertura" ? { melodiaAbertura: null } : {}),
       });
       return;
@@ -58,7 +73,11 @@ function TelaMelhorias() {
       setAviso("Vocês já escolheram 3. Desmarquem uma antes de escolher outra.");
       return;
     }
-    salvar({ melhorias: [...novas, id] });
+    salvar({
+      melhorias: [...novas, id],
+      ajustesAtualizadosEm: new Date().toISOString(),
+      ...(equipe?.avisoCatalogo ? { avisoCatalogo: false } : {}),
+    });
   }
 
   const comSom = escolhidas.includes("som_abertura");
@@ -70,6 +89,18 @@ function TelaMelhorias() {
         <div className="sticky top-[68px] z-10 mb-4 rounded-2xl bg-primary px-4 py-3 text-center text-xl font-extrabold text-primary-foreground shadow-cartao">
           Escolhidas: {escolhidas.length} de {MAXIMO_MELHORIAS}
         </div>
+
+        {equipe.avisoCatalogo && (
+          <div className="mb-4 rounded-2xl bg-info px-4 py-4 text-info-foreground">
+            <p className="font-extrabold">O catálogo de melhorias mudou. Escolham de novo.</p>
+            <button
+              onClick={() => salvar({ avisoCatalogo: false })}
+              className="mt-2 rounded-full bg-card/30 px-4 py-2 text-sm font-bold"
+            >
+              Entendi
+            </button>
+          </div>
+        )}
 
         {aviso && (
           <p className="mb-4 rounded-2xl bg-alerta px-4 py-3 font-bold text-alerta-foreground">
@@ -121,25 +152,58 @@ function TelaMelhorias() {
               {MELODIAS.map((melodia) => {
                 const ativa = equipe.melodiaAbertura === melodia.id;
                 return (
-                  <button
+                  <div
                     key={melodia.id}
-                    onClick={() => salvar({ melodiaAbertura: melodia.id })}
-                    className={`flex items-center gap-3 rounded-2xl border-2 p-4 text-left text-lg font-bold ${
+                    className={`flex items-center gap-2 rounded-2xl border-2 p-2 ${
                       ativa
                         ? "border-secondary bg-secondary text-secondary-foreground"
                         : "border-input bg-background"
                     }`}
                   >
-                    <span className="text-2xl" aria-hidden>
-                      {melodia.icone}
-                    </span>
-                    {melodia.nome}
-                  </button>
+                    <button
+                      onClick={() => salvar({ melodiaAbertura: melodia.id })}
+                      className="flex flex-1 items-center gap-3 p-2 text-left text-lg font-bold"
+                    >
+                      <span className="text-2xl" aria-hidden>
+                        {melodia.icone}
+                      </span>
+                      {melodia.nome}
+                    </button>
+                    <button
+                      onClick={() => void tocarNotas(melodia.notas)}
+                      aria-label={`Ouvir ${melodia.nome}`}
+                      className="flex items-center gap-1 rounded-xl bg-primary px-3 py-3 text-sm font-extrabold text-primary-foreground active:scale-95"
+                    >
+                      <Play className="size-5" /> Ouvir
+                    </button>
+                  </div>
                 );
               })}
             </div>
           </section>
         )}
+
+        {escolhidas
+          .map((id) => MELHORIAS.find((m) => m.id === id))
+          .filter((m): m is (typeof MELHORIAS)[number] => Boolean(m))
+          .filter((m) => (AJUSTES_MELHORIAS[m.id] ?? []).length > 0)
+          .map((melhoria) => (
+            <section key={melhoria.id} className="cartao-toque mt-6 p-5">
+              <h2 className="flex items-center gap-2 text-2xl">
+                <span aria-hidden>{melhoria.icone}</span> Ajustes do {melhoria.nome}
+              </h2>
+              <div className="mt-4 space-y-4">
+                {(AJUSTES_MELHORIAS[melhoria.id] ?? []).map((campo) => (
+                  <Deslizante
+                    key={campo.id}
+                    campo={campo}
+                    valor={valorDe(campo, ajustesMelhorias[melhoria.id])}
+                    aoMudar={(novo) => mudarAjuste(melhoria.id, campo, novo)}
+                  />
+                ))}
+              </div>
+            </section>
+          ))}
 
         <section className="cartao-toque mt-6 p-5">
           <label htmlFor="justificativa" className="text-lg font-bold">
