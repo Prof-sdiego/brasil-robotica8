@@ -434,7 +434,8 @@ export function montarCodigo(equipe: Equipe): CodigoGerado {
   return {
     controle,
     tituloControle: modo === "teclado" ? "CONTROLE POR TECLADO" : "CONTROLE",
-    robo: aplicarMarcadores(MODELO_ROBO, robo),
+    // Duas passadas: os trechos colados (comunicação, melhorias) também têm marcadores.
+    robo: aplicarMarcadores(aplicarMarcadores(MODELO_ROBO, robo), robo),
     tituloRobo: modo === "celular" ? "ROBÔ POR BLUETOOTH" : "ROBÔ",
   };
 }
