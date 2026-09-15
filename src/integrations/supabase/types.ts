@@ -19,6 +19,7 @@ export type Database = {
           ajustes: Json
           ajustes_atualizados_em: string | null
           ajustes_melhorias: Json
+          atribuicao_botoes: Json
           aviso_catalogo: boolean
           checklist: Json
           codigo_acesso: string
@@ -32,7 +33,10 @@ export type Database = {
           justificativa: string
           melhorias: Json
           melodia_abertura: string | null
+          modo_pilotagem: string
           nome_equipe: string
+          nome_microbit: string
+          senha_robo: string
           sensibilidade: number
           turma: string
           updated_at: string
@@ -41,6 +45,7 @@ export type Database = {
           ajustes?: Json
           ajustes_atualizados_em?: string | null
           ajustes_melhorias?: Json
+          atribuicao_botoes?: Json
           aviso_catalogo?: boolean
           checklist?: Json
           codigo_acesso: string
@@ -54,7 +59,10 @@ export type Database = {
           justificativa?: string
           melhorias?: Json
           melodia_abertura?: string | null
+          modo_pilotagem?: string
           nome_equipe: string
+          nome_microbit?: string
+          senha_robo?: string
           sensibilidade?: number
           turma: string
           updated_at?: string
@@ -63,6 +71,7 @@ export type Database = {
           ajustes?: Json
           ajustes_atualizados_em?: string | null
           ajustes_melhorias?: Json
+          atribuicao_botoes?: Json
           aviso_catalogo?: boolean
           checklist?: Json
           codigo_acesso?: string
@@ -76,7 +85,10 @@ export type Database = {
           justificativa?: string
           melhorias?: Json
           melodia_abertura?: string | null
+          modo_pilotagem?: string
           nome_equipe?: string
+          nome_microbit?: string
+          senha_robo?: string
           sensibilidade?: number
           turma?: string
           updated_at?: string
