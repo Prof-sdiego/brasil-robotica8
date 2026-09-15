@@ -1,8 +1,20 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { CheckSquare, Code2, LogOut, Radio, Sparkles, Users, Wand2 } from "lucide-react";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import {
+  CheckSquare,
+  Code2,
+  HelpCircle,
+  Lock,
+  LogOut,
+  Radio,
+  Sparkles,
+  Users,
+  Wand2,
+} from "lucide-react";
+import { useEffect } from "react";
 
 import { BarraProgresso } from "@/components/BarraProgresso";
-import { sairDaEquipe } from "@/lib/sessao";
+import { listarFaltantes, papeisFaltantes } from "@/lib/equipeStatus";
+import { sairDaEquipe, useTutorialVisto } from "@/lib/sessao";
 import { useAluno } from "@/lib/useAluno";
 
 export const Route = createFileRoute("/painel")({
