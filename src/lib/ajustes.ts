@@ -137,12 +137,23 @@ export const SECOES_AJUSTES: SecaoAjustes[] = [
     campos: [
       {
         tipo: "deslizante",
-        id: "zona_morta",
-        nome: "Zona morta",
+        id: "zona_frente",
+        nome: "Zona morta para frente e trás",
         ajuda: "Inclinação pequena que o controle ignora. Se o robô anda sozinho, aumente.",
         min: 40,
         max: 150,
         padrao: 80,
+        passo: 5,
+      },
+      {
+        tipo: "deslizante",
+        id: "zona_curva",
+        nome: "Zona morta para os lados",
+        ajuda:
+          "Precisa ser bem maior que a de frente. Se o robô puxa para um lado quando você quer ir reto, aumente este.",
+        min: 100,
+        max: 350,
+        padrao: 180,
         passo: 5,
       },
       {
