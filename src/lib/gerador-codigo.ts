@@ -163,7 +163,20 @@ input.onButtonPressed(Button.AB, function () {
 };
 
 /** Linha de código que cada movimento de coreografia gera. */
-export const LINHAS_MOVIMENTOS: Record<string, (params: number[]) => string> = {};
+export const LINHAS_MOVIMENTOS: Record<string, (params: number[]) => string> = {
+  frente: (p) => `andarFrente(${p[0]})`,
+  tras: (p) => `andarTras(${p[0]})`,
+  girar_direita: (p) => `girarDireita(${p[0]})`,
+  girar_esquerda: (p) => `girarEsquerda(${p[0]})`,
+  parado: (p) => `pausar(${p[0]})`,
+  curva_direita: (p) => `curvaDireita(${p[0]})`,
+  curva_esquerda: (p) => `curvaEsquerda(${p[0]})`,
+  estrela: (p) => `estrela(${p[0]})`,
+  quadrado: (p) => `quadrado(${p[0]})`,
+  piao: (p) => `piao(${p[0]})`,
+  tremida: (p) => `tremida(${p[0]})`,
+  apitar: (p) => `apitar(${p[0]}, ${p[1]})`,
+};
 
 /** Trecho da melodia de abertura escolhida. */
 export const TRECHOS_MELODIAS: Record<string, string> = {
@@ -798,12 +811,7 @@ export function duracaoEstimada(movimentos: MovimentoNaSequencia[]): number {
   for (const item of movimentos) {
     const movimento = MOVIMENTOS.find((m) => m.id === item.movimentoId);
     if (!movimento) continue;
-    if (movimento.paramDuracaoIndex !== undefined) {
-      const ms = item.params[movimento.paramDuracaoIndex] ?? 0;
-      total += ms / 1000;
-    } else {
-      total += movimento.duracaoBase;
-    }
+    total += movimento.duracao(item.params);
   }
   return Math.round(total * 10) / 10;
 }

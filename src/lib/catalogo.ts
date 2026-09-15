@@ -106,121 +106,110 @@ export type Movimento = {
   id: string;
   nome: string;
   icone: string;
-  duracaoBase: number; // segundos, quando não depende de parâmetro
   params: { nome: string; min: number; max: number; padrao: number; unidade: string }[];
-  /** Se informado, a duração vem deste parâmetro (em milissegundos). */
-  paramDuracaoIndex?: number;
+  /** Duração estimada em segundos, a partir dos parâmetros escolhidos. */
+  duracao: (params: number[]) => number;
 };
+
+// Tempo estimado de uma volta completa do robô (GIRO360, em ms).
+const GIRO360 = 1100;
+const PAUSA = 0.07; // pausa curta que cada movimento deixa no final
+
+const tempo = (nome = "Tempo", min = 200, max = 2000, padrao = 700) => ({
+  nome,
+  min,
+  max,
+  padrao,
+  unidade: "ms",
+});
 
 export const MOVIMENTOS: Movimento[] = [
   {
     id: "frente",
     nome: "Andar para frente",
     icone: "⬆️",
-    duracaoBase: 1,
-    params: [
-      { nome: "Velocidade", min: 20, max: 100, padrao: 60, unidade: "%" },
-      { nome: "Tempo", min: 200, max: 3000, padrao: 1000, unidade: "ms" },
-    ],
-    paramDuracaoIndex: 1,
+    params: [tempo()],
+    duracao: (p) => (p[0] ?? 0) / 1000 + PAUSA,
   },
   {
     id: "tras",
     nome: "Andar para trás",
     icone: "⬇️",
-    duracaoBase: 1,
-    params: [
-      { nome: "Velocidade", min: 20, max: 100, padrao: 60, unidade: "%" },
-      { nome: "Tempo", min: 200, max: 3000, padrao: 1000, unidade: "ms" },
-    ],
-    paramDuracaoIndex: 1,
-  },
-  {
-    id: "girar_esquerda",
-    nome: "Girar à esquerda",
-    icone: "↩️",
-    duracaoBase: 0.8,
-    params: [{ nome: "Graus", min: 15, max: 360, padrao: 90, unidade: "°" }],
+    params: [tempo()],
+    duracao: (p) => (p[0] ?? 0) / 1000 + PAUSA,
   },
   {
     id: "girar_direita",
-    nome: "Girar à direita",
+    nome: "Girar para a direita",
     icone: "↪️",
-    duracaoBase: 0.8,
-    params: [{ nome: "Graus", min: 15, max: 360, padrao: 90, unidade: "°" }],
+    params: [tempo("Tempo", 100, 2000, 400)],
+    duracao: (p) => (p[0] ?? 0) / 1000 + PAUSA,
   },
   {
-    id: "giro360",
-    nome: "Giro completo (360°)",
-    icone: "🌀",
-    duracaoBase: 2,
-    params: [{ nome: "Velocidade", min: 30, max: 100, padrao: 70, unidade: "%" }],
+    id: "girar_esquerda",
+    nome: "Girar para a esquerda",
+    icone: "↩️",
+    params: [tempo("Tempo", 100, 2000, 400)],
+    duracao: (p) => (p[0] ?? 0) / 1000 + PAUSA,
   },
   {
-    id: "curva_esquerda",
-    nome: "Curva para a esquerda",
-    icone: "↖️",
-    duracaoBase: 1,
-    params: [
-      { nome: "Velocidade", min: 20, max: 100, padrao: 50, unidade: "%" },
-      { nome: "Tempo", min: 200, max: 3000, padrao: 800, unidade: "ms" },
-    ],
-    paramDuracaoIndex: 1,
+    id: "parado",
+    nome: "Ficar parado",
+    icone: "🛑",
+    params: [tempo("Tempo", 100, 2000, 500)],
+    duracao: (p) => (p[0] ?? 0) / 1000,
   },
   {
     id: "curva_direita",
-    nome: "Curva para a direita",
+    nome: "Curva aberta à direita",
     icone: "↗️",
-    duracaoBase: 1,
-    params: [
-      { nome: "Velocidade", min: 20, max: 100, padrao: 50, unidade: "%" },
-      { nome: "Tempo", min: 200, max: 3000, padrao: 800, unidade: "ms" },
-    ],
-    paramDuracaoIndex: 1,
+    params: [tempo()],
+    duracao: (p) => (p[0] ?? 0) / 1000 + PAUSA,
   },
   {
-    id: "parar",
-    nome: "Parar",
-    icone: "🛑",
-    duracaoBase: 0.5,
-    params: [{ nome: "Pausa", min: 100, max: 3000, padrao: 500, unidade: "ms" }],
-    paramDuracaoIndex: 0,
+    id: "curva_esquerda",
+    nome: "Curva aberta à esquerda",
+    icone: "↖️",
+    params: [tempo()],
+    duracao: (p) => (p[0] ?? 0) / 1000 + PAUSA,
   },
   {
-    id: "vibrar",
-    nome: "Sacudir no lugar",
+    id: "estrela",
+    nome: "Desenhar uma estrela",
+    icone: "⭐",
+    params: [{ nome: "Tamanho do lado", min: 300, max: 1200, padrao: 650, unidade: "ms" }],
+    duracao: (p) => 5 * ((p[0] ?? 0) / 1000 + (GIRO360 * 144) / 360 / 1000 + 2 * PAUSA),
+  },
+  {
+    id: "quadrado",
+    nome: "Desenhar um quadrado",
+    icone: "🔲",
+    params: [{ nome: "Tamanho do lado", min: 300, max: 1200, padrao: 600, unidade: "ms" }],
+    duracao: (p) => 4 * ((p[0] ?? 0) / 1000 + (GIRO360 * 90) / 360 / 1000 + 2 * PAUSA),
+  },
+  {
+    id: "piao",
+    nome: "Girar como pião",
+    icone: "🌀",
+    params: [{ nome: "Número de voltas", min: 1, max: 5, padrao: 2, unidade: "voltas" }],
+    duracao: (p) => ((p[0] ?? 0) * GIRO360) / 1000 + PAUSA,
+  },
+  {
+    id: "tremida",
+    nome: "Tremida no lugar",
     icone: "〰️",
-    duracaoBase: 1,
-    params: [{ nome: "Repetições", min: 1, max: 8, padrao: 3, unidade: "x" }],
+    params: [{ nome: "Número de vezes", min: 1, max: 8, padrao: 3, unidade: "vezes" }],
+    duracao: (p) => (p[0] ?? 0) * 0.24 + PAUSA,
   },
   {
-    id: "mostrar_icone",
-    nome: "Mostrar ícone no display",
-    icone: "😃",
-    duracaoBase: 0.6,
-    params: [{ nome: "Ícone", min: 1, max: 6, padrao: 1, unidade: "nº" }],
-  },
-  {
-    id: "tocar_nota",
-    nome: "Tocar uma nota",
-    icone: "🎶",
-    duracaoBase: 0.5,
+    id: "apitar",
+    nome: "Apitar",
+    icone: "🔔",
     params: [
-      { nome: "Nota", min: 1, max: 8, padrao: 3, unidade: "nº" },
-      { nome: "Tempo", min: 100, max: 1500, padrao: 400, unidade: "ms" },
+      { nome: "Altura", min: 200, max: 1500, padrao: 880, unidade: "Hz" },
+      { nome: "Tempo", min: 100, max: 600, padrao: 200, unidade: "ms" },
     ],
-    paramDuracaoIndex: 1,
-  },
-  {
-    id: "acender_leds",
-    nome: "Acender as luzes",
-    icone: "🔴",
-    duracaoBase: 0.6,
-    params: [
-      { nome: "Cor", min: 1, max: 6, padrao: 1, unidade: "nº" },
-      { nome: "Tempo", min: 100, max: 2000, padrao: 600, unidade: "ms" },
-    ],
-    paramDuracaoIndex: 1,
+    duracao: (p) => (p[1] ?? 0) / 1000,
   },
 ];
 
@@ -237,14 +226,110 @@ export const ITENS_CHECKLIST: { id: string; texto: string }[] = [
   { id: "ensaio", texto: "Ensaio feito com a turma" },
 ];
 
-export const INSTRUCOES_INSTALACAO: string[] = [
-  "Abra o site makecode.microbit.org em uma aba nova.",
-  "Crie um projeto novo e dê o nome CONTROLE. Depois crie outro chamado ROBO.",
-  "Nos dois projetos, clique em Extensões e instale a extensão robotbit.",
-  "Clique no botão { } JavaScript no topo do editor.",
-  "Apague tudo que estiver escrito e cole o código do CONTROLE no projeto CONTROLE.",
-  "Ligue o micro:bit do controle no cabo USB e clique em Baixar.",
-  "Repita: abra o projeto ROBO, cole o código do ROBÔ, ligue o micro:bit do robô e clique em Baixar.",
-  "Ligue os dois micro:bit e teste: inclinando o controle, o robô deve andar.",
-  "Se o robô não responder, confira se os dois códigos foram para os micro:bit certos.",
+export type ParteInstrucoes = { titulo: string; icone: string; passos: string[]; nota?: string };
+
+export const INSTRUCOES_INSTALACAO: ParteInstrucoes[] = [
+  {
+    titulo: "Antes de tudo: vocês têm dois micro:bit",
+    icone: "🎮",
+    passos: [
+      "Um fica na sua mão — é o CONTROLE. O outro fica encaixado no carrinho — é o ROBÔ.",
+      "Cada um recebe um código diferente. Não troquem. Se colocarem o código do robô no controle, nada funciona.",
+    ],
+  },
+  {
+    titulo: "Parte 1 · Preparar o MakeCode",
+    icone: "⚙️",
+    passos: [
+      "Abram o site makecode.microbit.org",
+      "Cliquem em Novo Projeto. Deem um nome: CONTROLE (depois vocês vão repetir tudo isso com o nome ROBO).",
+      "Cliquem na engrenagem ⚙️ no canto de cima, à direita.",
+      "Escolham Extensões.",
+      "Na caixa de busca, escrevam robotbit e apertem Enter.",
+      "Cliquem no cartão que aparecer com o nome robotbit (da KittenBot).",
+      "Esperem a página recarregar sozinha.",
+    ],
+    nota: "Por que isso é necessário? Na placa do robô, o micro:bit não liga direto nos motores. Existe um chip no meio do caminho, e essa extensão é o que ensina o MakeCode a conversar com ele. Sem ela, o código dá erro em várias linhas.",
+  },
+  {
+    titulo: "Parte 2 · Colar o código",
+    icone: "📋",
+    passos: [
+      "No alto da tela, no meio, tem dois botões: Blocos e JavaScript. Cliquem em JavaScript.",
+      "Vai aparecer uma tela com texto. Apaguem tudo o que estiver lá: cliquem dentro, apertem Ctrl + A e depois Delete.",
+      "Voltem aqui e cliquem em Copiar no código do CONTROLE.",
+      "Voltem ao MakeCode e colem: Ctrl + V.",
+      "Cliquem de novo em Blocos, lá no alto.",
+    ],
+    nota: "Pronto: o programa virou blocos coloridos. É o mesmo programa, escrito de outro jeito.",
+  },
+  {
+    titulo: "Parte 3 · Mandar para o micro:bit",
+    icone: "🔌",
+    passos: [
+      "Liguem o micro:bit no computador pelo cabo USB.",
+      "Cliquem no botão roxo Baixar, no canto de baixo à esquerda.",
+      "Se o computador perguntar onde salvar, escolham o MICROBIT que aparece na lista de dispositivos, como se fosse um pendrive.",
+      "A luz de trás do micro:bit vai piscar. Quando parar, está pronto.",
+    ],
+  },
+  {
+    titulo: "Parte 4 · Repetir para o robô",
+    icone: "🤖",
+    passos: [
+      "Voltem ao passo 2 e façam tudo de novo, agora com o código do ROBÔ, num projeto novo chamado ROBO.",
+      "Não esqueçam de instalar a extensão robotbit nesse projeto também. Cada projeto do MakeCode é separado.",
+    ],
+  },
+  {
+    titulo: "Ligações no carrinho",
+    icone: "🔧",
+    passos: [
+      "Motor esquerdo: os dois contatos A (A+ e A−) do lado M1.",
+      "Motor direito: os dois contatos B (B+ e B−) do lado M1.",
+      "O contato VM fica vazio. O lado M2 fica vazio.",
+      "A cor do fio não importa. Se o motor girar para o lado errado, troquem os dois fios daquele motor de lugar.",
+    ],
+    nota: "⚠️ Nunca espetem fio de motor nas fileiras de pinos coloridos (S1, S2, S3…). Isso queima a placa.",
+  },
+  {
+    titulo: "Testando",
+    icone: "✅",
+    passos: [
+      "Liguem os dois micro:bit. Segurem o controle parado enquanto aparece o bonequinho dormindo — é nessa hora que ele aprende qual é a posição de parado. Quando aparecer o ✓, pode usar.",
+      "Levantem o carrinho com as rodas no ar e inclinem o controle: para frente, as duas rodas giram para frente; para trás, as duas giram para trás; para o lado, uma gira para um lado e a outra para o outro.",
+      "Se o robô gira quando deveria andar reto, os fios de um motor estão invertidos. Troquem os dois fios do par A de lugar.",
+    ],
+  },
+  {
+    titulo: "Ajustando a estrela e o quadrado",
+    icone: "⭐",
+    passos: [
+      "O robô precisa saber quanto tempo leva para dar uma volta completa. Esse número está no código, na linha: let GIRO360 = 1100",
+      "Coloquem o robô no chão e marquem para onde está apontando a frente dele.",
+      "Apertem o botão B do próprio robô. Ele vai dar uma volta.",
+      "Parou apontando exatamente para o mesmo lugar? Então está certo. Girou demais? Diminuam o número. Girou de menos? Aumentem.",
+      "Testem de novo até fechar. Façam isso com a bateria cheia: bateria fraca gira mais devagar, e aí o número muda.",
+    ],
+    nota: "Enquanto o GIRO360 não estiver certo, a estrela sai torta e não fecha. Cada ponta da estrela exige um giro de exatamente 144 graus — e o robô calcula esse giro a partir do tempo de uma volta inteira.",
+  },
+  {
+    titulo: "Os botões do controle",
+    icone: "🕹️",
+    passos: [
+      "Depende das melhorias que a sua equipe escolheu. O gerador escreveu o mapa certo no comentário do topo do seu código — confiram lá.",
+      "Botão A do robô (não do controle) é sempre parada de emergência.",
+    ],
+  },
+  {
+    titulo: "Se der erro",
+    icone: "🆘",
+    passos: [
+      "\"Cannot find name 'robotbit'\" → a extensão não foi instalada nesse projeto. Voltem à Parte 1.",
+      "O robô não responde ao controle → o número do grupo de rádio está diferente nos dois códigos. Confiram a primeira linha dos dois.",
+      "O robô responde ao controle de outra equipe → duas equipes estão com o mesmo número de grupo. Chamem o professor.",
+      "O robô anda sozinho sem ninguém mexer → o controle não foi calibrado numa posição parada. Desliguem e liguem o controle, segurando ele imóvel enquanto aparece o bonequinho dormindo.",
+      "Não sai som nenhum → se o micro:bit for de modelo antigo (V1), ele não tem alto-falante. Precisa de um buzzer ligado nos pinos P0 e GND.",
+    ],
+  },
 ];
