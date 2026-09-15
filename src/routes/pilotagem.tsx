@@ -98,6 +98,26 @@ function TelaPilotagem() {
           );
         })}
 
+        {escolhido === "celular" && (
+          <section className="cartao-toque p-5">
+            <h2 className="text-2xl">O nome do seu micro:bit</h2>
+            <p className="mt-1 text-sm font-semibold text-muted-foreground">
+              Ligue o micro:bit do robô. Ele mostra cinco letras na tela. Digite essas letras aqui
+              para achar o robô certo na hora de conectar o celular.
+            </p>
+            <input
+              value={equipe.nomeMicrobit}
+              maxLength={5}
+              placeholder="zuvit"
+              onChange={(e) => salvar({ nomeMicrobit: e.target.value.toLowerCase() })}
+              className="mt-3 w-full rounded-xl border-2 border-input bg-background px-4 py-4 text-center font-mono text-2xl font-bold tracking-widest outline-none focus:border-ring"
+            />
+            <p className="mt-3 rounded-xl bg-muted px-3 py-2 font-bold">
+              Senha do robô da equipe: <span className="font-mono">{equipe.senhaRobo || "—"}</span>
+            </p>
+          </section>
+        )}
+
         <p className="flex items-start gap-2 rounded-2xl bg-alerta px-4 py-3 font-bold text-alerta-foreground">
           <AlertTriangle className="mt-0.5 size-5 shrink-0" />
           Trocar de modo muda o código: será preciso copiar e reinstalar os programas.
