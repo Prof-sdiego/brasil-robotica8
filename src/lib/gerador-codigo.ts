@@ -745,16 +745,28 @@ export function montarCodigo(equipe: Equipe): CodigoGerado {
   const botaoBOcupado = MODULOS_QUE_OCUPAM_BOTAO_B.some((id) => equipe.melhorias.includes(id));
 
   // Todos os números vêm da tela Ajustes. Ninguém edita o código à mão.
-  const velocidadeMaxima = numeroAjuste(equipe.ajustes, "velocidade_maxima");
+  const ajustes = equipe.ajustes;
+  const velocidadeMaxima = numeroAjuste(ajustes, "velocidade_maxima");
+  const usaArranqueSuave = equipe.melhorias.includes("arranque_suave");
   const base: Partial<Record<Marcador, string>> = {
     NOME_EQUIPE: equipe.nomeEquipe,
     GRUPO: String(equipe.grupoRadio),
-    SENSIBILIDADE: String(numeroAjuste(equipe.ajustes, "sensibilidade")),
+    SENSIBILIDADE: String(numeroAjuste(ajustes, "sensibilidade")),
     VEL_NORMAL: String(
       equipe.melhorias.includes("turbo")
         ? numeroAjusteMelhoria(equipe.ajustesMelhorias, "turbo", "velocidade_normal")
         : velocidadeMaxima,
     ),
+    ZONA: String(numeroAjuste(ajustes, "zona_morta")),
+    GIRO: String(numeroAjuste(ajustes, "forca_giro")),
+    RITMO: String(numeroAjuste(ajustes, "ritmo_envio")),
+    INV_ESQ: ligadoAjuste(ajustes, "inverter_motor_esquerdo") ? "-1" : "1",
+    INV_DIR: ligadoAjuste(ajustes, "inverter_motor_direito") ? "-1" : "1",
+    DEADMAN: String(numeroAjuste(ajustes, "parada_perda_sinal")),
+    GIRO360: String(numeroAjuste(ajustes, "giro360")),
+    VEL_COREO: String(numeroAjuste(ajustes, "velocidade_coreografia")),
+    // O Arranque suave troca a pilotagem por uma aceleração gradual.
+    MOVER_PILOTAGEM: usaArranqueSuave ? "moverSuave(esq, dir)" : "mover(esq, dir)",
   };
 
   const marcadoresControle: Marcador[] = ["CTRL_VARS", "CTRL_BOTAO_B", "CTRL_LOOP"];
