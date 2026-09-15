@@ -1,0 +1,5 @@
+ALTER TABLE public.equipes
+  ADD COLUMN IF NOT EXISTS modo_pilotagem TEXT NOT NULL DEFAULT 'inclinacao',
+  ADD COLUMN IF NOT EXISTS senha_robo TEXT NOT NULL DEFAULT '',
+  ADD COLUMN IF NOT EXISTS nome_microbit TEXT NOT NULL DEFAULT '',
+  ADD COLUMN IF NOT EXISTS atribuicao_botoes JSONB NOT NULL DEFAULT '{}'::jsonb;

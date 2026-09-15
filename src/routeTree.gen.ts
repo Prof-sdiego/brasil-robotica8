@@ -11,12 +11,14 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AjustesRouteImport } from './routes/ajustes'
+import { Route as BotoesRouteImport } from './routes/botoes'
 import { Route as ChecklistRouteImport } from './routes/checklist'
 import { Route as CodigoRouteImport } from './routes/codigo'
 import { Route as CoreografiasRouteImport } from './routes/coreografias'
 import { Route as EquipeRouteImport } from './routes/equipe'
 import { Route as MelhoriasRouteImport } from './routes/melhorias'
 import { Route as PainelRouteImport } from './routes/painel'
+import { Route as PilotagemRouteImport } from './routes/pilotagem'
 import { Route as ProfessorRouteImport } from './routes/professor'
 import { Route as ProgramadorRouteImport } from './routes/programador'
 import { Route as TutorialRouteImport } from './routes/tutorial'
@@ -33,6 +35,11 @@ const IndexRoute = IndexRouteImport.update({
 const AjustesRoute = AjustesRouteImport.update({
   id: '/ajustes',
   path: '/ajustes',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BotoesRoute = BotoesRouteImport.update({
+  id: '/botoes',
+  path: '/botoes',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ChecklistRoute = ChecklistRouteImport.update({
@@ -63,6 +70,11 @@ const MelhoriasRoute = MelhoriasRouteImport.update({
 const PainelRoute = PainelRouteImport.update({
   id: '/painel',
   path: '/painel',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PilotagemRoute = PilotagemRouteImport.update({
+  id: '/pilotagem',
+  path: '/pilotagem',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ProfessorRoute = ProfessorRouteImport.update({
@@ -104,12 +116,14 @@ const ProfessorEquipeIdRoute = ProfessorEquipeIdRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/ajustes': typeof AjustesRoute
+  '/botoes': typeof BotoesRoute
   '/checklist': typeof ChecklistRoute
   '/codigo': typeof CodigoRoute
   '/coreografias': typeof CoreografiasRoute
   '/equipe': typeof EquipeRoute
   '/melhorias': typeof MelhoriasRoute
   '/painel': typeof PainelRoute
+  '/pilotagem': typeof PilotagemRoute
   '/professor': typeof ProfessorRouteWithChildren
   '/programador': typeof ProgramadorRoute
   '/tutorial': typeof TutorialRoute
@@ -121,12 +135,14 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/ajustes': typeof AjustesRoute
+  '/botoes': typeof BotoesRoute
   '/checklist': typeof ChecklistRoute
   '/codigo': typeof CodigoRoute
   '/coreografias': typeof CoreografiasRoute
   '/equipe': typeof EquipeRoute
   '/melhorias': typeof MelhoriasRoute
   '/painel': typeof PainelRoute
+  '/pilotagem': typeof PilotagemRoute
   '/programador': typeof ProgramadorRoute
   '/tutorial': typeof TutorialRoute
   '/professor/cadastro': typeof ProfessorCadastroRoute
@@ -138,12 +154,14 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/ajustes': typeof AjustesRoute
+  '/botoes': typeof BotoesRoute
   '/checklist': typeof ChecklistRoute
   '/codigo': typeof CodigoRoute
   '/coreografias': typeof CoreografiasRoute
   '/equipe': typeof EquipeRoute
   '/melhorias': typeof MelhoriasRoute
   '/painel': typeof PainelRoute
+  '/pilotagem': typeof PilotagemRoute
   '/professor': typeof ProfessorRouteWithChildren
   '/programador': typeof ProgramadorRoute
   '/tutorial': typeof TutorialRoute
@@ -157,12 +175,14 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/ajustes'
+    | '/botoes'
     | '/checklist'
     | '/codigo'
     | '/coreografias'
     | '/equipe'
     | '/melhorias'
     | '/painel'
+    | '/pilotagem'
     | '/professor'
     | '/programador'
     | '/tutorial'
@@ -174,12 +194,14 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/ajustes'
+    | '/botoes'
     | '/checklist'
     | '/codigo'
     | '/coreografias'
     | '/equipe'
     | '/melhorias'
     | '/painel'
+    | '/pilotagem'
     | '/programador'
     | '/tutorial'
     | '/professor/cadastro'
@@ -190,12 +212,14 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/ajustes'
+    | '/botoes'
     | '/checklist'
     | '/codigo'
     | '/coreografias'
     | '/equipe'
     | '/melhorias'
     | '/painel'
+    | '/pilotagem'
     | '/professor'
     | '/programador'
     | '/tutorial'
@@ -208,12 +232,14 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AjustesRoute: typeof AjustesRoute
+  BotoesRoute: typeof BotoesRoute
   ChecklistRoute: typeof ChecklistRoute
   CodigoRoute: typeof CodigoRoute
   CoreografiasRoute: typeof CoreografiasRoute
   EquipeRoute: typeof EquipeRoute
   MelhoriasRoute: typeof MelhoriasRoute
   PainelRoute: typeof PainelRoute
+  PilotagemRoute: typeof PilotagemRoute
   ProfessorRoute: typeof ProfessorRouteWithChildren
   ProgramadorRoute: typeof ProgramadorRoute
   TutorialRoute: typeof TutorialRoute
@@ -233,6 +259,13 @@ declare module '@tanstack/react-router' {
       path: '/ajustes'
       fullPath: '/ajustes'
       preLoaderRoute: typeof AjustesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/botoes': {
+      id: '/botoes'
+      path: '/botoes'
+      fullPath: '/botoes'
+      preLoaderRoute: typeof BotoesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/checklist': {
@@ -275,6 +308,13 @@ declare module '@tanstack/react-router' {
       path: '/painel'
       fullPath: '/painel'
       preLoaderRoute: typeof PainelRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/pilotagem': {
+      id: '/pilotagem'
+      path: '/pilotagem'
+      fullPath: '/pilotagem'
+      preLoaderRoute: typeof PilotagemRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/professor': {
@@ -350,12 +390,14 @@ const ProfessorRouteWithChildren = ProfessorRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AjustesRoute: AjustesRoute,
+  BotoesRoute: BotoesRoute,
   ChecklistRoute: ChecklistRoute,
   CodigoRoute: CodigoRoute,
   CoreografiasRoute: CoreografiasRoute,
   EquipeRoute: EquipeRoute,
   MelhoriasRoute: MelhoriasRoute,
   PainelRoute: PainelRoute,
+  PilotagemRoute: PilotagemRoute,
   ProfessorRoute: ProfessorRouteWithChildren,
   ProgramadorRoute: ProgramadorRoute,
   TutorialRoute: TutorialRoute,

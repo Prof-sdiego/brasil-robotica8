@@ -14,6 +14,7 @@
     --apagado: #7C9AA5;
     --alerta: #D64933;
     --ok: #4CB963;
+    --unidade: min(13vh, 12vw);
   }
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
   html, body {
@@ -24,83 +25,108 @@
   }
   body {
     display: flex; flex-direction: column;
-    padding: max(12px, env(safe-area-inset-top)) 14px max(14px, env(safe-area-inset-bottom));
-    gap: 12px;
+    padding: max(8px, env(safe-area-inset-top)) max(10px, env(safe-area-inset-right))
+             max(8px, env(safe-area-inset-bottom)) max(10px, env(safe-area-inset-left));
+    gap: 8px;
   }
 
-  header { display: flex; align-items: center; gap: 10px; }
-  h1 { font-size: 15px; font-weight: 650; margin: 0; flex: 1; }
+  header { display: flex; align-items: center; gap: 9px; flex: none; }
   .bolinha { width: 10px; height: 10px; border-radius: 50%; background: var(--alerta); flex: none; }
   .bolinha.ligado { background: var(--ok); }
+  h1 { font-size: 13.5px; font-weight: 650; margin: 0; flex: 1; white-space: nowrap;
+       overflow: hidden; text-overflow: ellipsis; }
+  #recado { font-size: 11.5px; color: var(--apagado); flex: 2; white-space: nowrap;
+            overflow: hidden; text-overflow: ellipsis; text-align: right; }
+  #senha {
+    font: inherit; font-size: 13px; font-weight: 650; letter-spacing: .06em;
+    width: 84px; flex: none; text-align: center; text-transform: uppercase;
+    padding: 7px 6px; border-radius: 6px; border: 2px solid var(--linha);
+    background: var(--painel); color: var(--claro); touch-action: auto;
+  }
+  #senha:focus { outline: none; border-color: var(--sinal); }
   #conectar {
-    font: inherit; font-size: 13.5px; font-weight: 650; padding: 9px 15px;
+    font: inherit; font-size: 13px; font-weight: 650; padding: 8px 14px; flex: none;
     border-radius: 6px; border: 2px solid var(--sinal);
     background: var(--sinal); color: #10242B;
   }
   #conectar.desligar { background: var(--painel); color: var(--claro); border-color: var(--linha); }
 
-  .recado {
-    font-size: 12.5px; color: var(--claro); background: var(--painel);
-    border-left: 3px solid var(--sinal); border-radius: 5px;
-    padding: 8px 11px; line-height: 1.45;
+  main {
+    flex: 1; min-height: 0; display: grid; gap: 10px;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
   }
 
-  .medidores { display: flex; gap: 10px; }
-  .medidor { flex: 1; }
-  .medidor .topo {
-    display: flex; justify-content: space-between;
-    font-size: 11px; color: var(--apagado); margin-bottom: 4px;
-  }
-  .medidor .topo b { color: var(--claro); font-variant-numeric: tabular-nums; }
-  .trilho {
-    position: relative; height: 14px; border-radius: 3px;
-    background: var(--painel); border: 2px solid var(--linha); overflow: hidden;
-  }
-  .trilho::after {
-    content: ""; position: absolute; left: 50%; top: 0; bottom: 0;
-    width: 2px; background: var(--linha);
-  }
-  .preenche { position: absolute; top: 0; bottom: 0; left: 50%; width: 0; background: var(--sinal); }
-  .preenche.re { background: var(--alerta); }
-
+  /* ─── direcional ─── */
   .cruz {
-    flex: 1; display: grid; gap: 8px; min-height: 0;
-    grid-template-columns: 1fr 1fr 1fr;
-    grid-template-rows: 1fr 1fr;
+    display: grid; gap: 7px;
+    grid-template-columns: repeat(3, var(--unidade));
+    grid-template-rows: repeat(2, var(--unidade));
     grid-template-areas: ". cima ." "esq baixo dir";
   }
   .dpad {
-    border-radius: 12px; border: 2px solid var(--linha); background: var(--painel);
-    display: grid; place-items: center; gap: 2px; padding: 6px;
+    border-radius: 13px; border: 2px solid var(--linha); background: var(--painel);
+    display: grid; place-items: center; gap: 1px;
   }
-  .dpad .seta { font-size: 30px; line-height: 1; }
-  .dpad .nome { font-size: 11px; color: var(--apagado); }
+  .dpad .seta { font-size: calc(var(--unidade) * .38); line-height: 1; }
+  .dpad .nome { font-size: calc(var(--unidade) * .12); color: var(--apagado); }
   .dpad.ativa { background: var(--sinal); border-color: var(--sinal); color: #10242B; }
   .dpad.ativa .nome { color: #2C1F00; }
-  #d-cima  { grid-area: cima; }
-  #d-esq   { grid-area: esq; }
-  #d-baixo { grid-area: baixo; }
-  #d-dir   { grid-area: dir; }
+  #d-cima { grid-area: cima; } #d-esq { grid-area: esq; }
+  #d-baixo { grid-area: baixo; } #d-dir { grid-area: dir; }
 
-  .acoes { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-  .acoes button {
-    font: inherit; font-size: 13.5px; font-weight: 600; padding: 13px 8px;
-    border-radius: 8px; border: 2px solid var(--linha);
-    background: var(--painel); color: var(--claro);
+  /* ─── centro ─── */
+  .meio { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+  .medidor .topo {
+    display: flex; justify-content: space-between;
+    font-size: 10.5px; color: var(--apagado); margin-bottom: 3px;
   }
-  .acoes button:disabled { opacity: .4; }
-  .acoes .quente { border-color: var(--sinal); }
-  .acoes .quente.ativo { background: var(--sinal); color: #10242B; }
-  .acoes .parar { border-color: var(--alerta); color: #FFBDB3; grid-column: 1 / -1; }
+  .medidor .topo b { color: var(--claro); font-variant-numeric: tabular-nums; }
+  .trilho {
+    position: relative; height: 13px; border-radius: 3px;
+    background: var(--painel); border: 2px solid var(--linha); overflow: hidden;
+  }
+  .trilho::after { content: ""; position: absolute; left: 50%; top: 0; bottom: 0;
+                   width: 2px; background: var(--linha); }
+  .preenche { position: absolute; top: 0; bottom: 0; left: 50%; width: 0; background: var(--sinal); }
+  .preenche.re { background: var(--alerta); }
 
-  .sliders { display: flex; gap: 14px; }
-  .slider { flex: 1; }
   .slider label {
     display: flex; justify-content: space-between;
-    font-size: 11px; color: var(--apagado); margin-bottom: 2px;
+    font-size: 10.5px; color: var(--apagado); margin-bottom: 1px;
   }
   .slider label b { color: var(--claro); font-variant-numeric: tabular-nums; }
-  input[type=range] { width: 100%; accent-color: var(--sinal); touch-action: auto; }
+  input[type=range] { width: 100%; margin: 0; accent-color: var(--sinal); touch-action: auto; }
+
+  /* ─── ações ─── */
+  .acoes {
+    display: grid; gap: 7px;
+    grid-template-columns: repeat(2, calc(var(--unidade) * 1.15));
+    grid-template-rows: repeat(2, calc(var(--unidade) * .95));
+  }
+  .acoes button {
+    font: inherit; font-size: calc(var(--unidade) * .15); font-weight: 650;
+    border-radius: 13px; border: 2px solid var(--linha);
+    background: var(--painel); color: var(--claro); padding: 4px;
+    line-height: 1.25;
+  }
+  .acoes button:disabled { opacity: .4; }
+  .acoes button b { font-size: calc(var(--unidade) * .2); color: var(--sinal); }
+  .acoes button span { font-size: calc(var(--unidade) * .13); color: var(--apagado); }
+  .acoes button.ativo { background: var(--sinal); color: #10242B; }
+  .acoes button.ativo b, .acoes button.ativo span { color: #2C1F00; }
+  .acoes .parar { border-color: var(--alerta); color: #FFBDB3; }
+
+  /* ─── celular em pé: empilha ─── */
+  @media (orientation: portrait) {
+    :root { --unidade: min(17vh, 25vw); }
+    main { grid-template-columns: 1fr; grid-template-rows: auto auto auto; gap: 14px; }
+    .cruz, .acoes { justify-content: center; margin: 0 auto; }
+    .acoes { grid-template-columns: repeat(2, 1fr); width: 100%; }
+    .meio { order: -1; }
+    #recado { flex: none; width: 100%; text-align: left; order: 3; white-space: normal; }
+    header { flex-wrap: wrap; }
+  }
 </style>
 </head>
 <body>
@@ -108,77 +134,100 @@
 <header>
   <span class="bolinha" id="bolinha"></span>
   <h1 id="titulo">Desconectado</h1>
+  <span id="recado">Ligue o robô e toque em Conectar.</span>
+  <input id="senha" type="text" placeholder="senha" maxlength="12" autocomplete="off"
+         autocapitalize="characters" spellcheck="false">
   <button id="conectar">Conectar</button>
 </header>
 
-<div class="recado" id="recado">Ligue o robô, toque em Conectar e escolha o micro:bit na lista.</div>
-
-<div class="medidores">
-  <div class="medidor">
-    <div class="topo"><span>Esquerdo</span><b id="v-esq">0</b></div>
-    <div class="trilho"><div class="preenche" id="b-esq"></div></div>
+<main>
+  <div class="cruz">
+    <div class="dpad" id="d-cima"  data-k="w"><span class="seta">▲</span><span class="nome">frente</span></div>
+    <div class="dpad" id="d-esq"   data-k="a"><span class="seta">◀</span><span class="nome">girar</span></div>
+    <div class="dpad" id="d-baixo" data-k="s"><span class="seta">▼</span><span class="nome">ré</span></div>
+    <div class="dpad" id="d-dir"   data-k="d"><span class="seta">▶</span><span class="nome">girar</span></div>
   </div>
-  <div class="medidor">
-    <div class="topo"><span>Direito</span><b id="v-dir">0</b></div>
-    <div class="trilho"><div class="preenche" id="b-dir"></div></div>
-  </div>
-</div>
 
-<div class="cruz">
-  <div class="dpad" id="d-cima"  data-k="w"><span class="seta">▲</span><span class="nome">frente</span></div>
-  <div class="dpad" id="d-esq"   data-k="a"><span class="seta">◀</span><span class="nome">girar</span></div>
-  <div class="dpad" id="d-baixo" data-k="s"><span class="seta">▼</span><span class="nome">ré</span></div>
-  <div class="dpad" id="d-dir"   data-k="d"><span class="seta">▶</span><span class="nome">girar</span></div>
-</div>
-
-<div class="acoes">
-  <button id="booster" class="quente" disabled>Booster 5s</button>
-  <button id="empinar" class="quente" disabled>Empinada</button>
-  <button id="c1" disabled>Coreografia 1</button>
-  <button id="c2" disabled>Coreografia 2</button>
-  <button id="parar" class="parar" disabled>Parar tudo</button>
-</div>
-
-<div class="sliders">
-  <div class="slider">
-    <label>Velocidade <b id="n-vel">255</b></label>
-    <input type="range" id="s-vel" min="80" max="255" value="255">
+  <div class="meio">
+    <div class="medidor">
+      <div class="topo"><span>Motor esquerdo</span><b id="v-esq">0</b></div>
+      <div class="trilho"><div class="preenche" id="b-esq"></div></div>
+    </div>
+    <div class="medidor">
+      <div class="topo"><span>Motor direito</span><b id="v-dir">0</b></div>
+      <div class="trilho"><div class="preenche" id="b-dir"></div></div>
+    </div>
+    <div class="slider">
+      <label>Velocidade <b id="n-vel">255</b></label>
+      <input type="range" id="s-vel" min="80" max="255" value="255">
+    </div>
+    <div class="slider">
+      <label>Força do giro <b id="n-giro">140</b></label>
+      <input type="range" id="s-giro" min="40" max="255" value="140">
+    </div>
   </div>
-  <div class="slider">
-    <label>Força do giro <b id="n-giro">140</b></label>
-    <input type="range" id="s-giro" min="40" max="255" value="140">
+
+  <div class="acoes">
+    <button id="bt-a" disabled><b>A</b><br><span id="rot-a">—</span></button>
+    <button id="bt-b" disabled><b>B</b><br><span id="rot-b">—</span></button>
+    <button id="bt-ab" disabled><b>A+B</b><br><span id="rot-ab">—</span></button>
+    <button id="parar" class="parar" disabled>Parar</button>
   </div>
-</div>
+</main>
 
 <script>
 const SERVICO = '6e400001-b5a3-f393-e0a9-e50e24dcca9e';
+
+// O site pode montar o endereço com a senha e o nome do micro:bit já dentro:
+//   ...?senha=K7Q2&nome=zuvit
+const url = new URLSearchParams(location.search);
+const NOME_ROBO = (url.get('nome') || '').trim();
+
+// O site monta o endereço com o que cada botão faz nesta equipe:
+//   ...?ba=Turbo&bb=Coreografia 1&bab=Empinada
+const rotulos = {
+  'rot-a':  url.get('ba')  || 'ação 1',
+  'rot-b':  url.get('bb')  || 'ação 2',
+  'rot-ab': url.get('bab') || 'ação 3'
+};
 let dispositivo = null, escrita = null, notifica = null;
-let ligado = false, relogio = null;
+let ligado = false, relogio = null, liberado = false;
 let ultimoEnviado = '', ultimaVez = 0;
 const teclas = { w:false, a:false, s:false, d:false };
 
 const $ = id => document.getElementById(id);
 const recado = t => { $('recado').textContent = t; };
-const acoes = ['booster','empinar','c1','c2','parar'];
+const acoes = ['bt-a','bt-b','bt-ab','parar'];
 
 function estado(on, texto) {
   ligado = on;
   $('bolinha').classList.toggle('ligado', on);
   $('titulo').textContent = texto;
-  $('conectar').textContent = on ? 'Desconectar' : 'Conectar';
+  $('conectar').textContent = on ? 'Sair' : 'Conectar';
   $('conectar').classList.toggle('desligar', on);
   acoes.forEach(i => $(i).disabled = !on);
 }
 
 async function conectar() {
   if (!navigator.bluetooth) {
-    recado('Este navegador não tem Bluetooth. Use o Chrome no Android.');
+    recado('Sem Bluetooth neste navegador. Use o Chrome no Android.');
     return;
   }
   try {
+    const senha = $('senha').value.trim().toUpperCase();
+    if (!senha) {
+      recado('Digite a senha da sua equipe antes de conectar.');
+      $('senha').focus();
+      return;
+    }
+
     recado('Procurando o micro:bit...');
+    // com o nome no endereço, a lista mostra só o robô da equipe
+    const alvo = NOME_ROBO
+      ? 'BBC micro:bit [' + NOME_ROBO + ']'
+      : 'BBC micro:bit';
     dispositivo = await navigator.bluetooth.requestDevice({
-      filters: [{ namePrefix: 'BBC micro:bit' }],
+      filters: [{ namePrefix: alvo }],
       optionalServices: [SERVICO]
     });
     dispositivo.addEventListener('gattserverdisconnected', caiu);
@@ -187,7 +236,6 @@ async function conectar() {
     const servico = await servidor.getPrimaryService(SERVICO);
     const lista = await servico.getCharacteristics();
 
-    // descobre qual característica escreve e qual avisa
     for (const c of lista) {
       if (c.properties.write || c.properties.writeWithoutResponse) escrita = c;
       if (c.properties.notify) notifica = c;
@@ -199,11 +247,22 @@ async function conectar() {
       notifica.addEventListener('characteristicvaluechanged', e => {
         const texto = new TextDecoder().decode(e.target.value).trim();
         if (texto === 'FIM') recado('A coreografia terminou.');
+        if (texto === 'OK') {
+          liberado = true;
+          estado(true, 'Conectado');
+          recado('Senha aceita. Segure os botões para pilotar.');
+        }
+        if (texto === 'NAO') {
+          liberado = false;
+          recado('Senha errada. Este robô é de outra equipe.');
+          desconectar();
+        }
       });
     }
 
-    estado(true, 'Conectado');
-    recado('Pronto! Segure os botões para pilotar.');
+    estado(true, 'Conferindo a senha...');
+    recado('Conectado. Conferindo a senha...');
+    await mandar('k' + senha);
     await mandar('v' + $('s-vel').value);
     await mandar('g' + $('s-giro').value);
     ultimoEnviado = '';
@@ -215,9 +274,9 @@ async function conectar() {
 
 function caiu() {
   clearInterval(relogio); relogio = null;
-  escrita = null; notifica = null;
+  escrita = null; notifica = null; liberado = false;
   estado(false, 'Desconectado');
-  recado('O robô se desconectou. Toque em Conectar para voltar.');
+  recado('O robô se soltou. Toque em Conectar para voltar.');
 }
 
 async function desconectar() {
@@ -278,7 +337,6 @@ function pintar(d) {
   });
 }
 
-// ─── toque nos botões direcionais ───
 document.querySelectorAll('.dpad').forEach(el => {
   const k = el.dataset.k;
   const liga = e => {
@@ -306,22 +364,18 @@ function soltarTudo() {
 document.addEventListener('visibilitychange', () => { if (document.hidden) soltarTudo(); });
 window.addEventListener('blur', soltarTudo);
 
-// ─── ações ───
-function piscar(id, ms) {
+function acionar(id, letra, rotulo) {
+  mandar(letra);
+  recado(rotulo + ' — em andamento.');
   const b = $(id);
   b.classList.add('ativo');
-  setTimeout(() => b.classList.remove('ativo'), ms);
+  setTimeout(() => b.classList.remove('ativo'), 700);
 }
 
-$('booster').addEventListener('click', () => {
-  mandar('x'); recado('Booster: 5 segundos na potência máxima.'); piscar('booster', 5000);
-});
-$('empinar').addEventListener('click', () => {
-  mandar('y'); recado('Empinada!'); piscar('empinar', 1000);
-});
-$('c1').addEventListener('click', () => { mandar('a'); recado('Coreografia 1 em andamento.'); });
-$('c2').addEventListener('click', () => { mandar('b'); recado('Coreografia 2 em andamento.'); });
-$('parar').addEventListener('click', () => { soltarTudo(); mandar('c'); recado('Tudo parado.'); });
+$('bt-a').addEventListener('click', () => acionar('bt-a', 'a', rotulos['rot-a']));
+$('bt-b').addEventListener('click', () => acionar('bt-b', 'b', rotulos['rot-b']));
+$('bt-ab').addEventListener('click', () => acionar('bt-ab', 'd', rotulos['rot-ab']));
+$('parar').addEventListener('click', () => { soltarTudo(); mandar('z'); recado('Tudo parado.'); });
 
 $('conectar').addEventListener('click', () => ligado ? desconectar() : conectar());
 
@@ -329,6 +383,12 @@ $('s-vel').addEventListener('input', e => { $('n-vel').textContent = e.target.va
 $('s-vel').addEventListener('change', e => mandar('v' + e.target.value));
 $('s-giro').addEventListener('input', e => { $('n-giro').textContent = e.target.value; pintar(digito()); });
 $('s-giro').addEventListener('change', e => mandar('g' + e.target.value));
+
+Object.keys(rotulos).forEach(id => { $(id).textContent = rotulos[id]; });
+
+if (url.get('senha')) {
+  $('senha').value = url.get('senha').toUpperCase();
+}
 
 pintar('5');
 estado(false, 'Desconectado');

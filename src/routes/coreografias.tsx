@@ -3,6 +3,7 @@ import { ArrowDown, ArrowUp, Timer, Trash2, Wand2 } from "lucide-react";
 import { useState } from "react";
 
 import { Cabecalho } from "@/components/Cabecalho";
+import { acoesDosBotoes, gatilhosDeCoreografia, NOME_BOTAO } from "@/lib/botoes";
 import { MOVIMENTOS } from "@/lib/catalogo";
 import { duracaoEstimada } from "@/lib/gerador-codigo";
 import type { Coreografia, MovimentoNaSequencia } from "@/lib/tipos";
@@ -28,23 +29,22 @@ export const Route = createFileRoute("/coreografias")({
 
 const MAXIMO_MOVIMENTOS = 12;
 
-const ROTULOS: Record<Coreografia["gatilho"], string> = {
-  A: "Botão A",
-  B: "Botão B",
-  AB: "Botões A + B",
-};
-
 function TelaCoreografias() {
   const { equipe, carregando, salvar, salvando } = useAluno({ exigirEquipeCompleta: true });
-  const [aberta, setAberta] = useState<Coreografia["gatilho"]>("A");
+  const [abertaEscolhida, setAberta] = useState<Coreografia["gatilho"]>("A");
 
   if (carregando || !equipe) {
     return <p className="p-8 text-center text-lg font-bold">Carregando...</p>;
   }
 
-  const temVelocidadeEspecial =
-    equipe.melhorias.includes("turbo") || equipe.melhorias.includes("marcha_lenta");
-  const gatilhos: Coreografia["gatilho"][] = temVelocidadeEspecial ? ["A", "AB"] : ["A", "B", "AB"];
+  const gatilhos = gatilhosDeCoreografia(equipe);
+  const acoes = acoesDosBotoes(equipe);
+  const rotuloDe = (gatilho: Coreografia["gatilho"]) => {
+    const acao = acoes.find((a) => a.botao === gatilho);
+    return acao?.numeroCoreografia
+      ? `Coreografia ${acao.numeroCoreografia} · ${NOME_BOTAO[gatilho]}`
+      : NOME_BOTAO[gatilho];
+  };
 
   function sequencia(gatilho: Coreografia["gatilho"]): MovimentoNaSequencia[] {
     const salvos = equipe!.coreografias.find((c) => c.gatilho === gatilho)?.movimentos ?? [];
@@ -117,6 +117,8 @@ function TelaCoreografias() {
     );
   }
 
+  const primeiro = gatilhos[0];
+  const aberta = gatilhos.includes(abertaEscolhida) ? abertaEscolhida : (primeiro ?? "A");
   const atual = sequencia(aberta);
   const duracao = duracaoEstimada(atual);
   const duracaoBoa = duracao >= 8 && duracao <= 20;
@@ -125,10 +127,16 @@ function TelaCoreografias() {
     <>
       <Cabecalho titulo="Coreografias" icone={<Wand2 className="size-6" />} salvando={salvando} />
       <main className="mx-auto max-w-3xl px-4 py-5 pb-16">
-        {temVelocidadeEspecial && (
+        {gatilhos.length === 0 && (
           <p className="mb-4 rounded-2xl bg-info px-4 py-3 font-bold text-info-foreground">
-            Como a equipe escolheu Turbo ou Marcha Lenta, o botão B fica com essa melhoria. Vocês
-            montam 2 coreografias.
+            Os três botões desta equipe estão ocupados por melhorias, então não há coreografia para
+            montar. Para liberar um botão, desmarquem uma melhoria em Melhorias.
+          </p>
+        )}
+        {gatilhos.length > 0 && gatilhos.length < 3 && (
+          <p className="mb-4 rounded-2xl bg-info px-4 py-3 font-bold text-info-foreground">
+            As melhorias de botão desta equipe ocupam {3 - gatilhos.length} dos três botões. Sobram{" "}
+            {gatilhos.length} para coreografia.
           </p>
         )}
 
@@ -143,7 +151,7 @@ function TelaCoreografias() {
                   : "bg-muted text-muted-foreground"
               }`}
             >
-              {ROTULOS[gatilho]}
+              {rotuloDe(gatilho)}
             </button>
           ))}
         </div>

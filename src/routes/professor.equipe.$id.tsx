@@ -2,9 +2,11 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowLeft } from "lucide-react";
 
 import { BarraProgresso } from "@/components/BarraProgresso";
+import { ManualBotoes } from "@/components/ManualBotoes";
 import { Etiqueta } from "@/components/Etiqueta";
 import { ITENS_CHECKLIST, MELHORIAS, MELODIAS, MOVIMENTOS } from "@/lib/catalogo";
 import { useEquipes } from "@/lib/equipes";
+import { modoDe } from "@/lib/modos";
 import { duracaoEstimada, montarCodigo } from "@/lib/gerador-codigo";
 
 export const Route = createFileRoute("/professor/equipe/$id")({
@@ -92,8 +94,16 @@ function DetalheEquipe() {
         )}
       </section>
 
+      <div className="mb-4">
+        <ManualBotoes equipe={equipe} />
+      </div>
+
       <section className="cartao-toque p-5">
         <h3 className="text-xl">Melhorias e justificativa</h3>
+        <p className="mt-1 font-bold">
+          <span aria-hidden>{modoDe(equipe.modoPilotagem).icone}</span> Modo de pilotagem:{" "}
+          {modoDe(equipe.modoPilotagem).nome}
+        </p>
         <div className="mt-2 flex flex-wrap gap-2">
           {equipe.melhorias.length === 0 && (
             <p className="font-semibold text-muted-foreground">Nada escolhido.</p>

@@ -8,8 +8,10 @@ import {
   atualizarCadastro,
   criarEquipes,
   gerarCodigoAcesso,
+  gerarSenhaRobo,
   removerEquipe,
   useEquipes,
+  type CadastroEquipe,
 } from "@/lib/equipes";
 
 export const Route = createFileRoute("/professor/cadastro")({
@@ -64,6 +66,8 @@ function Cadastro() {
         nomeEquipe,
         grupoRadio,
         codigoAcesso: partes[3] || gerarCodigoAcesso(nomeEquipe),
+        senhaRobo: (partes[4] || gerarSenhaRobo()).toUpperCase(),
+        nomeMicrobit: partes[5] || "",
       });
     }
     if (novas.length === 0) {
@@ -87,7 +91,14 @@ function Cadastro() {
     const nomeEquipe = `Equipe ${(equipes?.length ?? 0) + 1}`;
     try {
       await criarEquipes([
-        { turma: "8A", nomeEquipe, grupoRadio, codigoAcesso: gerarCodigoAcesso(nomeEquipe) },
+        {
+          turma: "8A",
+          nomeEquipe,
+          grupoRadio,
+          codigoAcesso: gerarCodigoAcesso(nomeEquipe),
+          senhaRobo: gerarSenhaRobo(),
+          nomeMicrobit: "",
+        },
       ]);
       recarregar();
     } catch {
@@ -106,8 +117,9 @@ function Cadastro() {
           <ClipboardPaste className="size-5 text-secondary" /> Importar lista colada
         </h2>
         <p className="mt-1 text-sm font-semibold text-muted-foreground">
-          Uma equipe por linha, no formato: turma; nome da equipe; grupo de rádio; código de acesso.
-          Os dois últimos são opcionais — o app preenche sozinho.
+          Uma equipe por linha, no formato: turma; nome da equipe; grupo de rádio; código de acesso;
+          senha do robô; nome do micro:bit. Só os dois primeiros são obrigatórios — o resto o app
+          preenche sozinho.
         </p>
         <textarea
           value={texto}
@@ -141,7 +153,9 @@ function Cadastro() {
             turma={equipe.turma}
             nomeEquipe={equipe.nomeEquipe}
             grupoRadio={equipe.grupoRadio}
-            codigoAcesso={equipe.codigoAcesso}
+  codigoAcesso={equipe.codigoAcesso}
+            senhaRobo={equipe.senhaRobo}
+            nomeMicrobit={equipe.nomeMicrobit}
             salvando={salvandoId === equipe.id}
             aoSalvar={async (dados) => {
               setSalvandoId(equipe.id);
@@ -168,18 +182,15 @@ function Cadastro() {
   );
 }
 
-type DadosCadastro = {
-  turma: string;
-  nomeEquipe: string;
-  grupoRadio: number;
-  codigoAcesso: string;
-};
+type DadosCadastro = CadastroEquipe;
 
 function LinhaCadastro({
   turma,
   nomeEquipe,
   grupoRadio,
   codigoAcesso,
+  senhaRobo,
+  nomeMicrobit,
   salvando,
   aoSalvar,
   aoRemover,
@@ -194,10 +205,12 @@ function LinhaCadastro({
     nomeEquipe,
     grupoRadio,
     codigoAcesso,
+    senhaRobo,
+    nomeMicrobit,
   });
 
   return (
-    <div className="cartao-toque grid grid-cols-2 gap-3 p-4 sm:grid-cols-5">
+    <div className="cartao-toque grid grid-cols-2 gap-3 p-4 sm:grid-cols-7">
       <label className="text-xs font-bold">
         Turma
         <input
@@ -230,6 +243,27 @@ function LinhaCadastro({
         <input
           value={dados.codigoAcesso}
           onChange={(e) => setDados({ ...dados, codigoAcesso: e.target.value.toUpperCase() })}
+          className="mt-1 w-full rounded-lg border-2 border-input bg-background px-3 py-2 font-mono text-base font-bold"
+        />
+      </label>
+      <label className="text-xs font-bold">
+        Senha do robô (4 a 8)
+        <input
+          value={dados.senhaRobo}
+          maxLength={8}
+          onChange={(e) =>
+            setDados({ ...dados, senhaRobo: e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, "") })
+          }
+          className="mt-1 w-full rounded-lg border-2 border-input bg-background px-3 py-2 font-mono text-base font-bold"
+        />
+      </label>
+      <label className="text-xs font-bold">
+        Nome do micro:bit (5 letras)
+        <input
+          value={dados.nomeMicrobit}
+          maxLength={5}
+          placeholder="zuvit"
+          onChange={(e) => setDados({ ...dados, nomeMicrobit: e.target.value.toLowerCase() })}
           className="mt-1 w-full rounded-lg border-2 border-input bg-background px-3 py-2 font-mono text-base font-bold"
         />
       </label>

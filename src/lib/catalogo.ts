@@ -38,8 +38,9 @@ export type Melhoria = {
   frase: string;
   batalha: Intensidade;
   demonstracao: Intensidade;
-  /** Botão do controle que a melhoria ocupa, quando ocupa algum. */
-  botao?: "B";
+  /** Melhorias de botão ocupam um dos três botões: A, B ou A+B. */
+  ocupaBotao?: boolean;
+  aviso?: string;
 };
 
 export const MELHORIAS: Melhoria[] = [
@@ -47,26 +48,39 @@ export const MELHORIAS: Melhoria[] = [
     id: "turbo",
     nome: "Turbo",
     icone: "🚀",
-    frase: "Aperta B e o robô ganha alguns segundos de velocidade máxima.",
+    frase:
+      "Aperta o botão e o robô ganha alguns segundos de velocidade máxima. Depois precisa recarregar.",
     batalha: "muito",
     demonstracao: "pouco",
-    botao: "B",
+    ocupaBotao: true,
   },
   {
     id: "marcha_lenta",
     nome: "Marcha Lenta",
     icone: "🐢",
-    frase: "Aperta B e o robô anda bem devagar, para manobras de precisão.",
+    frase:
+      "Passa para velocidade reduzida, para manobrar com precisão perto do balão. Aperta de novo e volta ao normal.",
     batalha: "muito",
     demonstracao: "medio",
-    botao: "B",
+    ocupaBotao: true,
+  },
+  {
+    id: "empinada",
+    nome: "Empinada",
+    icone: "🛹",
+    frase: "Ré curta e arranque seco. A ré joga o peso para trás e o robô levanta a frente.",
+    batalha: "pouco",
+    demonstracao: "muito",
+    ocupaBotao: true,
+    aviso:
+      "Para empinar, precisa de peso atrás do eixo traseiro. Peso em cima das rodas não adianta.",
   },
   {
     id: "contra_ataque",
     nome: "Contra-ataque automático",
     icone: "💥",
     frase:
-      "O robô sente quando leva uma batida e reage sozinho: recua e gira, tirando o balão da linha de frente do adversário.",
+      "O robô sente quando leva uma batida e reage sozinho: recua e gira, tirando o balão da linha de frente.",
     batalha: "muito",
     demonstracao: "medio",
   },
@@ -75,7 +89,7 @@ export const MELHORIAS: Melhoria[] = [
     nome: "Arranque suave",
     icone: "🎚️",
     frase:
-      "Em vez de sair de uma vez na velocidade máxima, o robô acelera aos poucos. Acaba o coice da largada e fica muito mais fácil de pilotar com precisão.",
+      "Em vez de sair de uma vez na velocidade máxima, acelera aos poucos. Acaba o coice da largada.",
     batalha: "muito",
     demonstracao: "pouco",
   },
@@ -83,7 +97,7 @@ export const MELHORIAS: Melhoria[] = [
     id: "som_abertura",
     nome: "Som de abertura",
     icone: "🎵",
-    frase: "O robô toca uma melodia curta ao ser ligado.",
+    frase: "Uma melodia curta quando o robô liga.",
     batalha: "nada",
     demonstracao: "muito",
   },
@@ -91,13 +105,12 @@ export const MELHORIAS: Melhoria[] = [
     id: "bipe_re",
     nome: "Bipe de ré",
     icone: "📢",
-    frase: "Quando o robô anda para trás, apita repetidamente como um caminhão.",
+    frase: "Apita como caminhão quando anda para trás.",
     batalha: "nada",
     demonstracao: "medio",
   },
 ];
 
-export const MELHORIAS_EXCLUSIVAS = ["turbo", "marcha_lenta"];
 export const MAXIMO_MELHORIAS = 3;
 
 /** Melhorias que saíram do catálogo: se a equipe tinha uma delas, precisa escolher de novo. */
@@ -286,6 +299,21 @@ export const ITENS_CHECKLIST: { id: string; texto: string }[] = [
   { id: "balao", texto: "Balão e suporte instalados" },
   { id: "ensaio", texto: "Ensaio feito com a turma" },
 ];
+
+/** O item 4 muda de texto conforme o modo de pilotagem da equipe. */
+export function itensChecklist(modo: string): { id: string; texto: string }[] {
+  return ITENS_CHECKLIST.map((item) =>
+    item.id === "codigo_instalado"
+      ? {
+          ...item,
+          texto:
+            modo === "celular"
+              ? "Código instalado no micro:bit do robô"
+              : "Código instalado nos dois micro:bit",
+        }
+      : item,
+  );
+}
 
 export type ParteInstrucoes = { titulo: string; icone: string; passos: string[]; nota?: string };
 
