@@ -85,7 +85,8 @@ function TelaChecklist() {
 
         <div className="space-y-3">
           {equipe.checklist.map((item) => {
-            const texto = itensChecklist.find((i) => i.id === item.id)?.texto ?? item.id;
+            const texto =
+              itensChecklist(equipe.modoPilotagem).find((i) => i.id === item.id)?.texto ?? item.id;
             const quando = item.marcadoEm
               ? new Date(item.marcadoEm).toLocaleString("pt-BR", {
                   dateStyle: "short",

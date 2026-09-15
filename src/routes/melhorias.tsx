@@ -1,11 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Music, Play, Sparkles } from "lucide-react";
+import { Link } from "@tanstack/react-router";
+import { AlertTriangle, Music, Play, Sparkles } from "lucide-react";
 import { useState } from "react";
 
 import { Cabecalho } from "@/components/Cabecalho";
 import { Deslizante } from "@/components/Deslizante";
 import { EtiquetaIntensidade } from "@/components/Etiqueta";
 import { AJUSTES_MELHORIAS, valorDe, type CampoAjuste } from "@/lib/ajustes";
+import { quantasCoreografias } from "@/lib/botoes";
 import { MAXIMO_MELHORIAS, MELHORIAS, MELODIAS } from "@/lib/catalogo";
 import { tocarNotas } from "@/lib/tocar";
 import { useAluno } from "@/lib/useAluno";
@@ -60,15 +62,7 @@ function TelaMelhorias() {
       });
       return;
     }
-    let novas = [...escolhidas];
-    if (id === "turbo" && novas.includes("marcha_lenta")) {
-      novas = novas.filter((m) => m !== "marcha_lenta");
-      setAviso("Turbo e Marcha Lenta disputam o mesmo botão. Escolham uma.");
-    }
-    if (id === "marcha_lenta" && novas.includes("turbo")) {
-      novas = novas.filter((m) => m !== "turbo");
-      setAviso("Turbo e Marcha Lenta disputam o mesmo botão. Escolham uma.");
-    }
+    const novas = [...escolhidas];
     if (novas.length >= MAXIMO_MELHORIAS) {
       setAviso("Vocês já escolheram 3. Desmarquem uma antes de escolher outra.");
       return;
@@ -86,8 +80,17 @@ function TelaMelhorias() {
     <>
       <Cabecalho titulo="Melhorias" icone={<Sparkles className="size-6" />} salvando={salvando} />
       <main className="mx-auto max-w-3xl px-4 py-5 pb-16">
-        <div className="sticky top-[68px] z-10 mb-4 rounded-2xl bg-primary px-4 py-3 text-center text-xl font-extrabold text-primary-foreground shadow-cartao">
-          Escolhidas: {escolhidas.length} de {MAXIMO_MELHORIAS}
+        <div className="sticky top-[68px] z-10 mb-4 space-y-1 rounded-2xl bg-primary px-4 py-3 text-center text-primary-foreground shadow-cartao">
+          <p className="text-xl font-extrabold">
+            Escolhidas: {escolhidas.length} de {MAXIMO_MELHORIAS}
+          </p>
+          <p className="text-sm font-bold">
+            {quantasCoreografias(escolhidas) === 0
+              ? "Os três botões estão ocupados: nenhuma coreografia."
+              : `Sobram ${quantasCoreografias(escolhidas)} ${
+                  quantasCoreografias(escolhidas) === 1 ? "coreografia" : "coreografias"
+                } para montar.`}
+          </p>
         </div>
 
         {equipe.avisoCatalogo && (
@@ -137,7 +140,17 @@ function TelaMelhorias() {
                 <div className="mt-3 flex flex-wrap gap-2">
                   <EtiquetaIntensidade rotulo="Batalha" nivel={melhoria.batalha} />
                   <EtiquetaIntensidade rotulo="Demonstração" nivel={melhoria.demonstracao} />
+                  {melhoria.ocupaBotao && (
+                    <span className="rounded-full bg-info px-2 py-1 text-xs font-extrabold text-info-foreground">
+                      ocupa um botão
+                    </span>
+                  )}
                 </div>
+                {melhoria.aviso && (
+                  <p className="mt-3 flex items-start gap-2 rounded-xl bg-alerta px-3 py-2 text-xs font-bold text-alerta-foreground">
+                    <AlertTriangle className="mt-0.5 size-4 shrink-0" /> {melhoria.aviso}
+                  </p>
+                )}
               </button>
             );
           })}
@@ -204,6 +217,13 @@ function TelaMelhorias() {
               </div>
             </section>
           ))}
+
+        <Link
+          to="/botoes"
+          className="mt-6 block rounded-2xl bg-secondary px-4 py-5 text-center text-xl font-extrabold text-secondary-foreground active:scale-[0.99]"
+        >
+          Escolher o que cada botão faz
+        </Link>
 
         <section className="cartao-toque mt-6 p-5">
           <label htmlFor="justificativa" className="text-lg font-bold">
