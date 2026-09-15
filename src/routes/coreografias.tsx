@@ -47,7 +47,19 @@ function TelaCoreografias() {
   const gatilhos: Coreografia["gatilho"][] = temVelocidadeEspecial ? ["A", "AB"] : ["A", "B", "AB"];
 
   function sequencia(gatilho: Coreografia["gatilho"]): MovimentoNaSequencia[] {
-    return equipe!.coreografias.find((c) => c.gatilho === gatilho)?.movimentos ?? [];
+    const salvos = equipe!.coreografias.find((c) => c.gatilho === gatilho)?.movimentos ?? [];
+    // Ajusta sequências antigas: descarta movimentos que saíram do catálogo e
+    // completa/corta parâmetros para bater com a definição atual.
+    return salvos.flatMap((item) => {
+      const definicao = MOVIMENTOS.find((m) => m.id === item.movimentoId);
+      if (!definicao) return [];
+      const params = definicao.params.map((p, i) => {
+        const valor = item.params[i];
+        if (valor === undefined || valor < p.min || valor > p.max) return p.padrao;
+        return valor;
+      });
+      return [{ ...item, params }];
+    });
   }
 
   function gravar(gatilho: Coreografia["gatilho"], movimentos: MovimentoNaSequencia[]) {
