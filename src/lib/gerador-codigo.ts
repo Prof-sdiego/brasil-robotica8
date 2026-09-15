@@ -11,7 +11,7 @@
 // Nenhuma tela precisa ser alterada quando esses textos mudarem.
 // =====================================================================
 
-import { numeroAjuste, numeroAjusteMelhoria } from "./ajustes";
+import { ligadoAjuste, numeroAjuste, numeroAjusteMelhoria } from "./ajustes";
 import { MOVIMENTOS } from "./catalogo";
 import type { Coreografia, Equipe, MovimentoNaSequencia } from "./tipos";
 
