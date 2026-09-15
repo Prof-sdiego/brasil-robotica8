@@ -6,45 +6,53 @@
 //   2. junta os trechos na ordem definida em ORDEM_MODULOS
 //   3. substitui os marcadores {{NOME}} dos modelos pelos textos resultantes
 //
-// O QUE AINDA FALTA PREENCHER (texto que o professor vai enviar):
-//   - LINHAS_MOVIMENTOS: a linha de código que cada movimento gera.
-// Nenhuma tela precisa ser alterada quando esses textos mudarem.
+// O controle não decide nada: ele só avisa qual botão foi apertado. Quem
+// decide o que cada botão faz é o robô — por isso as melhorias funcionam
+// igual nos três modos de pilotagem.
 // =====================================================================
 
 import { ligadoAjuste, numeroAjuste, numeroAjusteMelhoria } from "./ajustes";
+import { atribuicaoEfetiva, VALOR_COREOGRAFIA } from "./botoes";
 import { MOVIMENTOS } from "./catalogo";
-import type { Coreografia, Equipe, MovimentoNaSequencia } from "./tipos";
+import {
+  COMUNICACAO_BLUETOOTH,
+  COMUNICACAO_RADIO,
+  CORPO_PILOTAR_DIRETO,
+  MODELO_CONTROLE,
+  MODELO_CONTROLE_TECLADO,
+  MODELO_ROBO,
+} from "./modelos-codigo";
+import type { AjustesMelhorias } from "./ajustes";
+import type { Botao, Coreografia, Equipe, MovimentoNaSequencia } from "./tipos";
 
 /** Nomes dos marcadores aceitos nos modelos. */
 export const MARCADORES = [
   "NOME_EQUIPE",
   "GRUPO",
+  "SENHA",
   "SENSIBILIDADE",
-  "VEL_NORMAL",
   "ZONA_FRENTE",
   "ZONA_CURVA",
   "GIRO",
   "RITMO",
+  "VEL_NORMAL",
+  "GIRO360",
+  "VEL_COREO",
   "INV_ESQ",
   "INV_DIR",
   "TRIM_ESQ",
   "TRIM_DIR",
   "DEADMAN",
-  "MOVER_PILOTAGEM",
-  "GIRO360",
-  "VEL_COREO",
-  "CTRL_VARS",
-  "CTRL_BOTAO_B",
-  "CTRL_BOTAO_AB",
-  "CTRL_LOOP",
+  "CORPO_PILOTAR",
   "ROBO_VARS",
   "ROBO_SETUP",
   "ROBO_FUNCS",
   "SETA_EXTRA",
   "ROBO_LOOPS",
-  "COREO_1",
-  "COREO_2",
-  "COREO_3",
+  "BOTAO_A",
+  "BOTAO_B",
+  "BOTAO_AB",
+  "COMUNICACAO",
 ] as const;
 
 export type Marcador = (typeof MARCADORES)[number];
@@ -57,10 +65,8 @@ export const ORDEM_MODULOS: string[] = [
   "som_abertura",
   "turbo",
   "marcha_lenta",
+  "empinada",
 ];
-
-/** Módulos que ocupam o botão B do controle (deixam a equipe com 2 coreografias). */
-export const MODULOS_QUE_OCUPAM_BOTAO_B = ["turbo", "marcha_lenta"];
 
 /**
  * Marcador de parâmetro dentro do texto do módulo → id do campo da tela Ajustes.
@@ -69,6 +75,7 @@ export const MODULOS_QUE_OCUPAM_BOTAO_B = ["turbo", "marcha_lenta"];
 export const PARAMETROS_MELHORIAS: Record<string, Record<string, string>> = {
   turbo: { TURBO_DURACAO: "duracao_turbo", TURBO_RECARGA: "recarga" },
   marcha_lenta: { VEL_LENTA: "velocidade_lenta" },
+  empinada: { EMP_RECUO: "recuo", EMP_ARRANQUE: "arranque" },
   contra_ataque: {
     IMPACTO: "sensibilidade_impacto",
     CA_RECUO: "tempo_recuo",
@@ -82,55 +89,71 @@ export const PARAMETROS_MELHORIAS: Record<string, Record<string, string>> = {
 
 type TrechosPorMarcador = Partial<Record<Marcador, string>>;
 
-/** Texto que cada melhoria insere em cada marcador (controle e robô). */
+/** Texto que cada melhoria insere. Tudo vive no robô. */
 export const TRECHOS_MELHORIAS: Record<
   string,
-  { controle?: TrechosPorMarcador; robo?: TrechosPorMarcador }
+  { robo?: TrechosPorMarcador; corpoBotao?: string }
 > = {
   turbo: {
-    controle: {
-      CTRL_VARS: `let TURBO_DURACAO: number = {{TURBO_DURACAO}}
+    robo: {
+      ROBO_VARS: `let TURBO_DURACAO: number = {{TURBO_DURACAO}}
 let TURBO_RECARGA: number = {{TURBO_RECARGA}}
 let turboAte: number = 0
 let recargaAte: number = 0`,
-      CTRL_BOTAO_B: `    if (coreoAtiva) {
-        cancela()
-    } else if (input.runningTime() > recargaAte) {
-        VEL = 255
+      ROBO_LOOPS: `
+basic.forever(function () {
+    if (turboAte > 0 && input.runningTime() > turboAte) {
+        turboAte = 0
+        VEL_ATUAL = VEL_NORMAL
+        music.playTone(523, 80)
+        setaAtual = -1
+        seta(0)
+    }
+    basic.pause(50)
+})`,
+    },
+    corpoBotao: `    if (input.runningTime() > recargaAte) {
+        VEL_ATUAL = 255
         turboAte = input.runningTime() + TURBO_DURACAO
         recargaAte = turboAte + TURBO_RECARGA
         music.playTone(988, 100)
-        ultimaSeta = -1
+        setaAtual = -1
         basic.showIcon(IconNames.Yes)
     } else {
         music.playTone(262, 150)
     }`,
-      CTRL_LOOP: `    if (turboAte > 0 && input.runningTime() > turboAte) {
-        turboAte = 0
-        VEL = VEL_NORMAL
-        music.playTone(523, 80)
-        ultimaSeta = -1
-    }`,
-    },
   },
   marcha_lenta: {
-    controle: {
-      CTRL_VARS: `let VEL_LENTA: number = {{VEL_LENTA}}
+    robo: {
+      ROBO_VARS: `let VEL_LENTA: number = {{VEL_LENTA}}
 let lenta: boolean = false`,
-      CTRL_BOTAO_B: `    if (coreoAtiva) {
-        cancela()
-    } else if (lenta) {
+    },
+    corpoBotao: `    if (lenta) {
         lenta = false
-        VEL = VEL_NORMAL
+        VEL_ATUAL = VEL_NORMAL
         music.playTone(784, 100)
-        ultimaSeta = -1
     } else {
         lenta = true
-        VEL = VEL_LENTA
+        VEL_ATUAL = VEL_LENTA
         music.playTone(392, 100)
-        ultimaSeta = -1
-    }`,
+    }
+    setaAtual = -1
+    seta(0)`,
+  },
+  empinada: {
+    robo: {
+      ROBO_VARS: `let EMP_RECUO: number = {{EMP_RECUO}}
+let EMP_ARRANQUE: number = {{EMP_ARRANQUE}}`,
     },
+    corpoBotao: `    seta(2)
+    mover(-255, -255)
+    espera(EMP_RECUO)
+    parar()
+    espera(70)
+    seta(1)
+    mover(255, 255)
+    espera(EMP_ARRANQUE)
+    parar()`,
   },
   contra_ataque: {
     robo: {
@@ -141,13 +164,13 @@ let CA_DESCANSO: number = {{CA_DESCANSO}}
 let proximoCA: number = 0`,
       ROBO_LOOPS: `
 basic.forever(function () {
-    if (coreo || input.runningTime() < proximoCA) {
+    if (ocupado || input.runningTime() < proximoCA) {
         basic.pause(30)
         return
     }
     if (input.acceleration(Dimension.Strength) > IMPACTO) {
         proximoCA = input.runningTime() + CA_DESCANSO
-        coreo = true
+        ocupado = true
         music.playTone(147, 200)
         setaAtual = -1
         basic.showIcon(IconNames.Angry)
@@ -156,7 +179,7 @@ basic.forever(function () {
         mover(VEL_COREO, -VEL_COREO)
         basic.pause(graus(CA_GIRO))
         parar()
-        coreo = false
+        ocupado = false
         ultimo = input.runningTime()
         setaAtual = -1
         seta(0)
@@ -172,13 +195,7 @@ let alvoEsq: number = 0
 let alvoDir: number = 0
 let atualEsq: number = 0
 let atualDir: number = 0`,
-      ROBO_FUNCS: `// guarda para onde queremos ir; quem move de fato é o loop lá embaixo
-function moverSuave(esq: number, dir: number) {
-    alvoEsq = esq
-    alvoDir = dir
-}
-
-function aproxima(atual: number, alvo: number): number {
+      ROBO_FUNCS: `function aproxima(atual: number, alvo: number): number {
     if (atual < alvo) {
         atual += RAMPA
         if (atual > alvo) { atual = alvo }
@@ -190,7 +207,7 @@ function aproxima(atual: number, alvo: number): number {
 }`,
       ROBO_LOOPS: `
 basic.forever(function () {
-    if (coreo) {
+    if (ocupado) {
         atualEsq = 0
         atualDir = 0
         basic.pause(20)
@@ -218,7 +235,7 @@ let daRe: boolean = false`,
       SETA_EXTRA: `    daRe = (estado == 2)`,
       ROBO_LOOPS: `
 basic.forever(function () {
-    if (daRe && !coreo) {
+    if (daRe && !ocupado) {
         music.playTone(RE_ALTURA, 90)
         basic.pause(RE_INTERVALO)
     } else {
@@ -228,6 +245,15 @@ basic.forever(function () {
     },
   },
 };
+
+/** Com Arranque suave, a função pilotar guarda o alvo em vez de mover direto. */
+export const CORPO_PILOTAR_SUAVE = `    alvoEsq = Math.idiv(esq * VEL_ATUAL, 255)
+    alvoDir = Math.idiv(dir * VEL_ATUAL, 255)
+    if (esq == 0 && dir == 0) { seta(0) }
+    else if (esq > 0 && dir > 0) { seta(1) }
+    else if (esq < 0 && dir < 0) { seta(2) }
+    else if (esq < dir) { seta(3) }
+    else { seta(4) }`;
 
 /** Linha de código que cada movimento de coreografia gera. */
 export const LINHAS_MOVIMENTOS: Record<string, (params: number[]) => string> = {
@@ -272,560 +298,27 @@ music.playTone(392, 400)`,
 };
 
 // ---------------------------------------------------------------------
-// Modelos base — código real da oficina, com os marcadores {{...}}.
-// ---------------------------------------------------------------------
-
-export const MODELO_CONTROLE = `// ═══════════════════════════════════════════
-//   CONTROLE — Equipe {{NOME_EQUIPE}}
-//   Grupo de rádio: {{GRUPO}}
-// ═══════════════════════════════════════════
-
-let GRUPO: number = {{GRUPO}}
-let SENSIBILIDADE: number = {{SENSIBILIDADE}}
-let VEL_NORMAL: number = {{VEL_NORMAL}}
-
-// ───────────────────────────────────────────
-
-let VEL: number = VEL_NORMAL
-let GIRO: number = {{GIRO}}
-let ZONA_FRENTE: number = {{ZONA_FRENTE}}
-let ZONA_CURVA: number = {{ZONA_CURVA}}
-let MAXFRENTE: number = 450 - SENSIBILIDADE * 30
-let MAXCURVA: number = MAXFRENTE * 2
-
-let zeroY: number = 0
-let zeroX: number = 0
-let coreoAtiva: boolean = false
-let inicioCoreo: number = 0
-let ultimaSeta: number = -1
-let ultimoEnvio: number = -1
-{{CTRL_VARS}}
-
-radio.setGroup(GRUPO)
-radio.setTransmitPower(7)
-radio.setTransmitSerialNumber(false)
-pins.analogSetPitchPin(AnalogPin.P0)
-
-function calibrar() {
-    basic.showIcon(IconNames.Asleep)
-    basic.pause(800)
-    let sy: number = 0
-    let sx: number = 0
-    for (let i = 0; i < 20; i++) {
-        sy += input.acceleration(Dimension.Y)
-        sx += input.acceleration(Dimension.X)
-        basic.pause(25)
-    }
-    zeroY = Math.round(sy / 20)
-    zeroX = Math.round(sx / 20)
-    basic.showIcon(IconNames.Yes)
-    music.playTone(784, 150)
-    basic.pause(400)
-    ultimaSeta = -1
-    basic.showIcon(IconNames.SmallSquare)
-}
-
-calibrar()
-
-function mostrar(estado: number) {
-    if (estado == ultimaSeta) { return }
-    ultimaSeta = estado
-    if (estado == 0) {
-        basic.showIcon(IconNames.SmallSquare)
-    } else if (estado == 1) {
-        basic.showArrow(ArrowNames.North)
-    } else if (estado == 2) {
-        basic.showArrow(ArrowNames.South)
-    } else if (estado == 3) {
-        basic.showArrow(ArrowNames.West)
-    } else {
-        basic.showArrow(ArrowNames.East)
-    }
-}
-
-function cancela() {
-    coreoAtiva = false
-    radio.sendNumber(900000)
-    music.playTone(330, 200)
-    ultimaSeta = -1
-    ultimoEnvio = -1
-    basic.showIcon(IconNames.SmallSquare)
-}
-
-function chamarCoreografia(codigo: number, letra: string) {
-    coreoAtiva = true
-    inicioCoreo = input.runningTime()
-    radio.sendNumber(codigo)
-    music.playTone(659, 120)
-    radio.sendNumber(codigo)
-    ultimaSeta = -1
-    ultimoEnvio = -1
-    basic.showString(letra)
-}
-
-// ─── BOTÃO A ───
-input.onButtonPressed(Button.A, function () {
-    if (coreoAtiva) {
-        cancela()
-    } else {
-        chamarCoreografia(900001, "1")
-    }
-})
-
-// ─── BOTÃO B ───
-input.onButtonPressed(Button.B, function () {
-{{CTRL_BOTAO_B}}
-})
-
-// ─── BOTÕES A + B ───
-input.onButtonPressed(Button.AB, function () {
-{{CTRL_BOTAO_AB}}
-})
-
-// o robô avisa que terminou a coreografia
-radio.onReceivedNumber(function (n: number) {
-    if (n == 900009 && coreoAtiva) {
-        coreoAtiva = false
-        ultimaSeta = -1
-        basic.showIcon(IconNames.Yes)
-        music.playTone(784, 150)
-        music.playTone(988, 250)
-        basic.pause(200)
-        ultimaSeta = -1
-        basic.showIcon(IconNames.SmallSquare)
-    }
-})
-
-basic.forever(function () {
-{{CTRL_LOOP}}
-    if (coreoAtiva) {
-        if (input.runningTime() - inicioCoreo > 40000) {
-            coreoAtiva = false
-            music.playTone(494, 200)
-            ultimaSeta = -1
-            basic.showIcon(IconNames.SmallSquare)
-        }
-        basic.pause(35)
-        return
-    }
-
-    let y: number = (input.acceleration(Dimension.Y) - zeroY) * -1
-    let x: number = (input.acceleration(Dimension.X) - zeroX) * -1
-
-    // zona morta subtrativa: o lado tem faixa maior, para a inclinação
-    // lateral acidental não virar curva quando você só quer ir reto
-    if (Math.abs(y) < ZONA_FRENTE) {
-        y = 0
-    } else if (y > 0) {
-        y = y - ZONA_FRENTE
-    } else {
-        y = y + ZONA_FRENTE
-    }
-
-    if (Math.abs(x) < ZONA_CURVA) {
-        x = 0
-    } else if (x > 0) {
-        x = x - ZONA_CURVA
-    } else {
-        x = x + ZONA_CURVA
-    }
-
-    if (y > MAXFRENTE) { y = MAXFRENTE }
-    if (y < -MAXFRENTE) { y = -MAXFRENTE }
-    if (x > MAXCURVA) { x = MAXCURVA }
-    if (x < -MAXCURVA) { x = -MAXCURVA }
-
-    let frente: number = Math.map(y, -MAXFRENTE, MAXFRENTE, -VEL, VEL)
-    let curva: number = Math.map(x, -MAXCURVA, MAXCURVA, -GIRO, GIRO)
-
-    // andando forte para frente, a curva perde força: prioriza o reto
-    if (frente != 0) {
-        let peso: number = 100 - Math.idiv(Math.abs(frente) * 45, 255)
-        curva = Math.idiv(curva * peso, 100)
-    }
-
-    let esq: number = Math.round(frente + curva)
-    let dir: number = Math.round(frente - curva)
-
-    // passou do teto? reduz os DOIS proporcionalmente em vez de cortar um só
-    let maior: number = Math.max(Math.abs(esq), Math.abs(dir))
-    if (maior > 255) {
-        esq = Math.idiv(esq * 255, maior)
-        dir = Math.idiv(dir * 255, maior)
-    }
-
-    let pacote: number = (esq + 255) * 1000 + (dir + 255)
-    radio.sendNumber(pacote)
-
-    if (pacote != ultimoEnvio) {
-        ultimoEnvio = pacote
-        if (esq == 0 && dir == 0) {
-            mostrar(0)
-        } else if (esq > 0 && dir > 0) {
-            mostrar(1)
-        } else if (esq < 0 && dir < 0) {
-            mostrar(2)
-        } else if (esq < dir) {
-            mostrar(3)
-        } else {
-            mostrar(4)
-        }
-    }
-
-    basic.pause({{RITMO}})
-})`;
-
-export const MODELO_ROBO = `// ═══════════════════════════════════════════
-//   ROBÔ — Equipe {{NOME_EQUIPE}}
-//   Grupo de rádio: {{GRUPO}}
-// ═══════════════════════════════════════════
-
-let GRUPO: number = {{GRUPO}}
-
-// Tempo em milissegundos para o robô dar UMA VOLTA COMPLETA (360°).
-let GIRO360: number = {{GIRO360}}
-
-// Velocidade usada nas coreografias (0 a 255).
-let VEL_COREO: number = {{VEL_COREO}}
-
-// Sentido dos motores: 1 = normal, -1 = invertido
-let INV_ESQ: number = {{INV_ESQ}}
-let INV_DIR: number = {{INV_DIR}}
-
-// Compensação de motor: se um lado for mais rápido que o outro, baixe o dele.
-// 100 = força total. 90 = 10% mais fraco.
-let TRIM_ESQ: number = {{TRIM_ESQ}}
-let TRIM_DIR: number = {{TRIM_DIR}}
-
-// Depois de quantos ms sem sinal do controle o robô para sozinho
-let DEADMAN: number = {{DEADMAN}}
-
-// ───────────────────────────────────────────
-
-let ultimo: number = 0
-let coreo: boolean = false
-let setaAtual: number = -1
-{{ROBO_VARS}}
-
-radio.setGroup(GRUPO)
-radio.setTransmitPower(7)
-radio.setTransmitSerialNumber(false)
-pins.analogSetPitchPin(AnalogPin.P0)
-basic.showIcon(IconNames.SmallSquare)
-{{ROBO_SETUP}}
-
-function mover(esq: number, dir: number) {
-    robotbit.MotorRun(robotbit.Motors.M1A, Math.idiv(esq * TRIM_ESQ, 100) * INV_ESQ)
-    robotbit.MotorRun(robotbit.Motors.M1B, Math.idiv(dir * TRIM_DIR, 100) * INV_DIR)
-}
-
-function parar() {
-    robotbit.MotorStopAll()
-}
-
-// desenha só quando muda — desenhar trava o programa
-function seta(estado: number) {
-    if (estado == setaAtual) { return }
-    setaAtual = estado
-{{SETA_EXTRA}}
-    if (estado == 0) {
-        basic.showIcon(IconNames.SmallSquare)
-    } else if (estado == 1) {
-        basic.showArrow(ArrowNames.North)
-    } else if (estado == 2) {
-        basic.showArrow(ArrowNames.South)
-    } else if (estado == 3) {
-        basic.showArrow(ArrowNames.West)
-    } else {
-        basic.showArrow(ArrowNames.East)
-    }
-}
-
-function espera(ms: number) {
-    let fim: number = input.runningTime() + ms
-    while (input.runningTime() < fim) {
-        if (!coreo) { return }
-        basic.pause(5)
-    }
-}
-
-// converte graus em tempo de giro
-function graus(g: number): number {
-    return Math.idiv(GIRO360 * g, 360)
-}
-
-// ═══════════════════════════════════════════
-//   MOVIMENTOS DISPONÍVEIS
-// ═══════════════════════════════════════════
-
-function andarFrente(t: number) {
-    if (!coreo) { return }
-    seta(1)
-    mover(VEL_COREO, VEL_COREO)
-    espera(t)
-    parar()
-    basic.pause(70)
-}
-
-function andarTras(t: number) {
-    if (!coreo) { return }
-    seta(2)
-    mover(-VEL_COREO, -VEL_COREO)
-    espera(t)
-    parar()
-    basic.pause(70)
-}
-
-function girarDireita(t: number) {
-    if (!coreo) { return }
-    seta(4)
-    mover(VEL_COREO, -VEL_COREO)
-    espera(t)
-    parar()
-    basic.pause(70)
-}
-
-function girarEsquerda(t: number) {
-    if (!coreo) { return }
-    seta(3)
-    mover(-VEL_COREO, VEL_COREO)
-    espera(t)
-    parar()
-    basic.pause(70)
-}
-
-function pausar(t: number) {
-    if (!coreo) { return }
-    seta(0)
-    parar()
-    espera(t)
-}
-
-function curvaDireita(t: number) {
-    if (!coreo) { return }
-    seta(4)
-    mover(VEL_COREO, Math.idiv(VEL_COREO * 43, 100))
-    espera(t)
-    parar()
-    basic.pause(70)
-}
-
-function curvaEsquerda(t: number) {
-    if (!coreo) { return }
-    seta(3)
-    mover(Math.idiv(VEL_COREO * 43, 100), VEL_COREO)
-    espera(t)
-    parar()
-    basic.pause(70)
-}
-
-function estrela(tamanho: number) {
-    for (let i = 0; i < 5; i++) {
-        if (!coreo) { return }
-        andarFrente(tamanho)
-        girarDireita(graus(144))
-    }
-}
-
-function quadrado(tamanho: number) {
-    for (let i = 0; i < 4; i++) {
-        if (!coreo) { return }
-        andarFrente(tamanho)
-        girarDireita(graus(90))
-    }
-}
-
-function piao(voltas: number) {
-    if (!coreo) { return }
-    setaAtual = -1
-    basic.showIcon(IconNames.Diamond)
-    mover(VEL_COREO, -VEL_COREO)
-    espera(GIRO360 * voltas)
-    parar()
-    basic.pause(70)
-}
-
-function tremida(vezes: number) {
-    for (let i = 0; i < vezes; i++) {
-        if (!coreo) { return }
-        mover(VEL_COREO, VEL_COREO)
-        espera(120)
-        mover(-VEL_COREO, -VEL_COREO)
-        espera(120)
-    }
-    parar()
-    basic.pause(70)
-}
-
-function apitar(altura: number, tempo: number) {
-    if (!coreo) { return }
-    music.playTone(altura, tempo)
-}
-
-{{ROBO_FUNCS}}
-
-// ═══════════════════════════════════════════
-//   AS COREOGRAFIAS DA EQUIPE
-// ═══════════════════════════════════════════
-
-function COREOGRAFIA_1() {
-{{COREO_1}}
-}
-
-function COREOGRAFIA_2() {
-{{COREO_2}}
-}
-{{COREO_3}}
-
-// ───────────────────────────────────────────
-
-function terminou() {
-    parar()
-    coreo = false
-    ultimo = input.runningTime()
-    radio.sendNumber(900009)
-    basic.pause(25)
-    radio.sendNumber(900009)
-    setaAtual = -1
-    seta(0)
-}
-
-radio.onReceivedNumber(function (n: number) {
-    if (n >= 900000) {
-        if (n == 900000) {
-            coreo = false
-            parar()
-            setaAtual = -1
-            seta(0)
-        } else if (n == 900001 && !coreo) {
-            coreo = true
-            control.inBackground(function () {
-                COREOGRAFIA_1()
-                terminou()
-            })
-        } else if (n == 900002 && !coreo) {
-            coreo = true
-            control.inBackground(function () {
-                COREOGRAFIA_2()
-                terminou()
-            })
-        } else if (n == 900003 && !coreo) {
-            coreo = true
-            control.inBackground(function () {
-                COREOGRAFIA_3()
-                terminou()
-            })
-        }
-        return
-    }
-
-    if (coreo) { return }
-
-    ultimo = input.runningTime()
-    let esq: number = Math.idiv(n, 1000) - 255
-    let dir: number = n % 1000 - 255
-
-    {{MOVER_PILOTAGEM}}
-
-    if (esq == 0 && dir == 0) {
-        seta(0)
-    } else if (esq > 0 && dir > 0) {
-        seta(1)
-    } else if (esq < 0 && dir < 0) {
-        seta(2)
-    } else if (esq < dir) {
-        seta(3)
-    } else {
-        seta(4)
-    }
-})
-
-// Botão A do robô = parada de emergência
-input.onButtonPressed(Button.A, function () {
-    coreo = false
-    parar()
-})
-
-// Botão B do robô = cronometrar o GIRO360
-// Aperte, tire a mão e espere a contagem. Ele dá uma volta com o tempo
-// programado. Parou exatamente onde começou? O número está certo.
-// Girou demais? Diminua. De menos? Aumente.
-input.onButtonPressed(Button.B, function () {
-    if (coreo) { return }
-    coreo = true
-    setaAtual = -1
-    // 2 segundos para tirar a mão e o robô assentar antes de girar
-    basic.showNumber(2)
-    music.playTone(523, 80)
-    basic.pause(1000)
-    basic.showNumber(1)
-    music.playTone(523, 80)
-    basic.pause(1000)
-    music.playTone(784, 120)
-    basic.showIcon(IconNames.Diamond)
-    mover(VEL_COREO, -VEL_COREO)
-    basic.pause(GIRO360)
-    parar()
-    coreo = false
-    setaAtual = -1
-    seta(0)
-    ultimo = input.runningTime()
-})
-
-basic.forever(function () {
-    if (!coreo && input.runningTime() - ultimo > DEADMAN) {
-        parar()
-        seta(0)
-    }
-    basic.pause(20)
-})
-{{ROBO_LOOPS}}`;
-
-// ---------------------------------------------------------------------
 // Montagem
 // ---------------------------------------------------------------------
 
-function identar(linhas: string[], espacos = 4): string {
-  const prefixo = " ".repeat(espacos);
-  return linhas.map((linha) => prefixo + linha).join("\n");
-}
-
-/** Converte uma sequência de movimentos em linhas de código, na ordem montada. */
-export function montarSequencia(movimentos: MovimentoNaSequencia[]): string {
-  const linhas = movimentos.map((item) => {
-    const gerar = LINHAS_MOVIMENTOS[item.movimentoId];
-    if (gerar) return gerar(item.params);
-    const movimento = MOVIMENTOS.find((m) => m.id === item.movimentoId);
-    const nome = movimento ? movimento.nome : item.movimentoId;
-    const args = item.params.join(", ");
-    return `// ${nome}(${args})`;
-  });
-  return identar(linhas);
-}
-
-/** Troca os {{PARAMETROS}} do texto do módulo pelos números da tela Ajustes. */
 function aplicarParametros(
   trecho: string,
   melhoriaId: string,
-  ajustesMelhorias: Equipe["ajustesMelhorias"],
+  ajustes: AjustesMelhorias | undefined,
 ): string {
   const mapa = PARAMETROS_MELHORIAS[melhoriaId] ?? {};
   return trecho.replace(/\{\{([A-Z_0-9]+)\}\}/g, (original, nome: string) => {
-    const campo = mapa[nome];
-    if (!campo) return original;
-    return String(numeroAjusteMelhoria(ajustesMelhorias, melhoriaId, campo));
+    const campoId = mapa[nome];
+    if (!campoId) return original;
+    return String(numeroAjusteMelhoria(ajustes, melhoriaId, campoId));
   });
 }
 
-function juntarTrechos(
-  equipe: Equipe,
-  lado: "controle" | "robo",
-  marcador: Marcador,
-): string {
+function juntarTrechos(equipe: Equipe, marcador: Marcador): string {
   const escolhidasEmOrdem = ORDEM_MODULOS.filter((id) => equipe.melhorias.includes(id));
   const trechos = escolhidasEmOrdem
     .map((id) => {
-      const trecho = TRECHOS_MELHORIAS[id]?.[lado]?.[marcador];
+      const trecho = TRECHOS_MELHORIAS[id]?.robo?.[marcador];
       if (!trecho || !trecho.trim()) return null;
       return aplicarParametros(trecho, id, equipe.ajustesMelhorias);
     })
@@ -834,9 +327,20 @@ function juntarTrechos(
   return trechos.join("\n\n");
 }
 
-function coreografiaPorGatilho(coreografias: Coreografia[], gatilho: Coreografia["gatilho"]) {
+function montarSequencia(movimentos: MovimentoNaSequencia[]): string {
+  return movimentos
+    .map((item) => {
+      const linha = LINHAS_MOVIMENTOS[item.movimentoId];
+      return linha ? `    ${linha(item.params)}` : null;
+    })
+    .filter((linha): linha is string => Boolean(linha))
+    .join("\n");
+}
+
+function corpoDeCoreografia(coreografias: Coreografia[], gatilho: Botao): string {
   const encontrada = coreografias.find((c) => c.gatilho === gatilho);
-  return encontrada ? montarSequencia(encontrada.movimentos) : "";
+  const corpo = encontrada ? montarSequencia(encontrada.movimentos) : "";
+  return corpo.trim() ? corpo : "    // esta coreografia ainda não foi montada";
 }
 
 function aplicarMarcadores(modelo: string, valores: Partial<Record<Marcador, string>>): string {
@@ -846,112 +350,92 @@ function aplicarMarcadores(modelo: string, valores: Partial<Record<Marcador, str
   });
 }
 
-export type CodigoGerado = { controle: string; robo: string };
+export type CodigoGerado = {
+  /** null no modo celular: lá não existe micro:bit de controle. */
+  controle: string | null;
+  tituloControle: string;
+  robo: string;
+  tituloRobo: string;
+};
 
-/** Monta os dois códigos da equipe colando trechos fixos nos marcadores. */
+/** Monta os códigos da equipe colando trechos fixos nos marcadores. */
 export function montarCodigo(equipe: Equipe): CodigoGerado {
-  // O botão B fica ocupado quando a equipe escolhe Turbo ou Marcha Lenta:
-  // nesse caso ela tem duas coreografias (A e A+B) em vez de três.
-  const botaoBOcupado = MODULOS_QUE_OCUPAM_BOTAO_B.some((id) => equipe.melhorias.includes(id));
-
-  // Todos os números vêm da tela Ajustes. Ninguém edita o código à mão.
+  const modo = equipe.modoPilotagem || "inclinacao";
   const ajustes = equipe.ajustes;
-  const velocidadeMaxima = numeroAjuste(ajustes, "velocidade_maxima");
+  const usaTurbo = equipe.melhorias.includes("turbo");
   const usaArranqueSuave = equipe.melhorias.includes("arranque_suave");
+
   const base: Partial<Record<Marcador, string>> = {
     NOME_EQUIPE: equipe.nomeEquipe,
     GRUPO: String(equipe.grupoRadio),
+    SENHA: (equipe.senhaRobo || "").toUpperCase(),
     SENSIBILIDADE: String(numeroAjuste(ajustes, "sensibilidade")),
-    VEL_NORMAL: String(
-      equipe.melhorias.includes("turbo")
-        ? numeroAjusteMelhoria(equipe.ajustesMelhorias, "turbo", "velocidade_normal")
-        : velocidadeMaxima,
-    ),
     ZONA_FRENTE: String(numeroAjuste(ajustes, "zona_frente")),
     ZONA_CURVA: String(numeroAjuste(ajustes, "zona_curva")),
     GIRO: String(numeroAjuste(ajustes, "forca_giro")),
     RITMO: String(numeroAjuste(ajustes, "ritmo_envio")),
+    // Quem escolhe Turbo tem a velocidade normal reduzida: é o que o turbo dá a mais.
+    VEL_NORMAL: String(
+      usaTurbo
+        ? numeroAjusteMelhoria(equipe.ajustesMelhorias, "turbo", "velocidade_normal")
+        : numeroAjuste(ajustes, "velocidade_maxima"),
+    ),
+    GIRO360: String(numeroAjuste(ajustes, "giro360")),
+    VEL_COREO: String(numeroAjuste(ajustes, "velocidade_coreografia")),
     INV_ESQ: ligadoAjuste(ajustes, "inverter_motor_esquerdo") ? "-1" : "1",
     INV_DIR: ligadoAjuste(ajustes, "inverter_motor_direito") ? "-1" : "1",
     TRIM_ESQ: String(numeroAjuste(ajustes, "forca_motor_esquerdo")),
     TRIM_DIR: String(numeroAjuste(ajustes, "forca_motor_direito")),
     DEADMAN: String(numeroAjuste(ajustes, "parada_perda_sinal")),
-    GIRO360: String(numeroAjuste(ajustes, "giro360")),
-    VEL_COREO: String(numeroAjuste(ajustes, "velocidade_coreografia")),
-    // O Arranque suave troca a pilotagem por uma aceleração gradual.
-    MOVER_PILOTAGEM: usaArranqueSuave ? "moverSuave(esq, dir)" : "mover(esq, dir)",
   };
 
-  const marcadoresControle: Marcador[] = ["CTRL_VARS", "CTRL_BOTAO_B", "CTRL_LOOP"];
-  const marcadoresRobo: Marcador[] = ["ROBO_VARS", "ROBO_SETUP", "ROBO_FUNCS", "SETA_EXTRA", "ROBO_LOOPS"];
-
-  const controle: Partial<Record<Marcador, string>> = { ...base };
   const robo: Partial<Record<Marcador, string>> = { ...base };
-
-  for (const marcador of marcadoresControle) {
-    controle[marcador] = juntarTrechos(equipe, "controle", marcador);
-  }
-  for (const marcador of marcadoresRobo) {
-    robo[marcador] = juntarTrechos(equipe, "robo", marcador);
+  for (const marcador of ["ROBO_VARS", "ROBO_SETUP", "ROBO_FUNCS", "SETA_EXTRA", "ROBO_LOOPS"] as Marcador[]) {
+    robo[marcador] = juntarTrechos(equipe, marcador);
   }
 
-  // Se nenhum módulo ocupou o botão B, ele chama a segunda coreografia.
-  if (!controle.CTRL_BOTAO_B?.trim()) {
-    controle.CTRL_BOTAO_B = identar([
-      "if (coreoAtiva) {",
-      "    cancela()",
-      "} else {",
-      "    chamarCoreografia(900002, \"2\")",
-      "}",
-    ]);
-  }
+  robo.CORPO_PILOTAR = usaArranqueSuave ? CORPO_PILOTAR_SUAVE : CORPO_PILOTAR_DIRETO;
 
-  // A+B chama a última coreografia da equipe.
-  const codigoAB = botaoBOcupado ? 900002 : 900003;
-  const letraAB = botaoBOcupado ? "2" : "3";
-  const trechoAB = juntarTrechos(equipe, "controle", "CTRL_BOTAO_AB");
-  controle.CTRL_BOTAO_AB = trechoAB.trim()
-    ? trechoAB
-    : identar([
-        "if (coreoAtiva) {",
-        "    cancela()",
-        "} else {",
-        `    chamarCoreografia(${codigoAB}, "${letraAB}")`,
-        "}",
-      ]);
-
-  // Coreografias: sem Turbo/Lenta são três (A, B, A+B); com um deles, duas (A, A+B).
-  robo.COREO_1 = coreografiaPorGatilho(equipe.coreografias, "A");
-  if (botaoBOcupado) {
-    robo.COREO_2 = coreografiaPorGatilho(equipe.coreografias, "AB");
-    robo.COREO_3 = [
-      "",
-      "function COREOGRAFIA_3() {",
-      "    // esta equipe usa o botão B para Turbo ou Marcha Lenta",
-      "}",
-    ].join("\n");
-  } else {
-    robo.COREO_2 = coreografiaPorGatilho(equipe.coreografias, "B");
-    robo.COREO_3 = [
-      "",
-      "function COREOGRAFIA_3() {",
-      coreografiaPorGatilho(equipe.coreografias, "AB"),
-      "}",
-    ].join("\n");
-  }
-
-  // A melodia de abertura entra no setup do robô, junto com os outros módulos.
+  // A melodia de abertura entra no setup do robô.
   const melodia = equipe.melhorias.includes("som_abertura") ? equipe.melodiaAbertura : null;
-  const trechoMelodia = melodia
-    ? (TRECHOS_MELODIAS[melodia] ?? `// melodia de abertura: ${melodia}`)
-    : "";
+  const trechoMelodia = melodia ? (TRECHOS_MELODIAS[melodia] ?? "") : "";
   if (trechoMelodia) {
     robo.ROBO_SETUP = [robo.ROBO_SETUP, trechoMelodia].filter(Boolean).join("\n");
   }
 
+  // Cada botão recebe o corpo da melhoria escolhida ou da coreografia.
+  const atribuicao = atribuicaoEfetiva(equipe);
+  const marcadorDoBotao: Record<Botao, Marcador> = {
+    A: "BOTAO_A",
+    B: "BOTAO_B",
+    AB: "BOTAO_AB",
+  };
+  for (const botao of ["A", "B", "AB"] as Botao[]) {
+    const valor = atribuicao[botao];
+    let corpo: string;
+    if (valor === VALOR_COREOGRAFIA) {
+      corpo = corpoDeCoreografia(equipe.coreografias, botao);
+    } else {
+      const trecho = TRECHOS_MELHORIAS[valor]?.corpoBotao;
+      corpo = trecho
+        ? aplicarParametros(trecho, valor, equipe.ajustesMelhorias)
+        : "    // este botão não foi usado por esta equipe";
+    }
+    robo[marcadorDoBotao[botao]] = corpo;
+  }
+
+  robo.COMUNICACAO = modo === "celular" ? COMUNICACAO_BLUETOOTH : COMUNICACAO_RADIO;
+
+  const controle =
+    modo === "celular"
+      ? null
+      : aplicarMarcadores(modo === "teclado" ? MODELO_CONTROLE_TECLADO : MODELO_CONTROLE, base);
+
   return {
-    controle: aplicarMarcadores(MODELO_CONTROLE, controle),
+    controle,
+    tituloControle: modo === "teclado" ? "CONTROLE POR TECLADO" : "CONTROLE",
     robo: aplicarMarcadores(MODELO_ROBO, robo),
+    tituloRobo: modo === "celular" ? "ROBÔ POR BLUETOOTH" : "ROBÔ",
   };
 }
 
