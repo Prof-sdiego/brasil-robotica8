@@ -111,18 +111,31 @@ function TelaCodigo() {
           cor="bg-primary text-primary-foreground"
         />
 
-        <section className="cartao-toque p-5">
-          <h2 className="text-xl">Como instalar</h2>
-          <ol className="mt-3 space-y-3">
-            {INSTRUCOES_INSTALACAO.map((passo, indice) => (
-              <li key={passo} className="flex gap-3">
-                <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-accent font-black text-accent-foreground">
-                  {indice + 1}
-                </span>
-                <span className="font-semibold">{passo}</span>
-              </li>
-            ))}
-          </ol>
+        <section className="space-y-4">
+          <h2 className="text-2xl">Como colocar o código no seu robô</h2>
+          {INSTRUCOES_INSTALACAO.map((parte) => (
+            <div key={parte.titulo} className="cartao-toque p-5">
+              <h3 className="flex items-center gap-2 text-lg">
+                <span aria-hidden="true">{parte.icone}</span>
+                {parte.titulo}
+              </h3>
+              <ol className="mt-3 space-y-3">
+                {parte.passos.map((passo, indice) => (
+                  <li key={passo} className="flex gap-3">
+                    <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-accent font-black text-accent-foreground">
+                      {indice + 1}
+                    </span>
+                    <span className="font-semibold">{passo}</span>
+                  </li>
+                ))}
+              </ol>
+              {parte.nota ? (
+                <p className="mt-4 rounded-xl border-l-4 border-info bg-info/10 p-3 text-sm font-semibold">
+                  {parte.nota}
+                </p>
+              ) : null}
+            </div>
+          ))}
         </section>
       </main>
     </>
