@@ -1,9 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Plus, Trash2, UserPlus, Users } from "lucide-react";
-import { useState } from "react";
+import { Lock, PartyPopper, Plus, Trash2, UserPlus, Users } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 
 import { Cabecalho } from "@/components/Cabecalho";
 import { MAXIMO_INTEGRANTES, PAPEIS } from "@/lib/catalogo";
+import { listarFaltantes, papeisFaltantes } from "@/lib/equipeStatus";
 import type { Integrante, Papel } from "@/lib/tipos";
 import { useAluno } from "@/lib/useAluno";
 
@@ -30,6 +31,21 @@ function TelaEquipe() {
   const [nome, setNome] = useState("");
   const [papel, setPapel] = useState<Papel | "">("");
   const [aberto, setAberto] = useState(false);
+  const [festa, setFesta] = useState(false);
+  const eraCompleta = useRef<boolean | null>(null);
+
+  const faltantes = equipe ? papeisFaltantes(equipe.integrantes) : [];
+  const completa = Boolean(equipe) && faltantes.length === 0;
+
+  useEffect(() => {
+    if (!equipe) return undefined;
+    const virouCompleta = eraCompleta.current === false && completa;
+    eraCompleta.current = completa;
+    if (!virouCompleta) return undefined;
+    setFesta(true);
+    const t = setTimeout(() => setFesta(false), 2600);
+    return () => clearTimeout(t);
+  }, [completa, equipe]);
 
   if (carregando || !equipe) {
     return <p className="p-8 text-center text-lg font-bold">Carregando...</p>;
@@ -74,7 +90,22 @@ function TelaEquipe() {
   return (
     <>
       <Cabecalho titulo="Equipe" icone={<Users className="size-6" />} salvando={salvando} />
+      {festa && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/50 p-6 animate-in fade-in">
+          <div className="cartao-toque flex animate-in flex-col items-center gap-3 p-8 text-center zoom-in-50 duration-500">
+            <PartyPopper className="size-16 animate-bounce text-primary" />
+            <p className="font-display text-3xl font-extrabold">Equipe completa!</p>
+            <p className="text-xl font-bold text-sucesso">Tudo liberado.</p>
+          </div>
+        </div>
+      )}
       <main className="mx-auto max-w-3xl px-4 py-5 pb-16">
+        {!completa && (
+          <p className="mb-4 flex items-start gap-2 rounded-2xl bg-alerta px-4 py-4 font-bold text-alerta-foreground">
+            <Lock className="mt-0.5 size-5 shrink-0" /> Faltam: {listarFaltantes(faltantes)}.
+            Cadastre a equipe completa para liberar o resto do site.
+          </p>
+        )}
         <div className="cartao-toque mb-5 p-4">
           <p className="text-base font-bold">
             {integrantes.length} de {MAXIMO_INTEGRANTES} pessoas na equipe

@@ -26,7 +26,7 @@ export const Route = createFileRoute("/checklist")({
 });
 
 function TelaChecklist() {
-  const { equipe, carregando, salvar, salvando } = useAluno();
+  const { equipe, carregando, salvar, salvando } = useAluno({ exigirEquipeCompleta: true });
   const [quem, setQuem] = useState("");
 
   if (carregando || !equipe) {

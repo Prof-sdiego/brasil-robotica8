@@ -26,7 +26,7 @@ export const Route = createFileRoute("/melhorias")({
 });
 
 function TelaMelhorias() {
-  const { equipe, carregando, salvar, salvando } = useAluno();
+  const { equipe, carregando, salvar, salvando } = useAluno({ exigirEquipeCompleta: true });
   const [aviso, setAviso] = useState("");
 
   if (carregando || !equipe) {

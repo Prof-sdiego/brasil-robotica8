@@ -35,7 +35,7 @@ const ROTULOS: Record<Coreografia["gatilho"], string> = {
 };
 
 function TelaCoreografias() {
-  const { equipe, carregando, salvar, salvando } = useAluno();
+  const { equipe, carregando, salvar, salvando } = useAluno({ exigirEquipeCompleta: true });
   const [aberta, setAberta] = useState<Coreografia["gatilho"]>("A");
 
   if (carregando || !equipe) {

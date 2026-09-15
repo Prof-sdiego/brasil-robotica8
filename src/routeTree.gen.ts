@@ -17,6 +17,8 @@ import { Route as EquipeRouteImport } from './routes/equipe'
 import { Route as MelhoriasRouteImport } from './routes/melhorias'
 import { Route as PainelRouteImport } from './routes/painel'
 import { Route as ProfessorRouteImport } from './routes/professor'
+import { Route as ProgramadorRouteImport } from './routes/programador'
+import { Route as TutorialRouteImport } from './routes/tutorial'
 import { Route as ProfessorIndexRouteImport } from './routes/professor.index'
 import { Route as ProfessorCadastroRouteImport } from './routes/professor.cadastro'
 import { Route as ProfessorEquipeIdRouteImport } from './routes/professor.equipe.$id'
@@ -61,6 +63,16 @@ const ProfessorRoute = ProfessorRouteImport.update({
   path: '/professor',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ProgramadorRoute = ProgramadorRouteImport.update({
+  id: '/programador',
+  path: '/programador',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TutorialRoute = TutorialRouteImport.update({
+  id: '/tutorial',
+  path: '/tutorial',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ProfessorIndexRoute = ProfessorIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -86,6 +98,8 @@ export interface FileRoutesByFullPath {
   '/melhorias': typeof MelhoriasRoute
   '/painel': typeof PainelRoute
   '/professor': typeof ProfessorRouteWithChildren
+  '/programador': typeof ProgramadorRoute
+  '/tutorial': typeof TutorialRoute
   '/professor/cadastro': typeof ProfessorCadastroRoute
   '/professor/': typeof ProfessorIndexRoute
   '/professor/equipe/$id': typeof ProfessorEquipeIdRoute
@@ -98,6 +112,8 @@ export interface FileRoutesByTo {
   '/equipe': typeof EquipeRoute
   '/melhorias': typeof MelhoriasRoute
   '/painel': typeof PainelRoute
+  '/programador': typeof ProgramadorRoute
+  '/tutorial': typeof TutorialRoute
   '/professor/cadastro': typeof ProfessorCadastroRoute
   '/professor': typeof ProfessorIndexRoute
   '/professor/equipe/$id': typeof ProfessorEquipeIdRoute
@@ -112,6 +128,8 @@ export interface FileRoutesById {
   '/melhorias': typeof MelhoriasRoute
   '/painel': typeof PainelRoute
   '/professor': typeof ProfessorRouteWithChildren
+  '/programador': typeof ProgramadorRoute
+  '/tutorial': typeof TutorialRoute
   '/professor/cadastro': typeof ProfessorCadastroRoute
   '/professor/': typeof ProfessorIndexRoute
   '/professor/equipe/$id': typeof ProfessorEquipeIdRoute
@@ -127,6 +145,8 @@ export interface FileRouteTypes {
     | '/melhorias'
     | '/painel'
     | '/professor'
+    | '/programador'
+    | '/tutorial'
     | '/professor/cadastro'
     | '/professor/'
     | '/professor/equipe/$id'
@@ -139,6 +159,8 @@ export interface FileRouteTypes {
     | '/equipe'
     | '/melhorias'
     | '/painel'
+    | '/programador'
+    | '/tutorial'
     | '/professor/cadastro'
     | '/professor'
     | '/professor/equipe/$id'
@@ -152,6 +174,8 @@ export interface FileRouteTypes {
     | '/melhorias'
     | '/painel'
     | '/professor'
+    | '/programador'
+    | '/tutorial'
     | '/professor/cadastro'
     | '/professor/'
     | '/professor/equipe/$id'
@@ -166,6 +190,8 @@ export interface RootRouteChildren {
   MelhoriasRoute: typeof MelhoriasRoute
   PainelRoute: typeof PainelRoute
   ProfessorRoute: typeof ProfessorRouteWithChildren
+  ProgramadorRoute: typeof ProgramadorRoute
+  TutorialRoute: typeof TutorialRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -226,6 +252,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProfessorRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/programador': {
+      id: '/programador'
+      path: '/programador'
+      fullPath: '/programador'
+      preLoaderRoute: typeof ProgramadorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tutorial': {
+      id: '/tutorial'
+      path: '/tutorial'
+      fullPath: '/tutorial'
+      preLoaderRoute: typeof TutorialRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/professor/': {
       id: '/professor/'
       path: '/'
@@ -275,6 +315,8 @@ const rootRouteChildren: RootRouteChildren = {
   MelhoriasRoute: MelhoriasRoute,
   PainelRoute: PainelRoute,
   ProfessorRoute: ProfessorRouteWithChildren,
+  ProgramadorRoute: ProgramadorRoute,
+  TutorialRoute: TutorialRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

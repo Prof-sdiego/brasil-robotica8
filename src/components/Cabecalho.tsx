@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { ArrowLeft, Check, Loader2 } from "lucide-react";
+import { ArrowLeft, Check, HelpCircle, Loader2 } from "lucide-react";
 import type { ReactNode } from "react";
 
 type Props = {
@@ -24,6 +24,13 @@ export function Cabecalho({ titulo, icone, voltarPara = "/painel", salvando }: P
           {icone}
           {titulo}
         </h1>
+        <Link
+          to="/tutorial"
+          className="flex shrink-0 items-center gap-1 rounded-full bg-card/25 px-3 py-2 text-sm font-bold backdrop-blur-sm active:scale-95"
+        >
+          <HelpCircle className="size-4" />
+          <span className="hidden sm:inline">Como funciona</span>
+        </Link>
         <span className="flex items-center gap-1 text-sm font-semibold opacity-90">
           {salvando ? (
             <>
