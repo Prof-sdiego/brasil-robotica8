@@ -41,12 +41,12 @@ export type Marcador = (typeof MARCADORES)[number];
 
 /** Ordem de encaixe quando mais de um módulo escreve no mesmo marcador. */
 export const ORDEM_MODULOS: string[] = [
-  "som_abertura",
   "farol",
-  "placar",
+  "bipe_re",
+  "contador_tempo",
+  "som_abertura",
   "turbo",
   "marcha_lenta",
-  "antibloqueio",
 ];
 
 /** Módulos que ocupam o botão B do controle (deixam a equipe com 2 coreografias). */
@@ -59,19 +59,140 @@ export const TRECHOS_MELHORIAS: Record<
   string,
   { controle?: TrechosPorMarcador; robo?: TrechosPorMarcador }
 > = {
-  turbo: {},
-  marcha_lenta: {},
+  farol: {
+    robo: {
+      ROBO_VARS: `let faixa: neopixel.Strip = null`,
+      ROBO_SETUP: `faixa = robotbit.rgb()
+faixa.setBrightness(60)
+faixa.showColor(neopixel.colors(NeoPixelColors.White))`,
+      SETA_EXTRA: `    if (estado == 0) {
+        faixa.showColor(neopixel.colors(NeoPixelColors.White))
+    } else if (estado == 1) {
+        faixa.showColor(neopixel.colors(NeoPixelColors.Green))
+    } else if (estado == 2) {
+        faixa.showColor(neopixel.colors(NeoPixelColors.Red))
+    } else {
+        faixa.showColor(neopixel.colors(NeoPixelColors.Blue))
+    }`,
+    },
+  },
+  turbo: {
+    controle: {
+      CTRL_VARS: `let turboAte: number = 0
+let recargaAte: number = 0`,
+      CTRL_BOTAO_B: `    if (coreoAtiva) {
+        cancela()
+    } else if (input.runningTime() > recargaAte) {
+        VEL = 255
+        turboAte = input.runningTime() + 2000
+        recargaAte = turboAte + 5000
+        music.playTone(988, 100)
+        ultimaSeta = -1
+        basic.showIcon(IconNames.Yes)
+    } else {
+        music.playTone(262, 150)
+    }`,
+      CTRL_LOOP: `    if (turboAte > 0 && input.runningTime() > turboAte) {
+        turboAte = 0
+        VEL = VEL_NORMAL
+        music.playTone(523, 80)
+        ultimaSeta = -1
+    }`,
+    },
+  },
+  marcha_lenta: {
+    controle: {
+      CTRL_VARS: `let lenta: boolean = false`,
+      CTRL_BOTAO_B: `    if (coreoAtiva) {
+        cancela()
+    } else if (lenta) {
+        lenta = false
+        VEL = VEL_NORMAL
+        music.playTone(784, 100)
+        ultimaSeta = -1
+    } else {
+        lenta = true
+        VEL = 110
+        music.playTone(392, 100)
+        ultimaSeta = -1
+    }`,
+    },
+  },
   som_abertura: {},
-  farol: {},
-  antibloqueio: {},
-  placar: {},
+  bipe_re: {
+    robo: {
+      ROBO_VARS: `let daRe: boolean = false`,
+      SETA_EXTRA: `    daRe = (estado == 2)`,
+      ROBO_LOOPS: `
+basic.forever(function () {
+    if (daRe) {
+        music.playTone(880, 90)
+        basic.pause(230)
+    } else {
+        basic.pause(100)
+    }
+})`,
+    },
+  },
+  contador_tempo: {
+    robo: {
+      ROBO_VARS: `let tempoMov: number = 0
+let marcaMov: number = 0
+let mostrouAgora: number = 0`,
+      SETA_EXTRA: `    if (marcaMov > 0) {
+        tempoMov += input.runningTime() - marcaMov
+        marcaMov = 0
+    }
+    if (estado != 0) { marcaMov = input.runningTime() }`,
+      ROBO_FUNCS: `// A+B no robô: mostra os segundos em movimento.
+// Apertando duas vezes seguidas, zera o contador.
+input.onButtonPressed(Button.AB, function () {
+    if (coreo) { return }
+    if (input.runningTime() - mostrouAgora < 3000) {
+        tempoMov = 0
+        marcaMov = 0
+        basic.showIcon(IconNames.No)
+        music.playTone(330, 200)
+        basic.pause(500)
+    } else {
+        basic.showNumber(Math.idiv(tempoMov, 1000))
+    }
+    mostrouAgora = input.runningTime()
+    setaAtual = -1
+    seta(0)
+})`,
+    },
+  },
 };
 
 /** Linha de código que cada movimento de coreografia gera. */
 export const LINHAS_MOVIMENTOS: Record<string, (params: number[]) => string> = {};
 
 /** Trecho da melodia de abertura escolhida. */
-export const TRECHOS_MELODIAS: Record<string, string> = {};
+export const TRECHOS_MELODIAS: Record<string, string> = {
+  fanfarra: `music.playTone(523, 150)
+music.playTone(659, 150)
+music.playTone(784, 150)
+music.playTone(1047, 350)`,
+  alerta_combate: `music.playTone(880, 120)
+basic.pause(80)
+music.playTone(880, 120)
+basic.pause(80)
+music.playTone(1175, 400)`,
+  robozinho: `music.playTone(392, 100)
+music.playTone(523, 100)
+music.playTone(440, 100)
+music.playTone(587, 100)
+music.playTone(494, 250)`,
+  descida_grave: `music.playTone(784, 130)
+music.playTone(659, 130)
+music.playTone(523, 130)
+music.playTone(392, 400)`,
+  sirene: `for (let i = 0; i < 2; i++) {
+    music.playTone(659, 180)
+    music.playTone(880, 180)
+}`,
+};
 
 // ---------------------------------------------------------------------
 // Modelos base — código real da oficina, com os marcadores {{...}}.
