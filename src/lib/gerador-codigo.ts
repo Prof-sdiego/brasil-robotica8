@@ -836,24 +836,10 @@ export function montarCodigo(equipe: Equipe): CodigoGerado {
     robo.ROBO_SETUP = [robo.ROBO_SETUP, trechoMelodia].filter(Boolean).join("\n");
   }
 
-  // Enquanto o modelo não tem marcadores próprios para estes números,
-  // trocamos as linhas fixas pelos valores da tela Ajustes.
-  const trocas: [RegExp, string][] = [
-    [/let ZONA: number = \d+/, `let ZONA: number = ${numeroAjuste(equipe.ajustes, "zona_morta")}`],
-    [
-      /let GIRO360: number = \d+/,
-      `let GIRO360: number = ${numeroAjuste(equipe.ajustes, "giro360")}`,
-    ],
-  ];
-
-  let textoControle = aplicarMarcadores(MODELO_CONTROLE, controle);
-  let textoRobo = aplicarMarcadores(MODELO_ROBO, robo);
-  for (const [procura, troca] of trocas) {
-    textoControle = textoControle.replace(procura, troca);
-    textoRobo = textoRobo.replace(procura, troca);
-  }
-
-  return { controle: textoControle, robo: textoRobo };
+  return {
+    controle: aplicarMarcadores(MODELO_CONTROLE, controle),
+    robo: aplicarMarcadores(MODELO_ROBO, robo),
+  };
 }
 
 /** Duração estimada de uma coreografia, em segundos. */
