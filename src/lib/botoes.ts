@@ -75,7 +75,7 @@ export function acoesDosBotoes(equipe: {
   const atribuicao = atribuicaoEfetiva(equipe);
   let contador = 0;
   return BOTOES.map((botao) => {
-    const valor = atribuicao[botao];
+    const valor = atribuicao[botao] ?? "";
     if (valor === VALOR_COREOGRAFIA) {
       contador += 1;
       return {

@@ -2,6 +2,8 @@
 
 export type Papel = "Piloto" | "Copiloto" | "Engenheiro" | "Programador" | "Staff";
 
+export type Botao = "A" | "B" | "AB";
+
 export type Integrante = {
   id: string;
   nome: string;
@@ -15,7 +17,7 @@ export type MovimentoNaSequencia = {
 };
 
 export type Coreografia = {
-  gatilho: "A" | "B" | "AB";
+  gatilho: Botao;
   movimentos: MovimentoNaSequencia[];
 };
 
@@ -34,6 +36,10 @@ export type Equipe = {
   nomeEquipe: string;
   grupoRadio: number;
   sensibilidade: number;
+  modoPilotagem: string;
+  senhaRobo: string;
+  nomeMicrobit: string;
+  atribuicaoBotoes: Partial<Record<Botao, string>>;
   ajustes: Record<string, number | boolean>;
   ajustesMelhorias: Record<string, Record<string, number | boolean>>;
   ajustesAtualizadosEm: string | null;
@@ -53,6 +59,8 @@ export type EquipeEditavel = Partial<
   Pick<
     Equipe,
     | "sensibilidade"
+    | "modoPilotagem"
+    | "atribuicaoBotoes"
     | "ajustes"
     | "ajustesMelhorias"
     | "ajustesAtualizadosEm"
