@@ -22,6 +22,7 @@ import { Route as ProgramadorRouteImport } from './routes/programador'
 import { Route as TutorialRouteImport } from './routes/tutorial'
 import { Route as ProfessorIndexRouteImport } from './routes/professor.index'
 import { Route as ProfessorCadastroRouteImport } from './routes/professor.cadastro'
+import { Route as ProfessorPilotarRouteImport } from './routes/professor.pilotar'
 import { Route as ProfessorEquipeIdRouteImport } from './routes/professor.equipe.$id'
 
 const IndexRoute = IndexRouteImport.update({
@@ -89,6 +90,11 @@ const ProfessorCadastroRoute = ProfessorCadastroRouteImport.update({
   path: '/cadastro',
   getParentRoute: () => ProfessorRoute,
 } as any)
+const ProfessorPilotarRoute = ProfessorPilotarRouteImport.update({
+  id: '/pilotar',
+  path: '/pilotar',
+  getParentRoute: () => ProfessorRoute,
+} as any)
 const ProfessorEquipeIdRoute = ProfessorEquipeIdRouteImport.update({
   id: '/equipe/$id',
   path: '/equipe/$id',
@@ -108,6 +114,7 @@ export interface FileRoutesByFullPath {
   '/programador': typeof ProgramadorRoute
   '/tutorial': typeof TutorialRoute
   '/professor/cadastro': typeof ProfessorCadastroRoute
+  '/professor/pilotar': typeof ProfessorPilotarRoute
   '/professor/': typeof ProfessorIndexRoute
   '/professor/equipe/$id': typeof ProfessorEquipeIdRoute
 }
@@ -123,6 +130,7 @@ export interface FileRoutesByTo {
   '/programador': typeof ProgramadorRoute
   '/tutorial': typeof TutorialRoute
   '/professor/cadastro': typeof ProfessorCadastroRoute
+  '/professor/pilotar': typeof ProfessorPilotarRoute
   '/professor': typeof ProfessorIndexRoute
   '/professor/equipe/$id': typeof ProfessorEquipeIdRoute
 }
@@ -140,6 +148,7 @@ export interface FileRoutesById {
   '/programador': typeof ProgramadorRoute
   '/tutorial': typeof TutorialRoute
   '/professor/cadastro': typeof ProfessorCadastroRoute
+  '/professor/pilotar': typeof ProfessorPilotarRoute
   '/professor/': typeof ProfessorIndexRoute
   '/professor/equipe/$id': typeof ProfessorEquipeIdRoute
 }
@@ -158,6 +167,7 @@ export interface FileRouteTypes {
     | '/programador'
     | '/tutorial'
     | '/professor/cadastro'
+    | '/professor/pilotar'
     | '/professor/'
     | '/professor/equipe/$id'
   fileRoutesByTo: FileRoutesByTo
@@ -173,6 +183,7 @@ export interface FileRouteTypes {
     | '/programador'
     | '/tutorial'
     | '/professor/cadastro'
+    | '/professor/pilotar'
     | '/professor'
     | '/professor/equipe/$id'
   id:
@@ -189,6 +200,7 @@ export interface FileRouteTypes {
     | '/programador'
     | '/tutorial'
     | '/professor/cadastro'
+    | '/professor/pilotar'
     | '/professor/'
     | '/professor/equipe/$id'
   fileRoutesById: FileRoutesById
@@ -300,6 +312,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProfessorCadastroRouteImport
       parentRoute: typeof ProfessorRoute
     }
+    '/professor/pilotar': {
+      id: '/professor/pilotar'
+      path: '/pilotar'
+      fullPath: '/professor/pilotar'
+      preLoaderRoute: typeof ProfessorPilotarRouteImport
+      parentRoute: typeof ProfessorRoute
+    }
     '/professor/equipe/$id': {
       id: '/professor/equipe/$id'
       path: '/equipe/$id'
@@ -312,12 +331,14 @@ declare module '@tanstack/react-router' {
 
 interface ProfessorRouteChildren {
   ProfessorCadastroRoute: typeof ProfessorCadastroRoute
+  ProfessorPilotarRoute: typeof ProfessorPilotarRoute
   ProfessorIndexRoute: typeof ProfessorIndexRoute
   ProfessorEquipeIdRoute: typeof ProfessorEquipeIdRoute
 }
 
 const ProfessorRouteChildren: ProfessorRouteChildren = {
   ProfessorCadastroRoute: ProfessorCadastroRoute,
+  ProfessorPilotarRoute: ProfessorPilotarRoute,
   ProfessorIndexRoute: ProfessorIndexRoute,
   ProfessorEquipeIdRoute: ProfessorEquipeIdRoute,
 }
