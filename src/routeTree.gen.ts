@@ -10,33 +10,162 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ChecklistRouteImport } from './routes/checklist'
+import { Route as CodigoRouteImport } from './routes/codigo'
+import { Route as CoreografiasRouteImport } from './routes/coreografias'
+import { Route as EquipeRouteImport } from './routes/equipe'
+import { Route as MelhoriasRouteImport } from './routes/melhorias'
+import { Route as PainelRouteImport } from './routes/painel'
+import { Route as ProfessorRouteImport } from './routes/professor'
+import { Route as ProfessorIndexRouteImport } from './routes/professor.index'
+import { Route as ProfessorCadastroRouteImport } from './routes/professor.cadastro'
+import { Route as ProfessorEquipeIdRouteImport } from './routes/professor.equipe.$id'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ChecklistRoute = ChecklistRouteImport.update({
+  id: '/checklist',
+  path: '/checklist',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CodigoRoute = CodigoRouteImport.update({
+  id: '/codigo',
+  path: '/codigo',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CoreografiasRoute = CoreografiasRouteImport.update({
+  id: '/coreografias',
+  path: '/coreografias',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EquipeRoute = EquipeRouteImport.update({
+  id: '/equipe',
+  path: '/equipe',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MelhoriasRoute = MelhoriasRouteImport.update({
+  id: '/melhorias',
+  path: '/melhorias',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PainelRoute = PainelRouteImport.update({
+  id: '/painel',
+  path: '/painel',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProfessorRoute = ProfessorRouteImport.update({
+  id: '/professor',
+  path: '/professor',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProfessorIndexRoute = ProfessorIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => ProfessorRoute,
+} as any)
+const ProfessorCadastroRoute = ProfessorCadastroRouteImport.update({
+  id: '/cadastro',
+  path: '/cadastro',
+  getParentRoute: () => ProfessorRoute,
+} as any)
+const ProfessorEquipeIdRoute = ProfessorEquipeIdRouteImport.update({
+  id: '/equipe/$id',
+  path: '/equipe/$id',
+  getParentRoute: () => ProfessorRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/checklist': typeof ChecklistRoute
+  '/codigo': typeof CodigoRoute
+  '/coreografias': typeof CoreografiasRoute
+  '/equipe': typeof EquipeRoute
+  '/melhorias': typeof MelhoriasRoute
+  '/painel': typeof PainelRoute
+  '/professor': typeof ProfessorRouteWithChildren
+  '/professor/cadastro': typeof ProfessorCadastroRoute
+  '/professor/': typeof ProfessorIndexRoute
+  '/professor/equipe/$id': typeof ProfessorEquipeIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/checklist': typeof ChecklistRoute
+  '/codigo': typeof CodigoRoute
+  '/coreografias': typeof CoreografiasRoute
+  '/equipe': typeof EquipeRoute
+  '/melhorias': typeof MelhoriasRoute
+  '/painel': typeof PainelRoute
+  '/professor/cadastro': typeof ProfessorCadastroRoute
+  '/professor': typeof ProfessorIndexRoute
+  '/professor/equipe/$id': typeof ProfessorEquipeIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/checklist': typeof ChecklistRoute
+  '/codigo': typeof CodigoRoute
+  '/coreografias': typeof CoreografiasRoute
+  '/equipe': typeof EquipeRoute
+  '/melhorias': typeof MelhoriasRoute
+  '/painel': typeof PainelRoute
+  '/professor': typeof ProfessorRouteWithChildren
+  '/professor/cadastro': typeof ProfessorCadastroRoute
+  '/professor/': typeof ProfessorIndexRoute
+  '/professor/equipe/$id': typeof ProfessorEquipeIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/checklist'
+    | '/codigo'
+    | '/coreografias'
+    | '/equipe'
+    | '/melhorias'
+    | '/painel'
+    | '/professor'
+    | '/professor/cadastro'
+    | '/professor/'
+    | '/professor/equipe/$id'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/checklist'
+    | '/codigo'
+    | '/coreografias'
+    | '/equipe'
+    | '/melhorias'
+    | '/painel'
+    | '/professor/cadastro'
+    | '/professor'
+    | '/professor/equipe/$id'
+  id:
+    | '__root__'
+    | '/'
+    | '/checklist'
+    | '/codigo'
+    | '/coreografias'
+    | '/equipe'
+    | '/melhorias'
+    | '/painel'
+    | '/professor'
+    | '/professor/cadastro'
+    | '/professor/'
+    | '/professor/equipe/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ChecklistRoute: typeof ChecklistRoute
+  CodigoRoute: typeof CodigoRoute
+  CoreografiasRoute: typeof CoreografiasRoute
+  EquipeRoute: typeof EquipeRoute
+  MelhoriasRoute: typeof MelhoriasRoute
+  PainelRoute: typeof PainelRoute
+  ProfessorRoute: typeof ProfessorRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +177,104 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/checklist': {
+      id: '/checklist'
+      path: '/checklist'
+      fullPath: '/checklist'
+      preLoaderRoute: typeof ChecklistRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/codigo': {
+      id: '/codigo'
+      path: '/codigo'
+      fullPath: '/codigo'
+      preLoaderRoute: typeof CodigoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/coreografias': {
+      id: '/coreografias'
+      path: '/coreografias'
+      fullPath: '/coreografias'
+      preLoaderRoute: typeof CoreografiasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/equipe': {
+      id: '/equipe'
+      path: '/equipe'
+      fullPath: '/equipe'
+      preLoaderRoute: typeof EquipeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/melhorias': {
+      id: '/melhorias'
+      path: '/melhorias'
+      fullPath: '/melhorias'
+      preLoaderRoute: typeof MelhoriasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/painel': {
+      id: '/painel'
+      path: '/painel'
+      fullPath: '/painel'
+      preLoaderRoute: typeof PainelRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/professor': {
+      id: '/professor'
+      path: '/professor'
+      fullPath: '/professor'
+      preLoaderRoute: typeof ProfessorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/professor/': {
+      id: '/professor/'
+      path: '/'
+      fullPath: '/professor/'
+      preLoaderRoute: typeof ProfessorIndexRouteImport
+      parentRoute: typeof ProfessorRoute
+    }
+    '/professor/cadastro': {
+      id: '/professor/cadastro'
+      path: '/cadastro'
+      fullPath: '/professor/cadastro'
+      preLoaderRoute: typeof ProfessorCadastroRouteImport
+      parentRoute: typeof ProfessorRoute
+    }
+    '/professor/equipe/$id': {
+      id: '/professor/equipe/$id'
+      path: '/equipe/$id'
+      fullPath: '/professor/equipe/$id'
+      preLoaderRoute: typeof ProfessorEquipeIdRouteImport
+      parentRoute: typeof ProfessorRoute
+    }
   }
 }
 
+interface ProfessorRouteChildren {
+  ProfessorCadastroRoute: typeof ProfessorCadastroRoute
+  ProfessorIndexRoute: typeof ProfessorIndexRoute
+  ProfessorEquipeIdRoute: typeof ProfessorEquipeIdRoute
+}
+
+const ProfessorRouteChildren: ProfessorRouteChildren = {
+  ProfessorCadastroRoute: ProfessorCadastroRoute,
+  ProfessorIndexRoute: ProfessorIndexRoute,
+  ProfessorEquipeIdRoute: ProfessorEquipeIdRoute,
+}
+
+const ProfessorRouteWithChildren = ProfessorRoute._addFileChildren(
+  ProfessorRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ChecklistRoute: ChecklistRoute,
+  CodigoRoute: CodigoRoute,
+  CoreografiasRoute: CoreografiasRoute,
+  EquipeRoute: EquipeRoute,
+  MelhoriasRoute: MelhoriasRoute,
+  PainelRoute: PainelRoute,
+  ProfessorRoute: ProfessorRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
