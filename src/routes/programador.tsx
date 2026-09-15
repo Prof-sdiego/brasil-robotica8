@@ -43,7 +43,7 @@ function TelaProgramador() {
     evento.preventDefault();
     if (!nome.trim()) return;
     const novo: Integrante = { id: crypto.randomUUID(), nome: nome.trim(), papel: "Programador" };
-    salvar({ integrantes: [...equipe.integrantes, novo] });
+    salvar({ integrantes: [...(equipe?.integrantes ?? []), novo] });
     navigate({ to: "/painel" });
   }
 
