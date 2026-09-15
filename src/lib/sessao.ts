@@ -31,6 +31,28 @@ export function useCodigoGuardado() {
   return estado;
 }
 
+const CHAVE_TUTORIAL = "oficina-robotica-tutorial";
+
+export function marcarTutorialVisto(codigo: string) {
+  if (typeof window !== "undefined") localStorage.setItem(`${CHAVE_TUTORIAL}-${codigo}`, "1");
+}
+
+/** Diz se o tutorial já foi visto por esta equipe (só depois da hidratação). */
+export function useTutorialVisto(codigo: string | null) {
+  const [estado, setEstado] = useState<{ pronto: boolean; visto: boolean }>({
+    pronto: false,
+    visto: true,
+  });
+  useEffect(() => {
+    if (!codigo) return;
+    setEstado({
+      pronto: true,
+      visto: localStorage.getItem(`${CHAVE_TUTORIAL}-${codigo}`) === "1",
+    });
+  }, [codigo]);
+  return estado;
+}
+
 export function useProfessorLogado() {
   const [estado, setEstado] = useState<{ pronto: boolean; logado: boolean }>({
     pronto: false,
