@@ -161,6 +161,15 @@ export function useSalvarEquipe(codigo: string | null) {
   return { salvar, salvando: mutation.isPending };
 }
 
+/** Gravação imediata (sem espera), para quando a tela vai trocar em seguida. */
+export async function salvarEquipeAgora(codigo: string, dados: EquipeEditavel) {
+  const { error } = await supabase
+    .from("equipes")
+    .update(paraLinha(dados))
+    .eq("codigo_acesso", codigo.trim().toUpperCase());
+  if (error) throw error;
+}
+
 export function gerarCodigoAcesso(nome: string): string {
   const base =
     (nome || "EQUIPE")
