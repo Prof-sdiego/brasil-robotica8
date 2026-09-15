@@ -4,6 +4,7 @@ import type { Intensidade } from "@/lib/catalogo";
 
 const CORES: Record<Intensidade, string> = {
   muito: "bg-sucesso text-sucesso-foreground",
+  medio: "bg-info text-info-foreground",
   pouco: "bg-alerta text-alerta-foreground",
   nada: "bg-muted text-muted-foreground",
 };

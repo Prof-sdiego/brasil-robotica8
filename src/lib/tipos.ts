@@ -34,6 +34,11 @@ export type Equipe = {
   nomeEquipe: string;
   grupoRadio: number;
   sensibilidade: number;
+  ajustes: Record<string, number | boolean>;
+  ajustesMelhorias: Record<string, Record<string, number | boolean>>;
+  ajustesAtualizadosEm: string | null;
+  codigoCopiadoEm: string | null;
+  avisoCatalogo: boolean;
   melhorias: string[];
   melodiaAbertura: string | null;
   coreografias: Coreografia[];
@@ -48,6 +53,11 @@ export type EquipeEditavel = Partial<
   Pick<
     Equipe,
     | "sensibilidade"
+    | "ajustes"
+    | "ajustesMelhorias"
+    | "ajustesAtualizadosEm"
+    | "codigoCopiadoEm"
+    | "avisoCatalogo"
     | "melhorias"
     | "melodiaAbertura"
     | "coreografias"

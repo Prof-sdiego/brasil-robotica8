@@ -6,6 +6,7 @@ import {
   Lock,
   LogOut,
   Radio,
+  SlidersHorizontal,
   Sparkles,
   Users,
   Wand2,
@@ -56,6 +57,13 @@ const CARTOES = [
     descricao: "Montem as sequências",
     icone: Wand2,
     cor: "bg-accent text-accent-foreground",
+  },
+  {
+    para: "/ajustes" as const,
+    titulo: "Ajustes",
+    descricao: "Todos os números do robô",
+    icone: SlidersHorizontal,
+    cor: "bg-alerta text-alerta-foreground",
   },
   {
     para: "/codigo" as const,

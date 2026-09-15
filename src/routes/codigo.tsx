@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Check, Code2, Copy, Gamepad2, Bot } from "lucide-react";
+import { AlertTriangle, Check, Code2, Copy, Gamepad2, Bot } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 
 import { Cabecalho } from "@/components/Cabecalho";
@@ -31,12 +31,14 @@ function CaixaCodigo({
   codigo,
   icone,
   cor,
+  aoCopiar,
 }: {
   titulo: string;
   aviso: string;
   codigo: string;
   icone: React.ReactNode;
   cor: string;
+  aoCopiar: () => void;
 }) {
   const [copiado, setCopiado] = useState(false);
 
@@ -44,6 +46,7 @@ function CaixaCodigo({
     try {
       await navigator.clipboard.writeText(codigo);
       setCopiado(true);
+      aoCopiar();
       setTimeout(() => setCopiado(false), 2000);
     } catch {
       setCopiado(false);
@@ -86,10 +89,26 @@ function TelaCodigo() {
     return <p className="p-8 text-center text-lg font-bold">Carregando...</p>;
   }
 
+  const desatualizado =
+    Boolean(equipe.ajustesAtualizadosEm) &&
+    (!equipe.codigoCopiadoEm ||
+      new Date(equipe.ajustesAtualizadosEm!) > new Date(equipe.codigoCopiadoEm));
+
+  function marcarCopiado() {
+    salvar({ codigoCopiadoEm: new Date().toISOString() });
+  }
+
   return (
     <>
       <Cabecalho titulo="Meu código" icone={<Code2 className="size-6" />} salvando={salvando} />
       <main className="mx-auto max-w-3xl space-y-5 px-4 py-5 pb-16">
+        {desatualizado && (
+          <p className="flex items-start gap-3 rounded-2xl bg-info px-4 py-4 text-lg font-extrabold text-info-foreground">
+            <AlertTriangle className="mt-0.5 size-6 shrink-0" />
+            Vocês mudaram os ajustes. Copiem o código de novo e reinstalem nos dois micro:bit.
+          </p>
+        )}
+
         <p className="rounded-2xl bg-alerta px-4 py-3 font-bold text-alerta-foreground">
           São dois micro:bit diferentes. Trocar os códigos não funciona: o controle precisa do código
           do CONTROLE e o robô precisa do código do ROBÔ.
@@ -101,6 +120,7 @@ function TelaCodigo() {
           codigo={codigos.controle}
           icone={<Gamepad2 className="size-8" />}
           cor="bg-secondary text-secondary-foreground"
+          aoCopiar={marcarCopiado}
         />
 
         <CaixaCodigo
@@ -109,6 +129,7 @@ function TelaCodigo() {
           codigo={codigos.robo}
           icone={<Bot className="size-8" />}
           cor="bg-primary text-primary-foreground"
+          aoCopiar={marcarCopiado}
         />
 
         <section className="space-y-4">

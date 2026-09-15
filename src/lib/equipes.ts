@@ -12,6 +12,11 @@ type LinhaEquipe = {
   nome_equipe: string;
   grupo_radio: number;
   sensibilidade: number;
+  ajustes: unknown;
+  ajustes_melhorias: unknown;
+  ajustes_atualizados_em: string | null;
+  codigo_copiado_em: string | null;
+  aviso_catalogo: boolean;
   melhorias: unknown;
   melodia_abertura: string | null;
   coreografias: unknown;
@@ -41,6 +46,24 @@ export function checklistCompleto(itens: ItemChecklist[]): ItemChecklist[] {
   });
 }
 
+function objeto(valor: unknown): Record<string, number | boolean> {
+  if (!valor || typeof valor !== "object" || Array.isArray(valor)) return {};
+  const saida: Record<string, number | boolean> = {};
+  for (const [chave, item] of Object.entries(valor as Record<string, unknown>)) {
+    if (typeof item === "number" || typeof item === "boolean") saida[chave] = item;
+  }
+  return saida;
+}
+
+function objetoDeObjetos(valor: unknown): Record<string, Record<string, number | boolean>> {
+  if (!valor || typeof valor !== "object" || Array.isArray(valor)) return {};
+  const saida: Record<string, Record<string, number | boolean>> = {};
+  for (const [chave, item] of Object.entries(valor as Record<string, unknown>)) {
+    saida[chave] = objeto(item);
+  }
+  return saida;
+}
+
 function paraEquipe(linha: LinhaEquipe): Equipe {
   return {
     id: linha.id,
@@ -49,6 +72,11 @@ function paraEquipe(linha: LinhaEquipe): Equipe {
     nomeEquipe: linha.nome_equipe,
     grupoRadio: linha.grupo_radio,
     sensibilidade: linha.sensibilidade,
+    ajustes: objeto(linha.ajustes),
+    ajustesMelhorias: objetoDeObjetos(linha.ajustes_melhorias),
+    ajustesAtualizadosEm: linha.ajustes_atualizados_em,
+    codigoCopiadoEm: linha.codigo_copiado_em,
+    avisoCatalogo: linha.aviso_catalogo === true,
     melhorias: lista<string>(linha.melhorias),
     melodiaAbertura: linha.melodia_abertura,
     coreografias: lista(linha.coreografias),
@@ -63,6 +91,15 @@ function paraEquipe(linha: LinhaEquipe): Equipe {
 function paraLinha(dados: EquipeEditavel) {
   return {
     ...(dados.sensibilidade !== undefined ? { sensibilidade: dados.sensibilidade } : {}),
+    ...(dados.ajustes !== undefined ? { ajustes: dados.ajustes as unknown as never } : {}),
+    ...(dados.ajustesMelhorias !== undefined
+      ? { ajustes_melhorias: dados.ajustesMelhorias as unknown as never }
+      : {}),
+    ...(dados.ajustesAtualizadosEm !== undefined
+      ? { ajustes_atualizados_em: dados.ajustesAtualizadosEm }
+      : {}),
+    ...(dados.codigoCopiadoEm !== undefined ? { codigo_copiado_em: dados.codigoCopiadoEm } : {}),
+    ...(dados.avisoCatalogo !== undefined ? { aviso_catalogo: dados.avisoCatalogo } : {}),
     ...(dados.melhorias !== undefined ? { melhorias: dados.melhorias } : {}),
     ...(dados.melodiaAbertura !== undefined ? { melodia_abertura: dados.melodiaAbertura } : {}),
     ...(dados.coreografias !== undefined
@@ -78,7 +115,7 @@ function paraLinha(dados: EquipeEditavel) {
 }
 
 const CAMPOS =
-  "id, codigo_acesso, turma, nome_equipe, grupo_radio, sensibilidade, melhorias, melodia_abertura, coreografias, integrantes, checklist, justificativa, codigo_gerado, updated_at";
+  "id, codigo_acesso, turma, nome_equipe, grupo_radio, sensibilidade, ajustes, ajustes_melhorias, ajustes_atualizados_em, codigo_copiado_em, aviso_catalogo, melhorias, melodia_abertura, coreografias, integrantes, checklist, justificativa, codigo_gerado, updated_at";
 
 export async function buscarEquipePorCodigo(codigo: string): Promise<Equipe | null> {
   const { data, error } = await supabase

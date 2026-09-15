@@ -11,6 +11,7 @@
 // Nenhuma tela precisa ser alterada quando esses textos mudarem.
 // =====================================================================
 
+import { numeroAjuste, numeroAjusteMelhoria } from "./ajustes";
 import { MOVIMENTOS } from "./catalogo";
 import type { Coreografia, Equipe, MovimentoNaSequencia } from "./tipos";
 
@@ -725,11 +726,17 @@ export function montarCodigo(equipe: Equipe): CodigoGerado {
   // nesse caso ela tem duas coreografias (A e A+B) em vez de três.
   const botaoBOcupado = MODULOS_QUE_OCUPAM_BOTAO_B.some((id) => equipe.melhorias.includes(id));
 
+  // Todos os números vêm da tela Ajustes. Ninguém edita o código à mão.
+  const velocidadeMaxima = numeroAjuste(equipe.ajustes, "velocidade_maxima");
   const base: Partial<Record<Marcador, string>> = {
     NOME_EQUIPE: equipe.nomeEquipe,
     GRUPO: String(equipe.grupoRadio),
-    SENSIBILIDADE: String(equipe.sensibilidade),
-    VEL_NORMAL: equipe.melhorias.includes("turbo") ? "180" : "255",
+    SENSIBILIDADE: String(numeroAjuste(equipe.ajustes, "sensibilidade")),
+    VEL_NORMAL: String(
+      equipe.melhorias.includes("turbo")
+        ? numeroAjusteMelhoria(equipe.ajustesMelhorias, "turbo", "velocidade_normal")
+        : velocidadeMaxima,
+    ),
   };
 
   const marcadoresControle: Marcador[] = ["CTRL_VARS", "CTRL_BOTAO_B", "CTRL_LOOP"];
@@ -799,10 +806,24 @@ export function montarCodigo(equipe: Equipe): CodigoGerado {
     robo.ROBO_SETUP = [robo.ROBO_SETUP, trechoMelodia].filter(Boolean).join("\n");
   }
 
-  return {
-    controle: aplicarMarcadores(MODELO_CONTROLE, controle),
-    robo: aplicarMarcadores(MODELO_ROBO, robo),
-  };
+  // Enquanto o modelo não tem marcadores próprios para estes números,
+  // trocamos as linhas fixas pelos valores da tela Ajustes.
+  const trocas: [RegExp, string][] = [
+    [/let ZONA: number = \d+/, `let ZONA: number = ${numeroAjuste(equipe.ajustes, "zona_morta")}`],
+    [
+      /let GIRO360: number = \d+/,
+      `let GIRO360: number = ${numeroAjuste(equipe.ajustes, "giro360")}`,
+    ],
+  ];
+
+  let textoControle = aplicarMarcadores(MODELO_CONTROLE, controle);
+  let textoRobo = aplicarMarcadores(MODELO_ROBO, robo);
+  for (const [procura, troca] of trocas) {
+    textoControle = textoControle.replace(procura, troca);
+    textoRobo = textoRobo.replace(procura, troca);
+  }
+
+  return { controle: textoControle, robo: textoRobo };
 }
 
 /** Duração estimada de uma coreografia, em segundos. */
