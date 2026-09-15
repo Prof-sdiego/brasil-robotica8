@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { ArrowLeft, Check, Loader2 } from "lucide-react";
+import { ArrowLeft, Check, HelpCircle, Loader2 } from "lucide-react";
 import type { ReactNode } from "react";
 
 type Props = {
