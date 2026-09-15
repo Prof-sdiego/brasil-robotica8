@@ -110,6 +110,7 @@ function paraLinha(dados: EquipeEditavel) {
   return {
     ...(dados.sensibilidade !== undefined ? { sensibilidade: dados.sensibilidade } : {}),
     ...(dados.modoPilotagem !== undefined ? { modo_pilotagem: dados.modoPilotagem } : {}),
+    ...(dados.nomeMicrobit !== undefined ? { nome_microbit: dados.nomeMicrobit } : {}),
     ...(dados.atribuicaoBotoes !== undefined
       ? { atribuicao_botoes: dados.atribuicaoBotoes as unknown as never }
       : {}),
