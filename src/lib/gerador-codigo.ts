@@ -11,7 +11,7 @@
 // Nenhuma tela precisa ser alterada quando esses textos mudarem.
 // =====================================================================
 
-import { numeroAjuste, numeroAjusteMelhoria } from "./ajustes";
+import { ligadoAjuste, numeroAjuste, numeroAjusteMelhoria } from "./ajustes";
 import { MOVIMENTOS } from "./catalogo";
 import type { Coreografia, Equipe, MovimentoNaSequencia } from "./tipos";
 
@@ -21,6 +21,15 @@ export const MARCADORES = [
   "GRUPO",
   "SENSIBILIDADE",
   "VEL_NORMAL",
+  "ZONA",
+  "GIRO",
+  "RITMO",
+  "INV_ESQ",
+  "INV_DIR",
+  "DEADMAN",
+  "MOVER_PILOTAGEM",
+  "GIRO360",
+  "VEL_COREO",
   "CTRL_VARS",
   "CTRL_BOTAO_B",
   "CTRL_BOTAO_AB",
@@ -221,8 +230,8 @@ let VEL_NORMAL: number = {{VEL_NORMAL}}
 // ───────────────────────────────────────────
 
 let VEL: number = VEL_NORMAL
-let GIRO: number = 255
-let ZONA: number = 80
+let GIRO: number = {{GIRO}}
+let ZONA: number = {{ZONA}}
 let MAXFRENTE: number = 450 - SENSIBILIDADE * 30
 let MAXCURVA: number = MAXFRENTE * 2
 
@@ -383,7 +392,7 @@ basic.forever(function () {
         }
     }
 
-    basic.pause(15)
+    basic.pause({{RITMO}})
 })
 `;
 
@@ -395,8 +404,17 @@ export const MODELO_ROBO = `// ════════════════�
 let GRUPO: number = {{GRUPO}}
 
 // Tempo em milissegundos para o robô dar UMA VOLTA COMPLETA (360°).
-// CRONOMETRE O SEU ROBÔ e ajuste! A estrela e o quadrado dependem disso.
-let GIRO360: number = 1100
+let GIRO360: number = {{GIRO360}}
+
+// Velocidade usada nas coreografias (0 a 255).
+let VEL_COREO: number = {{VEL_COREO}}
+
+// Sentido dos motores: 1 = normal, -1 = invertido
+let INV_ESQ: number = {{INV_ESQ}}
+let INV_DIR: number = {{INV_DIR}}
+
+// Depois de quantos ms sem sinal do controle o robô para sozinho
+let DEADMAN: number = {{DEADMAN}}
 
 // ───────────────────────────────────────────
 
@@ -413,8 +431,8 @@ basic.showIcon(IconNames.SmallSquare)
 {{ROBO_SETUP}}
 
 function mover(esq: number, dir: number) {
-    robotbit.MotorRun(robotbit.Motors.M1A, -esq)
-    robotbit.MotorRun(robotbit.Motors.M1B, dir)
+    robotbit.MotorRun(robotbit.Motors.M1A, esq * INV_ESQ)
+    robotbit.MotorRun(robotbit.Motors.M1B, dir * INV_DIR)
 }
 
 function parar() {
@@ -459,7 +477,7 @@ function graus(g: number): number {
 function andarFrente(t: number) {
     if (!coreo) { return }
     seta(1)
-    mover(255, 255)
+    mover(VEL_COREO, VEL_COREO)
     espera(t)
     parar()
     basic.pause(70)
@@ -468,7 +486,7 @@ function andarFrente(t: number) {
 function andarTras(t: number) {
     if (!coreo) { return }
     seta(2)
-    mover(-255, -255)
+    mover(-VEL_COREO, -VEL_COREO)
     espera(t)
     parar()
     basic.pause(70)
@@ -477,7 +495,7 @@ function andarTras(t: number) {
 function girarDireita(t: number) {
     if (!coreo) { return }
     seta(4)
-    mover(255, -255)
+    mover(VEL_COREO, -VEL_COREO)
     espera(t)
     parar()
     basic.pause(70)
@@ -486,7 +504,7 @@ function girarDireita(t: number) {
 function girarEsquerda(t: number) {
     if (!coreo) { return }
     seta(3)
-    mover(-255, 255)
+    mover(-VEL_COREO, VEL_COREO)
     espera(t)
     parar()
     basic.pause(70)
@@ -502,7 +520,7 @@ function pausar(t: number) {
 function curvaDireita(t: number) {
     if (!coreo) { return }
     seta(4)
-    mover(255, 110)
+    mover(VEL_COREO, Math.idiv(VEL_COREO * 43, 100))
     espera(t)
     parar()
     basic.pause(70)
@@ -511,7 +529,7 @@ function curvaDireita(t: number) {
 function curvaEsquerda(t: number) {
     if (!coreo) { return }
     seta(3)
-    mover(110, 255)
+    mover(Math.idiv(VEL_COREO * 43, 100), VEL_COREO)
     espera(t)
     parar()
     basic.pause(70)
@@ -537,7 +555,7 @@ function piao(voltas: number) {
     if (!coreo) { return }
     setaAtual = -1
     basic.showIcon(IconNames.Diamond)
-    mover(255, -255)
+    mover(VEL_COREO, -VEL_COREO)
     espera(GIRO360 * voltas)
     parar()
     basic.pause(70)
@@ -546,9 +564,9 @@ function piao(voltas: number) {
 function tremida(vezes: number) {
     for (let i = 0; i < vezes; i++) {
         if (!coreo) { return }
-        mover(255, 255)
+        mover(VEL_COREO, VEL_COREO)
         espera(120)
-        mover(-255, -255)
+        mover(-VEL_COREO, -VEL_COREO)
         espera(120)
     }
     parar()
@@ -623,7 +641,7 @@ radio.onReceivedNumber(function (n: number) {
     let esq: number = Math.idiv(n, 1000) - 255
     let dir: number = n % 1000 - 255
 
-    mover(esq, dir)
+    {{MOVER_PILOTAGEM}}
 
     if (esq == 0 && dir == 0) {
         seta(0)
@@ -662,7 +680,7 @@ input.onButtonPressed(Button.B, function () {
 })
 
 basic.forever(function () {
-    if (!coreo && input.runningTime() - ultimo > 300) {
+    if (!coreo && input.runningTime() - ultimo > DEADMAN) {
         parar()
         seta(0)
     }
@@ -727,16 +745,28 @@ export function montarCodigo(equipe: Equipe): CodigoGerado {
   const botaoBOcupado = MODULOS_QUE_OCUPAM_BOTAO_B.some((id) => equipe.melhorias.includes(id));
 
   // Todos os números vêm da tela Ajustes. Ninguém edita o código à mão.
-  const velocidadeMaxima = numeroAjuste(equipe.ajustes, "velocidade_maxima");
+  const ajustes = equipe.ajustes;
+  const velocidadeMaxima = numeroAjuste(ajustes, "velocidade_maxima");
+  const usaArranqueSuave = equipe.melhorias.includes("arranque_suave");
   const base: Partial<Record<Marcador, string>> = {
     NOME_EQUIPE: equipe.nomeEquipe,
     GRUPO: String(equipe.grupoRadio),
-    SENSIBILIDADE: String(numeroAjuste(equipe.ajustes, "sensibilidade")),
+    SENSIBILIDADE: String(numeroAjuste(ajustes, "sensibilidade")),
     VEL_NORMAL: String(
       equipe.melhorias.includes("turbo")
         ? numeroAjusteMelhoria(equipe.ajustesMelhorias, "turbo", "velocidade_normal")
         : velocidadeMaxima,
     ),
+    ZONA: String(numeroAjuste(ajustes, "zona_morta")),
+    GIRO: String(numeroAjuste(ajustes, "forca_giro")),
+    RITMO: String(numeroAjuste(ajustes, "ritmo_envio")),
+    INV_ESQ: ligadoAjuste(ajustes, "inverter_motor_esquerdo") ? "-1" : "1",
+    INV_DIR: ligadoAjuste(ajustes, "inverter_motor_direito") ? "-1" : "1",
+    DEADMAN: String(numeroAjuste(ajustes, "parada_perda_sinal")),
+    GIRO360: String(numeroAjuste(ajustes, "giro360")),
+    VEL_COREO: String(numeroAjuste(ajustes, "velocidade_coreografia")),
+    // O Arranque suave troca a pilotagem por uma aceleração gradual.
+    MOVER_PILOTAGEM: usaArranqueSuave ? "moverSuave(esq, dir)" : "mover(esq, dir)",
   };
 
   const marcadoresControle: Marcador[] = ["CTRL_VARS", "CTRL_BOTAO_B", "CTRL_LOOP"];
@@ -806,24 +836,10 @@ export function montarCodigo(equipe: Equipe): CodigoGerado {
     robo.ROBO_SETUP = [robo.ROBO_SETUP, trechoMelodia].filter(Boolean).join("\n");
   }
 
-  // Enquanto o modelo não tem marcadores próprios para estes números,
-  // trocamos as linhas fixas pelos valores da tela Ajustes.
-  const trocas: [RegExp, string][] = [
-    [/let ZONA: number = \d+/, `let ZONA: number = ${numeroAjuste(equipe.ajustes, "zona_morta")}`],
-    [
-      /let GIRO360: number = \d+/,
-      `let GIRO360: number = ${numeroAjuste(equipe.ajustes, "giro360")}`,
-    ],
-  ];
-
-  let textoControle = aplicarMarcadores(MODELO_CONTROLE, controle);
-  let textoRobo = aplicarMarcadores(MODELO_ROBO, robo);
-  for (const [procura, troca] of trocas) {
-    textoControle = textoControle.replace(procura, troca);
-    textoRobo = textoRobo.replace(procura, troca);
-  }
-
-  return { controle: textoControle, robo: textoRobo };
+  return {
+    controle: aplicarMarcadores(MODELO_CONTROLE, controle),
+    robo: aplicarMarcadores(MODELO_ROBO, robo),
+  };
 }
 
 /** Duração estimada de uma coreografia, em segundos. */
