@@ -17,6 +17,7 @@ export function temProgramador(integrantes: Integrante[]): boolean {
 /** "Piloto e Engenheiro" / "Piloto, Copiloto e Engenheiro" */
 export function listarFaltantes(faltantes: Papel[]): string {
   if (faltantes.length === 0) return "";
-  if (faltantes.length === 1) return faltantes[0];
-  return `${faltantes.slice(0, -1).join(", ")} e ${faltantes[faltantes.length - 1]}`;
+  if (faltantes.length === 1) return String(faltantes[0]);
+  const ultimo = String(faltantes[faltantes.length - 1]);
+  return `${faltantes.slice(0, -1).join(", ")} e ${ultimo}`;
 }
