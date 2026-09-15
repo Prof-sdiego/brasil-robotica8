@@ -1,9 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Plus, Trash2, UserPlus, Users } from "lucide-react";
-import { useState } from "react";
+import { Lock, PartyPopper, Plus, Trash2, UserPlus, Users } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 
 import { Cabecalho } from "@/components/Cabecalho";
 import { MAXIMO_INTEGRANTES, PAPEIS } from "@/lib/catalogo";
+import { listarFaltantes, papeisFaltantes } from "@/lib/equipeStatus";
 import type { Integrante, Papel } from "@/lib/tipos";
 import { useAluno } from "@/lib/useAluno";
 
