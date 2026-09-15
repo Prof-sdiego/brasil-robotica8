@@ -2,9 +2,11 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowLeft } from "lucide-react";
 
 import { BarraProgresso } from "@/components/BarraProgresso";
+import { ManualBotoes } from "@/components/ManualBotoes";
 import { Etiqueta } from "@/components/Etiqueta";
 import { ITENS_CHECKLIST, MELHORIAS, MELODIAS, MOVIMENTOS } from "@/lib/catalogo";
 import { useEquipes } from "@/lib/equipes";
+import { modoDe } from "@/lib/modos";
 import { duracaoEstimada, montarCodigo } from "@/lib/gerador-codigo";
 
 export const Route = createFileRoute("/professor/equipe/$id")({
@@ -95,6 +97,7 @@ function DetalheEquipe() {
       <section className="cartao-toque p-5">
         <h3 className="text-xl">Melhorias e justificativa</h3>
         <div className="mt-2 flex flex-wrap gap-2">
+          {null}
           {equipe.melhorias.length === 0 && (
             <p className="font-semibold text-muted-foreground">Nada escolhido.</p>
           )}

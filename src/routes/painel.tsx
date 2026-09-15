@@ -1,6 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import {
   CheckSquare,
+  Gamepad2,
   Code2,
   HelpCircle,
   Lock,
@@ -10,11 +11,14 @@ import {
   Sparkles,
   Users,
   Wand2,
+  Joystick,
 } from "lucide-react";
 import { useEffect } from "react";
 
 import { BarraProgresso } from "@/components/BarraProgresso";
+import { ManualBotoes } from "@/components/ManualBotoes";
 import { listarFaltantes, papeisFaltantes } from "@/lib/equipeStatus";
+import { modoDe } from "@/lib/modos";
 import { sairDaEquipe, useTutorialVisto } from "@/lib/sessao";
 import { useAluno } from "@/lib/useAluno";
 
@@ -45,11 +49,25 @@ const CARTOES = [
     cor: "bg-secondary text-secondary-foreground",
   },
   {
+    para: "/pilotagem" as const,
+    titulo: "Como pilotar",
+    descricao: "Escolham o modo",
+    icone: Joystick,
+    cor: "bg-info text-info-foreground",
+  },
+  {
     para: "/melhorias" as const,
     titulo: "Melhorias",
     descricao: "Escolham até 3",
     icone: Sparkles,
     cor: "bg-primary text-primary-foreground",
+  },
+  {
+    para: "/botoes" as const,
+    titulo: "Botões",
+    descricao: "O que A, B e A+B fazem",
+    icone: Gamepad2,
+    cor: "bg-sucesso text-sucesso-foreground",
   },
   {
     para: "/coreografias" as const,
@@ -132,6 +150,10 @@ function Painel() {
           <p className="mt-1 text-sm font-semibold leading-snug">
             Ele já está no código. Não mude esse número, ou seu robô vai obedecer ao controle de
             outra equipe.
+          </p>
+          <p className="mt-3 text-lg font-extrabold">
+            <span aria-hidden>{modoDe(equipe.modoPilotagem).icone}</span> Pilotagem:{" "}
+            {modoDe(equipe.modoPilotagem).nome}
           </p>
         </div>
       </div>
@@ -221,6 +243,12 @@ function Painel() {
         </Link>
       )}
 
+
+      {!travado && (
+        <div className="mt-4">
+          <ManualBotoes equipe={equipe} />
+        </div>
+      )}
 
       <p className="mt-6 text-center text-sm font-semibold text-muted-foreground">
         Última atualização: {atualizado}
