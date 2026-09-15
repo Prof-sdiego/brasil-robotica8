@@ -765,15 +765,33 @@ export function montarSequencia(movimentos: MovimentoNaSequencia[]): string {
   return identar(linhas);
 }
 
+/** Troca os {{PARAMETROS}} do texto do módulo pelos números da tela Ajustes. */
+function aplicarParametros(
+  trecho: string,
+  melhoriaId: string,
+  ajustesMelhorias: Equipe["ajustesMelhorias"],
+): string {
+  const mapa = PARAMETROS_MELHORIAS[melhoriaId] ?? {};
+  return trecho.replace(/\{\{([A-Z_0-9]+)\}\}/g, (original, nome: string) => {
+    const campo = mapa[nome];
+    if (!campo) return original;
+    return String(numeroAjusteMelhoria(ajustesMelhorias, melhoriaId, campo));
+  });
+}
+
 function juntarTrechos(
-  melhorias: string[],
+  equipe: Equipe,
   lado: "controle" | "robo",
   marcador: Marcador,
 ): string {
-  const escolhidasEmOrdem = ORDEM_MODULOS.filter((id) => melhorias.includes(id));
+  const escolhidasEmOrdem = ORDEM_MODULOS.filter((id) => equipe.melhorias.includes(id));
   const trechos = escolhidasEmOrdem
-    .map((id) => TRECHOS_MELHORIAS[id]?.[lado]?.[marcador])
-    .filter((trecho): trecho is string => Boolean(trecho && trecho.trim()));
+    .map((id) => {
+      const trecho = TRECHOS_MELHORIAS[id]?.[lado]?.[marcador];
+      if (!trecho || !trecho.trim()) return null;
+      return aplicarParametros(trecho, id, equipe.ajustesMelhorias);
+    })
+    .filter((trecho): trecho is string => Boolean(trecho));
   // Linha em branco entre os módulos, conforme a ordem de encaixe do catálogo.
   return trechos.join("\n\n");
 }
