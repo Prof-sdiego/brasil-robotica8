@@ -48,9 +48,9 @@ export type Marcador = (typeof MARCADORES)[number];
 
 /** Ordem de encaixe quando mais de um módulo escreve no mesmo marcador. */
 export const ORDEM_MODULOS: string[] = [
-  "farol",
   "bipe_re",
-  "contador_tempo",
+  "arranque_suave",
+  "contra_ataque",
   "som_abertura",
   "turbo",
   "marcha_lenta",
@@ -59,6 +59,24 @@ export const ORDEM_MODULOS: string[] = [
 /** Módulos que ocupam o botão B do controle (deixam a equipe com 2 coreografias). */
 export const MODULOS_QUE_OCUPAM_BOTAO_B = ["turbo", "marcha_lenta"];
 
+/**
+ * Marcador de parâmetro dentro do texto do módulo → id do campo da tela Ajustes.
+ * Nada é inventado: só troca de número.
+ */
+export const PARAMETROS_MELHORIAS: Record<string, Record<string, string>> = {
+  turbo: { TURBO_DURACAO: "duracao_turbo", TURBO_RECARGA: "recarga" },
+  marcha_lenta: { VEL_LENTA: "velocidade_lenta" },
+  contra_ataque: {
+    IMPACTO: "sensibilidade_impacto",
+    CA_RECUO: "tempo_recuo",
+    CA_GIRO: "angulo_giro",
+    CA_DESCANSO: "descanso",
+  },
+  arranque_suave: { RAMPA: "suavidade" },
+  bipe_re: { RE_ALTURA: "altura_bipe", RE_INTERVALO: "intervalo_bipe" },
+  som_abertura: {},
+};
+
 type TrechosPorMarcador = Partial<Record<Marcador, string>>;
 
 /** Texto que cada melhoria insere em cada marcador (controle e robô). */
@@ -66,33 +84,18 @@ export const TRECHOS_MELHORIAS: Record<
   string,
   { controle?: TrechosPorMarcador; robo?: TrechosPorMarcador }
 > = {
-  farol: {
-    robo: {
-      ROBO_VARS: `let faixa: neopixel.Strip = null`,
-      ROBO_SETUP: `faixa = robotbit.rgb()
-faixa.setBrightness(60)
-faixa.showColor(neopixel.colors(NeoPixelColors.White))`,
-      SETA_EXTRA: `    if (estado == 0) {
-        faixa.showColor(neopixel.colors(NeoPixelColors.White))
-    } else if (estado == 1) {
-        faixa.showColor(neopixel.colors(NeoPixelColors.Green))
-    } else if (estado == 2) {
-        faixa.showColor(neopixel.colors(NeoPixelColors.Red))
-    } else {
-        faixa.showColor(neopixel.colors(NeoPixelColors.Blue))
-    }`,
-    },
-  },
   turbo: {
     controle: {
-      CTRL_VARS: `let turboAte: number = 0
+      CTRL_VARS: `let TURBO_DURACAO: number = {{TURBO_DURACAO}}
+let TURBO_RECARGA: number = {{TURBO_RECARGA}}
+let turboAte: number = 0
 let recargaAte: number = 0`,
       CTRL_BOTAO_B: `    if (coreoAtiva) {
         cancela()
     } else if (input.runningTime() > recargaAte) {
         VEL = 255
-        turboAte = input.runningTime() + 2000
-        recargaAte = turboAte + 5000
+        turboAte = input.runningTime() + TURBO_DURACAO
+        recargaAte = turboAte + TURBO_RECARGA
         music.playTone(988, 100)
         ultimaSeta = -1
         basic.showIcon(IconNames.Yes)
@@ -109,7 +112,8 @@ let recargaAte: number = 0`,
   },
   marcha_lenta: {
     controle: {
-      CTRL_VARS: `let lenta: boolean = false`,
+      CTRL_VARS: `let VEL_LENTA: number = {{VEL_LENTA}}
+let lenta: boolean = false`,
       CTRL_BOTAO_B: `    if (coreoAtiva) {
         cancela()
     } else if (lenta) {
@@ -119,54 +123,104 @@ let recargaAte: number = 0`,
         ultimaSeta = -1
     } else {
         lenta = true
-        VEL = 110
+        VEL = VEL_LENTA
         music.playTone(392, 100)
         ultimaSeta = -1
     }`,
     },
   },
+  contra_ataque: {
+    robo: {
+      ROBO_VARS: `let IMPACTO: number = {{IMPACTO}}
+let CA_RECUO: number = {{CA_RECUO}}
+let CA_GIRO: number = {{CA_GIRO}}
+let CA_DESCANSO: number = {{CA_DESCANSO}}
+let proximoCA: number = 0`,
+      ROBO_LOOPS: `
+basic.forever(function () {
+    if (coreo || input.runningTime() < proximoCA) {
+        basic.pause(30)
+        return
+    }
+    if (input.acceleration(Dimension.Strength) > IMPACTO) {
+        proximoCA = input.runningTime() + CA_DESCANSO
+        coreo = true
+        music.playTone(147, 200)
+        setaAtual = -1
+        basic.showIcon(IconNames.Angry)
+        mover(-VEL_COREO, -VEL_COREO)
+        basic.pause(CA_RECUO)
+        mover(VEL_COREO, -VEL_COREO)
+        basic.pause(graus(CA_GIRO))
+        parar()
+        coreo = false
+        ultimo = input.runningTime()
+        setaAtual = -1
+        seta(0)
+    }
+    basic.pause(30)
+})`,
+    },
+  },
+  arranque_suave: {
+    robo: {
+      ROBO_VARS: `let RAMPA: number = {{RAMPA}}
+let alvoEsq: number = 0
+let alvoDir: number = 0
+let atualEsq: number = 0
+let atualDir: number = 0`,
+      ROBO_FUNCS: `// guarda para onde queremos ir; quem move de fato é o loop lá embaixo
+function moverSuave(esq: number, dir: number) {
+    alvoEsq = esq
+    alvoDir = dir
+}
+
+function aproxima(atual: number, alvo: number): number {
+    if (atual < alvo) {
+        atual += RAMPA
+        if (atual > alvo) { atual = alvo }
+    } else if (atual > alvo) {
+        atual -= RAMPA
+        if (atual < alvo) { atual = alvo }
+    }
+    return atual
+}`,
+      ROBO_LOOPS: `
+basic.forever(function () {
+    if (coreo) {
+        atualEsq = 0
+        atualDir = 0
+        basic.pause(20)
+        return
+    }
+    if (input.runningTime() - ultimo > DEADMAN) {
+        alvoEsq = 0
+        alvoDir = 0
+    }
+    if (atualEsq != alvoEsq || atualDir != alvoDir) {
+        atualEsq = aproxima(atualEsq, alvoEsq)
+        atualDir = aproxima(atualDir, alvoDir)
+        mover(atualEsq, atualDir)
+    }
+    basic.pause(20)
+})`,
+    },
+  },
   som_abertura: {},
   bipe_re: {
     robo: {
-      ROBO_VARS: `let daRe: boolean = false`,
+      ROBO_VARS: `let RE_ALTURA: number = {{RE_ALTURA}}
+let RE_INTERVALO: number = {{RE_INTERVALO}}
+let daRe: boolean = false`,
       SETA_EXTRA: `    daRe = (estado == 2)`,
       ROBO_LOOPS: `
 basic.forever(function () {
     if (daRe) {
-        music.playTone(880, 90)
-        basic.pause(230)
+        music.playTone(RE_ALTURA, 90)
+        basic.pause(RE_INTERVALO)
     } else {
         basic.pause(100)
     }
-})`,
-    },
-  },
-  contador_tempo: {
-    robo: {
-      ROBO_VARS: `let tempoMov: number = 0
-let marcaMov: number = 0
-let mostrouAgora: number = 0`,
-      SETA_EXTRA: `    if (marcaMov > 0) {
-        tempoMov += input.runningTime() - marcaMov
-        marcaMov = 0
-    }
-    if (estado != 0) { marcaMov = input.runningTime() }`,
-      ROBO_FUNCS: `// A+B no robô: mostra os segundos em movimento.
-// Apertando duas vezes seguidas, zera o contador.
-input.onButtonPressed(Button.AB, function () {
-    if (coreo) { return }
-    if (input.runningTime() - mostrouAgora < 3000) {
-        tempoMov = 0
-        marcaMov = 0
-        basic.showIcon(IconNames.No)
-        music.playTone(330, 200)
-        basic.pause(500)
-    } else {
-        basic.showNumber(Math.idiv(tempoMov, 1000))
-    }
-    mostrouAgora = input.runningTime()
-    setaAtual = -1
-    seta(0)
 })`,
     },
   },
@@ -711,15 +765,33 @@ export function montarSequencia(movimentos: MovimentoNaSequencia[]): string {
   return identar(linhas);
 }
 
+/** Troca os {{PARAMETROS}} do texto do módulo pelos números da tela Ajustes. */
+function aplicarParametros(
+  trecho: string,
+  melhoriaId: string,
+  ajustesMelhorias: Equipe["ajustesMelhorias"],
+): string {
+  const mapa = PARAMETROS_MELHORIAS[melhoriaId] ?? {};
+  return trecho.replace(/\{\{([A-Z_0-9]+)\}\}/g, (original, nome: string) => {
+    const campo = mapa[nome];
+    if (!campo) return original;
+    return String(numeroAjusteMelhoria(ajustesMelhorias, melhoriaId, campo));
+  });
+}
+
 function juntarTrechos(
-  melhorias: string[],
+  equipe: Equipe,
   lado: "controle" | "robo",
   marcador: Marcador,
 ): string {
-  const escolhidasEmOrdem = ORDEM_MODULOS.filter((id) => melhorias.includes(id));
+  const escolhidasEmOrdem = ORDEM_MODULOS.filter((id) => equipe.melhorias.includes(id));
   const trechos = escolhidasEmOrdem
-    .map((id) => TRECHOS_MELHORIAS[id]?.[lado]?.[marcador])
-    .filter((trecho): trecho is string => Boolean(trecho && trecho.trim()));
+    .map((id) => {
+      const trecho = TRECHOS_MELHORIAS[id]?.[lado]?.[marcador];
+      if (!trecho || !trecho.trim()) return null;
+      return aplicarParametros(trecho, id, equipe.ajustesMelhorias);
+    })
+    .filter((trecho): trecho is string => Boolean(trecho));
   // Linha em branco entre os módulos, conforme a ordem de encaixe do catálogo.
   return trechos.join("\n\n");
 }
@@ -776,10 +848,10 @@ export function montarCodigo(equipe: Equipe): CodigoGerado {
   const robo: Partial<Record<Marcador, string>> = { ...base };
 
   for (const marcador of marcadoresControle) {
-    controle[marcador] = juntarTrechos(equipe.melhorias, "controle", marcador);
+    controle[marcador] = juntarTrechos(equipe, "controle", marcador);
   }
   for (const marcador of marcadoresRobo) {
-    robo[marcador] = juntarTrechos(equipe.melhorias, "robo", marcador);
+    robo[marcador] = juntarTrechos(equipe, "robo", marcador);
   }
 
   // Se nenhum módulo ocupou o botão B, ele chama a segunda coreografia.
@@ -796,7 +868,7 @@ export function montarCodigo(equipe: Equipe): CodigoGerado {
   // A+B chama a última coreografia da equipe.
   const codigoAB = botaoBOcupado ? 900002 : 900003;
   const letraAB = botaoBOcupado ? "2" : "3";
-  const trechoAB = juntarTrechos(equipe.melhorias, "controle", "CTRL_BOTAO_AB");
+  const trechoAB = juntarTrechos(equipe, "controle", "CTRL_BOTAO_AB");
   controle.CTRL_BOTAO_AB = trechoAB.trim()
     ? trechoAB
     : identar([
