@@ -79,6 +79,9 @@ function Painel() {
     return <p className="p-8 text-center text-lg font-bold">Carregando...</p>;
   }
 
+  const faltantes = papeisFaltantes(equipe.integrantes);
+  const travado = faltantes.length > 0;
+  const avisoTrava = `Faltam: ${listarFaltantes(faltantes)}. Cadastre a equipe completa para liberar o resto do site.`;
   const feitos = equipe.checklist.filter((item) => item.marcado).length;
   const atualizado = new Date(equipe.atualizadoEm).toLocaleString("pt-BR", {
     dateStyle: "short",
