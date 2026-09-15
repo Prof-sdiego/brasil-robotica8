@@ -18,6 +18,8 @@ import { Route as MelhoriasRouteImport } from './routes/melhorias'
 import { Route as PainelRouteImport } from './routes/painel'
 import { Route as ProfessorRouteImport } from './routes/professor'
 import { Route as ProfessorIndexRouteImport } from './routes/professor.index'
+import { Route as ProfessorCadastroRouteImport } from './routes/professor.cadastro'
+import { Route as ProfessorEquipeIdRouteImport } from './routes/professor.equipe.$id'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -64,6 +66,16 @@ const ProfessorIndexRoute = ProfessorIndexRouteImport.update({
   path: '/',
   getParentRoute: () => ProfessorRoute,
 } as any)
+const ProfessorCadastroRoute = ProfessorCadastroRouteImport.update({
+  id: '/cadastro',
+  path: '/cadastro',
+  getParentRoute: () => ProfessorRoute,
+} as any)
+const ProfessorEquipeIdRoute = ProfessorEquipeIdRouteImport.update({
+  id: '/equipe/$id',
+  path: '/equipe/$id',
+  getParentRoute: () => ProfessorRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -74,7 +86,9 @@ export interface FileRoutesByFullPath {
   '/melhorias': typeof MelhoriasRoute
   '/painel': typeof PainelRoute
   '/professor': typeof ProfessorRouteWithChildren
+  '/professor/cadastro': typeof ProfessorCadastroRoute
   '/professor/': typeof ProfessorIndexRoute
+  '/professor/equipe/$id': typeof ProfessorEquipeIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -84,7 +98,9 @@ export interface FileRoutesByTo {
   '/equipe': typeof EquipeRoute
   '/melhorias': typeof MelhoriasRoute
   '/painel': typeof PainelRoute
+  '/professor/cadastro': typeof ProfessorCadastroRoute
   '/professor': typeof ProfessorIndexRoute
+  '/professor/equipe/$id': typeof ProfessorEquipeIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -96,7 +112,9 @@ export interface FileRoutesById {
   '/melhorias': typeof MelhoriasRoute
   '/painel': typeof PainelRoute
   '/professor': typeof ProfessorRouteWithChildren
+  '/professor/cadastro': typeof ProfessorCadastroRoute
   '/professor/': typeof ProfessorIndexRoute
+  '/professor/equipe/$id': typeof ProfessorEquipeIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -109,7 +127,9 @@ export interface FileRouteTypes {
     | '/melhorias'
     | '/painel'
     | '/professor'
+    | '/professor/cadastro'
     | '/professor/'
+    | '/professor/equipe/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -119,7 +139,9 @@ export interface FileRouteTypes {
     | '/equipe'
     | '/melhorias'
     | '/painel'
+    | '/professor/cadastro'
     | '/professor'
+    | '/professor/equipe/$id'
   id:
     | '__root__'
     | '/'
@@ -130,7 +152,9 @@ export interface FileRouteTypes {
     | '/melhorias'
     | '/painel'
     | '/professor'
+    | '/professor/cadastro'
     | '/professor/'
+    | '/professor/equipe/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -209,15 +233,33 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProfessorIndexRouteImport
       parentRoute: typeof ProfessorRoute
     }
+    '/professor/cadastro': {
+      id: '/professor/cadastro'
+      path: '/cadastro'
+      fullPath: '/professor/cadastro'
+      preLoaderRoute: typeof ProfessorCadastroRouteImport
+      parentRoute: typeof ProfessorRoute
+    }
+    '/professor/equipe/$id': {
+      id: '/professor/equipe/$id'
+      path: '/equipe/$id'
+      fullPath: '/professor/equipe/$id'
+      preLoaderRoute: typeof ProfessorEquipeIdRouteImport
+      parentRoute: typeof ProfessorRoute
+    }
   }
 }
 
 interface ProfessorRouteChildren {
+  ProfessorCadastroRoute: typeof ProfessorCadastroRoute
   ProfessorIndexRoute: typeof ProfessorIndexRoute
+  ProfessorEquipeIdRoute: typeof ProfessorEquipeIdRoute
 }
 
 const ProfessorRouteChildren: ProfessorRouteChildren = {
+  ProfessorCadastroRoute: ProfessorCadastroRoute,
   ProfessorIndexRoute: ProfessorIndexRoute,
+  ProfessorEquipeIdRoute: ProfessorEquipeIdRoute,
 }
 
 const ProfessorRouteWithChildren = ProfessorRoute._addFileChildren(
