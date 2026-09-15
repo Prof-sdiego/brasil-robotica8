@@ -64,6 +64,7 @@ function TelaAjustes() {
   const { equipe, carregando, salvar, salvando } = useAluno({ exigirEquipeCompleta: true });
   const [avancadosAbertos, setAvancadosAbertos] = useState(false);
   const [calibrando, setCalibrando] = useState(false);
+  const [dicasAbertas, setDicasAbertas] = useState(false);
 
   if (carregando || !equipe) {
     return <p className="p-8 text-center text-lg font-bold">Carregando...</p>;
