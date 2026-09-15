@@ -10,6 +10,9 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ChecklistRouteImport } from './routes/checklist'
+import { Route as CodigoRouteImport } from './routes/codigo'
+import { Route as CoreografiasRouteImport } from './routes/coreografias'
 import { Route as EquipeRouteImport } from './routes/equipe'
 import { Route as MelhoriasRouteImport } from './routes/melhorias'
 import { Route as PainelRouteImport } from './routes/painel'
@@ -17,6 +20,21 @@ import { Route as PainelRouteImport } from './routes/painel'
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ChecklistRoute = ChecklistRouteImport.update({
+  id: '/checklist',
+  path: '/checklist',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CodigoRoute = CodigoRouteImport.update({
+  id: '/codigo',
+  path: '/codigo',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CoreografiasRoute = CoreografiasRouteImport.update({
+  id: '/coreografias',
+  path: '/coreografias',
   getParentRoute: () => rootRouteImport,
 } as any)
 const EquipeRoute = EquipeRouteImport.update({
@@ -37,12 +55,18 @@ const PainelRoute = PainelRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/checklist': typeof ChecklistRoute
+  '/codigo': typeof CodigoRoute
+  '/coreografias': typeof CoreografiasRoute
   '/equipe': typeof EquipeRoute
   '/melhorias': typeof MelhoriasRoute
   '/painel': typeof PainelRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/checklist': typeof ChecklistRoute
+  '/codigo': typeof CodigoRoute
+  '/coreografias': typeof CoreografiasRoute
   '/equipe': typeof EquipeRoute
   '/melhorias': typeof MelhoriasRoute
   '/painel': typeof PainelRoute
@@ -50,20 +74,48 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/checklist': typeof ChecklistRoute
+  '/codigo': typeof CodigoRoute
+  '/coreografias': typeof CoreografiasRoute
   '/equipe': typeof EquipeRoute
   '/melhorias': typeof MelhoriasRoute
   '/painel': typeof PainelRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/equipe' | '/melhorias' | '/painel'
+  fullPaths:
+    | '/'
+    | '/checklist'
+    | '/codigo'
+    | '/coreografias'
+    | '/equipe'
+    | '/melhorias'
+    | '/painel'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/equipe' | '/melhorias' | '/painel'
-  id: '__root__' | '/' | '/equipe' | '/melhorias' | '/painel'
+  to:
+    | '/'
+    | '/checklist'
+    | '/codigo'
+    | '/coreografias'
+    | '/equipe'
+    | '/melhorias'
+    | '/painel'
+  id:
+    | '__root__'
+    | '/'
+    | '/checklist'
+    | '/codigo'
+    | '/coreografias'
+    | '/equipe'
+    | '/melhorias'
+    | '/painel'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ChecklistRoute: typeof ChecklistRoute
+  CodigoRoute: typeof CodigoRoute
+  CoreografiasRoute: typeof CoreografiasRoute
   EquipeRoute: typeof EquipeRoute
   MelhoriasRoute: typeof MelhoriasRoute
   PainelRoute: typeof PainelRoute
@@ -76,6 +128,27 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/checklist': {
+      id: '/checklist'
+      path: '/checklist'
+      fullPath: '/checklist'
+      preLoaderRoute: typeof ChecklistRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/codigo': {
+      id: '/codigo'
+      path: '/codigo'
+      fullPath: '/codigo'
+      preLoaderRoute: typeof CodigoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/coreografias': {
+      id: '/coreografias'
+      path: '/coreografias'
+      fullPath: '/coreografias'
+      preLoaderRoute: typeof CoreografiasRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/equipe': {
@@ -104,6 +177,9 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ChecklistRoute: ChecklistRoute,
+  CodigoRoute: CodigoRoute,
+  CoreografiasRoute: CoreografiasRoute,
   EquipeRoute: EquipeRoute,
   MelhoriasRoute: MelhoriasRoute,
   PainelRoute: PainelRoute,
