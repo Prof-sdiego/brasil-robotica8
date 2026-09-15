@@ -798,12 +798,7 @@ export function duracaoEstimada(movimentos: MovimentoNaSequencia[]): number {
   for (const item of movimentos) {
     const movimento = MOVIMENTOS.find((m) => m.id === item.movimentoId);
     if (!movimento) continue;
-    if (movimento.paramDuracaoIndex !== undefined) {
-      const ms = item.params[movimento.paramDuracaoIndex] ?? 0;
-      total += ms / 1000;
-    } else {
-      total += movimento.duracaoBase;
-    }
+    total += movimento.duracao(item.params);
   }
   return Math.round(total * 10) / 10;
 }
