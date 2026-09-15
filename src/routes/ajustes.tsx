@@ -34,6 +34,32 @@ const PASSOS_CALIBRACAO = [
   "Gerem o código de novo e repitam até fechar.",
 ];
 
+const DICAS_PROBLEMAS = [
+  {
+    problema: "Uma roda gira mais rápido que a outra quando vou reto",
+    solucao:
+      "Aumente a zona morta para os lados. Se continuar, baixe a força do motor mais rápido.",
+  },
+  {
+    problema: "As rodas giram em sentidos opostos quando deveriam ir juntas",
+    solucao:
+      "Mesma coisa: zona morta para os lados. Sua mão está inclinando de lado sem perceber.",
+  },
+  {
+    problema: "O robô gira no lugar em vez de andar reto",
+    solucao: 'Marque "inverter motor esquerdo". Se piorar, desmarque e marque o direito.',
+  },
+  {
+    problema: "O robô anda sozinho sem ninguém mexer",
+    solucao:
+      "Desligue e ligue o controle, segurando ele parado enquanto aparece o bonequinho dormindo. Se continuar, aumente a zona morta de frente e trás.",
+  },
+  {
+    problema: "O robô anda ao contrário do que eu inclino",
+    solucao: 'Marque os dois "inverter motor".',
+  },
+];
+
 function TelaAjustes() {
   const { equipe, carregando, salvar, salvando } = useAluno({ exigirEquipeCompleta: true });
   const [avancadosAbertos, setAvancadosAbertos] = useState(false);
