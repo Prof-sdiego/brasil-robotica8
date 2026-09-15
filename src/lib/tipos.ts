@@ -60,6 +60,7 @@ export type EquipeEditavel = Partial<
     Equipe,
     | "sensibilidade"
     | "modoPilotagem"
+    | "nomeMicrobit"
     | "atribuicaoBotoes"
     | "ajustes"
     | "ajustesMelhorias"
