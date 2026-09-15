@@ -38,14 +38,13 @@ function TelaEquipe() {
   const completa = Boolean(equipe) && faltantes.length === 0;
 
   useEffect(() => {
-    if (!equipe) return;
-    if (eraCompleta.current === false && completa) {
-      setFesta(true);
-      const t = setTimeout(() => setFesta(false), 2600);
-      eraCompleta.current = completa;
-      return () => clearTimeout(t);
-    }
+    if (!equipe) return undefined;
+    const virouCompleta = eraCompleta.current === false && completa;
     eraCompleta.current = completa;
+    if (!virouCompleta) return undefined;
+    setFesta(true);
+    const t = setTimeout(() => setFesta(false), 2600);
+    return () => clearTimeout(t);
   }, [completa, equipe]);
 
   if (carregando || !equipe) {
