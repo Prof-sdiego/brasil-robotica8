@@ -14,7 +14,60 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      equipes: {
+        Row: {
+          checklist: Json
+          codigo_acesso: string
+          codigo_gerado: boolean
+          coreografias: Json
+          created_at: string
+          grupo_radio: number
+          id: string
+          integrantes: Json
+          justificativa: string
+          melhorias: Json
+          melodia_abertura: string | null
+          nome_equipe: string
+          sensibilidade: number
+          turma: string
+          updated_at: string
+        }
+        Insert: {
+          checklist?: Json
+          codigo_acesso: string
+          codigo_gerado?: boolean
+          coreografias?: Json
+          created_at?: string
+          grupo_radio?: number
+          id?: string
+          integrantes?: Json
+          justificativa?: string
+          melhorias?: Json
+          melodia_abertura?: string | null
+          nome_equipe: string
+          sensibilidade?: number
+          turma: string
+          updated_at?: string
+        }
+        Update: {
+          checklist?: Json
+          codigo_acesso?: string
+          codigo_gerado?: boolean
+          coreografias?: Json
+          created_at?: string
+          grupo_radio?: number
+          id?: string
+          integrantes?: Json
+          justificativa?: string
+          melhorias?: Json
+          melodia_abertura?: string | null
+          nome_equipe?: string
+          sensibilidade?: number
+          turma?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
