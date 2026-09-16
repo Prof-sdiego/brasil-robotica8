@@ -45,6 +45,29 @@ function lista<T>(valor: unknown): T[] {
   return Array.isArray(valor) ? (valor as T[]) : [];
 }
 
+const PAPEIS_VALIDOS: Papel[] = [
+  "Piloto",
+  "Copiloto",
+  "Engenheiro",
+  "Programador",
+  "Ajudante",
+  "Designer",
+];
+
+/** "Staff" virou "Ajudante"; e sempre um ajudante fica com a chave do programa ligada. */
+function integrantesNormalizados(valor: unknown): Integrante[] {
+  const bruto = lista<Integrante & { papel: string }>(valor);
+  const integrantes: Integrante[] = bruto.map((i) => ({
+    ...i,
+    papel: (PAPEIS_VALIDOS.includes(i.papel as Papel) ? i.papel : "Ajudante") as Papel,
+  }));
+  const ajudantes = integrantes.filter((i) => i.papel === "Ajudante");
+  if (ajudantes.length > 0 && !ajudantes.some((i) => i.podeEditar)) {
+    ajudantes[0]!.podeEditar = true;
+  }
+  return integrantes;
+}
+
 export function checklistCompleto(itens: ItemChecklist[]): ItemChecklist[] {
   return ITENS_CHECKLIST.map((definicao) => {
     const existente = itens.find((item) => item.id === definicao.id);
