@@ -22,11 +22,17 @@ export const TELAS_TUTORIAL: { icone: string; titulo: string; texto: string }[] 
     icone: "👥",
     titulo: "Primeiro a equipe",
     texto:
-      "Só depois de cadastrar o piloto, o copiloto, o engenheiro e o programador o resto do site abre.",
+      "Só depois de cadastrar o piloto, o copiloto, o engenheiro, o programador e pelo menos um ajudante o resto do site abre.",
+  },
+  {
+    icone: "🎫",
+    titulo: "Cada um tem o seu código",
+    texto:
+      "O programador cadastra a equipe e o site cria um código de 4 letras para cada pessoa. Com ele, cada um entra e vê a sua parte.",
   },
   {
     icone: "✅",
     titulo: "Marquem o checklist",
-    texto: "É como o professor acompanha o andamento de vocês.",
+    texto: "É como o professor acompanha o andamento de vocês. Cada item guarda quem marcou.",
   },
 ];
