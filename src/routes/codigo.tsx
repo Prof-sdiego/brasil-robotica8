@@ -4,11 +4,9 @@ import { useEffect, useMemo, useState } from "react";
 
 import { Cabecalho } from "@/components/Cabecalho";
 import { ManualBotoes } from "@/components/ManualBotoes";
-import { rotulosDosBotoes } from "@/lib/botoes";
 import { INSTRUCOES_INSTALACAO } from "@/lib/catalogo";
 import { montarCodigo } from "@/lib/gerador-codigo";
-import { AVISO_TECLADO, modoDe, PASSOS_CELULAR } from "@/lib/modos";
-import type { Equipe } from "@/lib/tipos";
+import { AVISO_TECLADO, enderecoDoPainel, modoDe, PASSOS_CELULAR } from "@/lib/modos";
 import { useAluno } from "@/lib/useAluno";
 
 export const Route = createFileRoute("/codigo")({
@@ -29,22 +27,6 @@ export const Route = createFileRoute("/codigo")({
   component: TelaCodigo,
 });
 
-function enderecoDoPainel(equipe: Equipe): string | null {
-  const modo = equipe.modoPilotagem || "inclinacao";
-  const { ba, bb, bab } = rotulosDosBotoes(equipe);
-  const partes = [
-    `ba=${encodeURIComponent(ba)}`,
-    `bb=${encodeURIComponent(bb)}`,
-    `bab=${encodeURIComponent(bab)}`,
-  ];
-  if (modo === "teclado") return `/pilotar-teclado.html?${partes.join("&")}`;
-  if (modo === "celular") {
-    return `/pilotar-celular.html?senha=${encodeURIComponent(
-      equipe.senhaRobo,
-    )}&nome=${encodeURIComponent(equipe.nomeMicrobit)}&${partes.join("&")}`;
-  }
-  return null;
-}
 
 function CaixaCodigo({
   titulo,

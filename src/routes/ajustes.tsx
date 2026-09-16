@@ -189,7 +189,7 @@ function TelaAjustes() {
           )}
         </section>
 
-        {SECOES_AJUSTES.filter((s) => s.avancada).map((secao) => (
+        {(podeAvancado ? SECOES_AJUSTES.filter((s) => s.avancada) : []).map((secao) => (
           <section key={secao.id} className="cartao-toque mb-5 p-5">
             <button
               onClick={() => setAvancadosAbertos(!avancadosAbertos)}
