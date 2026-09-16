@@ -254,6 +254,12 @@ function CadastroIntegrantes({ equipe }: { equipe: Equipe }) {
       toast.error(`Não há mais vaga de ${papel} nesta equipe.`);
       return;
     }
+    const novo: Integrante = {
+      id: crypto.randomUUID(),
+      nome: nome.trim(),
+      papel,
+      ...(papel === "Ajudante" ? { especialidade } : {}),
+    };
     const novaLista = [...integrantes, novo];
     await gravar(novaLista);
     setNome("");
