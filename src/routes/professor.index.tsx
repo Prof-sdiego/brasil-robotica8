@@ -205,8 +205,29 @@ function VisaoGeral() {
                   {feitos}/{equipe.checklist.length} checklist
                 </span>
                 <span className="text-sm font-bold">
-                  {equipe.integrantes.length} integrantes
+                  {equipe.integrantes.length} de 8 integrantes
                 </span>
+                <Etiqueta tom={temDesigner ? "sucesso" : "neutra"}>
+                  {temDesigner ? "🎨 com designer" : "sem designer"}
+                </Etiqueta>
+              </div>
+
+              <div className="mt-3 flex flex-wrap gap-2">
+                {PAPEIS.map((definicao) => {
+                  const quantos = equipe.integrantes.filter(
+                    (i) => i.papel === definicao.papel,
+                  ).length;
+                  const obrigatorioVago =
+                    quantos === 0 && PAPEIS_OBRIGATORIOS.includes(definicao.papel);
+                  return (
+                    <Etiqueta
+                      key={definicao.papel}
+                      tom={obrigatorioVago ? "alerta" : quantos > 0 ? "info" : "neutra"}
+                    >
+                      {definicao.icone} {definicao.papel} · {quantos}
+                    </Etiqueta>
+                  );
+                })}
               </div>
 
               <div className="mt-3 flex flex-wrap gap-2">
@@ -217,7 +238,7 @@ function VisaoGeral() {
                 ))}
                 {vagos.length > 0 && (
                   <Etiqueta tom="alerta">
-                    <AlertTriangle className="size-3" /> vago: {vagos.join(", ")}
+                    <AlertTriangle className="size-3" /> falta: {vagos.join(", ")}
                   </Etiqueta>
                 )}
                 {parada && (
