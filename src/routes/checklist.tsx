@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { BarraProgresso } from "@/components/BarraProgresso";
 import { Cabecalho } from "@/components/Cabecalho";
 import { nomeComPapel } from "@/lib/acessos";
-import { itensChecklist } from "@/lib/catalogo";
+import { ITENS_CHECKLIST } from "@/lib/catalogo";
 import { useAluno } from "@/lib/useAluno";
 
 export const Route = createFileRoute("/checklist")({
@@ -93,8 +93,7 @@ function TelaChecklist() {
 
         <div className="space-y-3">
           {equipe.checklist.map((item) => {
-            const texto =
-              itensChecklist(equipe.modoPilotagem).find((i) => i.id === item.id)?.texto ?? item.id;
+            const texto = ITENS_CHECKLIST.find((i) => i.id === item.id)?.texto ?? item.id;
             const quando = item.marcadoEm
               ? new Date(item.marcadoEm).toLocaleString("pt-BR", {
                   dateStyle: "short",

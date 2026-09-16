@@ -1,8 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { ExternalLink, Joystick, LogOut } from "lucide-react";
+import { AlertTriangle, ExternalLink, Joystick, LogOut } from "lucide-react";
 
 import { ManualBotoes } from "@/components/ManualBotoes";
-import { AVISO_TECLADO, enderecoDoPainel, modoDe, PASSOS_CELULAR } from "@/lib/modos";
+import { AVISO_ANDROID, AVISO_PASSO_DOIS, enderecoDoPainel, PASSOS_CELULAR } from "@/lib/modos";
 import { sairDaEquipe } from "@/lib/sessao";
 import { useAluno } from "@/lib/useAluno";
 
@@ -12,7 +12,7 @@ export const Route = createFileRoute("/pilotar")({
       { title: "Pilotar o robô — Oficina de Robótica" },
       {
         name: "description",
-        content: "Painel de pilotagem da equipe e o manual dos botões A, B e A+B.",
+        content: "Painel de pilotagem pelo celular e o manual dos botões A, B e A+B.",
       },
       { property: "og:title", content: "Pilotar o robô — Oficina de Robótica" },
       {
@@ -31,7 +31,6 @@ function TelaPilotar() {
     return <p className="p-8 text-center text-lg font-bold">Carregando...</p>;
   }
 
-  const modo = modoDe(equipe.modoPilotagem);
   const painel = enderecoDoPainel(equipe);
 
   return (
@@ -45,7 +44,7 @@ function TelaPilotar() {
             <Joystick className="size-7" /> {integrante?.papel ?? "Piloto"}
           </h1>
           <p className="mt-1 text-lg font-bold">
-            <span aria-hidden>{modo.icone}</span> {modo.nome}
+            <span aria-hidden>📱</span> Pilotagem pelo celular, por Bluetooth
           </p>
         </div>
         <button
@@ -60,52 +59,47 @@ function TelaPilotar() {
       </div>
 
       <div className="mt-5 space-y-5">
-        {painel ? (
-          <a
-            href={painel}
-            target="_blank"
-            rel="noreferrer"
-            className="flex items-center justify-center gap-2 rounded-2xl bg-secondary px-4 py-6 text-2xl font-extrabold text-secondary-foreground active:scale-[0.99]"
-          >
-            <ExternalLink className="size-6" /> Abrir o painel de pilotagem
-          </a>
-        ) : (
-          <p className="rounded-2xl bg-muted px-4 py-4 font-bold">
-            Neste modo vocês pilotam inclinando o micro:bit que fica na sua mão. Não tem painel na
-            tela: segure o controle parado ao ligar, até aparecer o ✓.
-          </p>
-        )}
+        <a
+          href={painel}
+          target="_blank"
+          rel="noreferrer"
+          className="flex items-center justify-center gap-2 rounded-2xl bg-secondary px-4 py-6 text-2xl font-extrabold text-secondary-foreground active:scale-[0.99]"
+        >
+          <ExternalLink className="size-6" /> Abrir o painel de pilotagem
+        </a>
 
-        {modo.id === "teclado" && (
-          <p className="rounded-2xl bg-alerta px-4 py-4 font-bold text-alerta-foreground">
-            {AVISO_TECLADO}
+        <div className="cartao-toque p-5">
+          <h2 className="text-xl">Para o celular conectar</h2>
+          <ol className="mt-3 space-y-2">
+            {PASSOS_CELULAR.map((passo, indice) => (
+              <li
+                key={passo.texto}
+                className={`flex gap-3 rounded-xl p-3 font-bold ${
+                  passo.destaque ? "bg-alerta text-alerta-foreground" : "bg-muted"
+                }`}
+              >
+                <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-primary font-black text-primary-foreground">
+                  {indice + 1}
+                </span>
+                <span>
+                  {passo.texto}
+                  {passo.destaque && (
+                    <span className="mt-1 flex items-start gap-2 text-sm font-extrabold">
+                      <AlertTriangle className="mt-0.5 size-4 shrink-0" /> {AVISO_PASSO_DOIS}
+                    </span>
+                  )}
+                </span>
+              </li>
+            ))}
+          </ol>
+          <p className="mt-3 rounded-xl bg-info px-3 py-2 font-bold text-info-foreground">
+            {AVISO_ANDROID}
           </p>
-        )}
-
-        {modo.id === "celular" && (
-          <div className="cartao-toque p-5">
-            <h2 className="text-xl">Para o celular conectar</h2>
-            <ol className="mt-3 space-y-2">
-              {PASSOS_CELULAR.map((passo, indice) => (
-                <li
-                  key={passo.texto}
-                  className={`flex gap-3 rounded-xl p-3 font-bold ${
-                    passo.destaque ? "bg-alerta text-alerta-foreground" : "bg-muted"
-                  }`}
-                >
-                  <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-primary font-black text-primary-foreground">
-                    {indice + 1}
-                  </span>
-                  <span>{passo.texto}</span>
-                </li>
-              ))}
-            </ol>
-            <p className="mt-3 rounded-xl bg-muted p-3 font-bold">
-              Senha do robô: <span className="font-mono">{equipe.senhaRobo || "—"}</span> · Nome do
-              micro:bit: <span className="font-mono">{equipe.nomeMicrobit || "—"}</span>
-            </p>
-          </div>
-        )}
+          <p className="mt-3 rounded-xl bg-muted p-3 font-bold">
+            Senha do robô: <span className="font-mono">{equipe.senhaRobo || "—"}</span> · Nome do
+            micro:bit: <span className="font-mono">{equipe.nomeMicrobit || "—"}</span>
+          </p>
+        </div>
 
         <ManualBotoes equipe={equipe} />
       </div>

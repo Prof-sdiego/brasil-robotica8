@@ -4,9 +4,8 @@ import { useMemo, useState } from "react";
 
 import { BarraProgresso } from "@/components/BarraProgresso";
 import { Etiqueta } from "@/components/Etiqueta";
-import { MELHORIAS, PAPEIS, PAPEIS_OBRIGATORIOS } from "@/lib/catalogo";
+import { ITEM_CELULAR_TESTADO, MELHORIAS, PAPEIS, PAPEIS_OBRIGATORIOS } from "@/lib/catalogo";
 import { useEquipes } from "@/lib/equipes";
-import { MODOS, modoDe } from "@/lib/modos";
 import type { Equipe } from "@/lib/tipos";
 
 export const Route = createFileRoute("/professor/")({
@@ -31,6 +30,10 @@ function papeisVagos(equipe: Equipe) {
   return PAPEIS_OBRIGATORIOS.filter(
     (papel) => !equipe.integrantes.some((i) => i.papel === papel),
   );
+}
+
+function celularTestado(equipe: Equipe) {
+  return equipe.checklist.some((item) => item.id === ITEM_CELULAR_TESTADO && item.marcado);
 }
 
 function paradaHaUmaSemana(equipe: Equipe) {
@@ -81,10 +84,7 @@ function VisaoGeral() {
       concluidas: todas.filter((e) => e.checklist.every((i) => i.marcado)).length,
       comCodigo: todas.filter((e) => e.codigoGerado).length,
       melhorias: [...contagemMelhorias.entries()].sort((a, b) => b[1] - a[1]),
-      modos: MODOS.map((modo) => ({
-        ...modo,
-        quantidade: todas.filter((e) => (e.modoPilotagem || "inclinacao") === modo.id).length,
-      })),
+      celularTestado: todas.filter((e) => celularTestado(e)).length,
     };
   }, [equipes]);
 
@@ -114,14 +114,10 @@ function VisaoGeral() {
       </section>
 
       <div className="cartao-toque mt-4 p-4">
-        <p className="mb-2 font-bold">Modo de pilotagem das equipes</p>
-        <div className="flex flex-wrap gap-2">
-          {resumo.modos.map((modo) => (
-            <Etiqueta key={modo.id} tom="info">
-              {modo.icone} {modo.nome} · {modo.quantidade}
-            </Etiqueta>
-          ))}
-        </div>
+        <p className="mb-2 font-bold">Celular Android testado e conectando</p>
+        <Etiqueta tom={resumo.celularTestado === resumo.total ? "sucesso" : "alerta"}>
+          📱 {resumo.celularTestado} de {resumo.total} equipes confirmaram
+        </Etiqueta>
       </div>
 
       {resumo.melhorias.length > 0 && (
@@ -187,8 +183,8 @@ function VisaoGeral() {
                 <Etiqueta tom={radioRepetido ? "alerta" : "info"}>
                   <Radio className="size-3" /> rádio {equipe.grupoRadio}
                 </Etiqueta>
-                <Etiqueta tom="primaria">
-                  {modoDe(equipe.modoPilotagem).icone} {modoDe(equipe.modoPilotagem).nome}
+                <Etiqueta tom={celularTestado(equipe) ? "sucesso" : "alerta"}>
+                  📱 {celularTestado(equipe) ? "celular testado" : "celular não testado"}
                 </Etiqueta>
                 <Etiqueta tom={equipe.codigoGerado ? "sucesso" : "neutra"}>
                   {equipe.codigoGerado ? "código gerado" : "sem código ainda"}

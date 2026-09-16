@@ -1,12 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { AlertTriangle, Bot, Check, Code2, Copy, ExternalLink, Gamepad2 } from "lucide-react";
+import { AlertTriangle, Bot, Check, Code2, Copy, ExternalLink, Smartphone } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 
 import { Cabecalho } from "@/components/Cabecalho";
 import { ManualBotoes } from "@/components/ManualBotoes";
 import { INSTRUCOES_INSTALACAO } from "@/lib/catalogo";
 import { montarCodigo } from "@/lib/gerador-codigo";
-import { AVISO_TECLADO, enderecoDoPainel, modoDe, PASSOS_CELULAR } from "@/lib/modos";
+import { AVISO_ANDROID, AVISO_PASSO_DOIS, enderecoDoPainel, PASSOS_CELULAR } from "@/lib/modos";
 import { useAluno } from "@/lib/useAluno";
 
 export const Route = createFileRoute("/codigo")({
@@ -15,32 +15,27 @@ export const Route = createFileRoute("/codigo")({
       { title: "Meu código — Oficina de Robótica" },
       {
         name: "description",
-        content: "Copie o código do controle e o código do robô e instale em cada micro:bit.",
+        content: "Copie o código do robô e instale no micro:bit do carrinho da sua equipe.",
       },
       { property: "og:title", content: "Meu código — Oficina de Robótica" },
       {
         property: "og:description",
-        content: "O código pronto do controle e do robô da sua equipe, com o passo a passo.",
+        content: "O código pronto do robô da sua equipe, com o passo a passo da instalação.",
       },
     ],
   }),
   component: TelaCodigo,
 });
 
-
 function CaixaCodigo({
   titulo,
   aviso,
   codigo,
-  icone,
-  cor,
   aoCopiar,
 }: {
   titulo: string;
   aviso: string;
   codigo: string;
-  icone: React.ReactNode;
-  cor: string;
   aoCopiar: () => void;
 }) {
   const [copiado, setCopiado] = useState(false);
@@ -58,8 +53,8 @@ function CaixaCodigo({
 
   return (
     <section className="cartao-toque overflow-hidden">
-      <div className={`flex items-center gap-3 px-4 py-3 ${cor}`}>
-        {icone}
+      <div className="flex items-center gap-3 bg-primary px-4 py-3 text-primary-foreground">
+        <Bot className="size-8" />
         <div className="flex-1">
           <h2 className="text-2xl">{titulo}</h2>
           <p className="text-sm font-bold opacity-90">{aviso}</p>
@@ -73,14 +68,17 @@ function CaixaCodigo({
         className="flex w-full items-center justify-center gap-2 bg-sucesso px-4 py-4 text-lg font-extrabold text-sucesso-foreground active:scale-[0.99]"
       >
         {copiado ? <Check className="size-5" /> : <Copy className="size-5" />}
-        {copiado ? "Copiado!" : `Copiar código do ${titulo.toLowerCase()}`}
+        {copiado ? "Copiado!" : "Copiar o código do robô"}
       </button>
     </section>
   );
 }
 
 function TelaCodigo() {
-  const { equipe, carregando, salvar, salvando } = useAluno({ exigirEquipeCompleta: true, area: "codigo" });
+  const { equipe, carregando, salvar, salvando } = useAluno({
+    exigirEquipeCompleta: true,
+    area: "codigo",
+  });
 
   const codigos = useMemo(() => (equipe ? montarCodigo(equipe) : null), [equipe]);
 
@@ -92,7 +90,6 @@ function TelaCodigo() {
     return <p className="p-8 text-center text-lg font-bold">Carregando...</p>;
   }
 
-  const modo = modoDe(equipe.modoPilotagem);
   const painel = enderecoDoPainel(equipe);
 
   const desatualizado =
@@ -115,88 +112,69 @@ function TelaCodigo() {
           </p>
         )}
 
-        <p className="rounded-2xl bg-muted px-4 py-3 font-bold">
-          <span aria-hidden>{modo.icone}</span> Modo de pilotagem: {modo.nome}
-        </p>
+        <section className="cartao-toque p-5">
+          <h2 className="flex items-center gap-2 text-2xl">
+            <Smartphone className="size-6" /> Os três passos da instalação
+          </h2>
+          <ol className="mt-4 space-y-3">
+            {PASSOS_CELULAR.map((passo, indice) => (
+              <li
+                key={passo.texto}
+                className={`flex gap-3 rounded-xl p-4 text-lg font-bold ${
+                  passo.destaque
+                    ? "bg-alerta text-alerta-foreground ring-4 ring-alerta/40"
+                    : "bg-muted text-foreground"
+                }`}
+              >
+                <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-primary text-lg font-black text-primary-foreground">
+                  {indice + 1}
+                </span>
+                <span>
+                  {passo.texto}
+                  {passo.destaque && (
+                    <span className="mt-2 flex items-start gap-2 text-base font-extrabold">
+                      <AlertTriangle className="mt-0.5 size-5 shrink-0" /> {AVISO_PASSO_DOIS}
+                    </span>
+                  )}
+                </span>
+              </li>
+            ))}
+          </ol>
 
-        {modo.id === "celular" ? (
-          <section className="cartao-toque p-5">
-            <h2 className="text-2xl">Antes de instalar, três passos</h2>
-            <ol className="mt-3 space-y-3">
-              {PASSOS_CELULAR.map((passo, indice) => (
-                <li
-                  key={passo.texto}
-                  className={`flex gap-3 rounded-xl p-3 font-bold ${
-                    passo.destaque
-                      ? "bg-alerta text-alerta-foreground"
-                      : "bg-background text-foreground"
-                  }`}
-                >
-                  <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-primary font-black text-primary-foreground">
-                    {indice + 1}
-                  </span>
-                  <span>
-                    {passo.texto}
-                    {passo.destaque && (
-                      <span className="mt-1 block text-sm font-extrabold">
-                        Este é o passo mais esquecido. Sem ele o celular não conecta.
-                      </span>
-                    )}
-                  </span>
-                </li>
-              ))}
-            </ol>
-            <p className="mt-4 rounded-xl bg-muted p-3 font-bold">
-              Senha do robô: <span className="font-mono">{equipe.senhaRobo || "—"}</span> · Nome do
-              micro:bit: <span className="font-mono">{equipe.nomeMicrobit || "—"}</span>
+          <p className="mt-4 rounded-xl bg-info px-4 py-3 font-bold text-info-foreground">
+            {AVISO_ANDROID}
+          </p>
+
+          <div className="mt-4 rounded-xl bg-muted p-4">
+            <p className="font-bold">
+              Senha do robô: <span className="font-mono">{equipe.senhaRobo || "—"}</span>
             </p>
-          </section>
-        ) : (
-          <p className="rounded-2xl bg-alerta px-4 py-3 font-bold text-alerta-foreground">
-            São dois micro:bit diferentes. Trocar os códigos não funciona: o controle precisa do
-            código do CONTROLE e o robô precisa do código do ROBÔ.
-          </p>
-        )}
+            <label className="mt-3 block text-sm font-bold">
+              Nome do micro:bit (as cinco letras que ele mostra ao ligar)
+              <input
+                value={equipe.nomeMicrobit}
+                maxLength={5}
+                placeholder="zuvit"
+                onChange={(e) => salvar({ nomeMicrobit: e.target.value.toLowerCase() })}
+                className="mt-1 w-full rounded-xl border-2 border-input bg-background px-4 py-3 text-center font-mono text-2xl font-bold tracking-widest outline-none focus:border-ring"
+              />
+            </label>
+          </div>
+        </section>
 
-        {modo.id === "teclado" && (
-          <p className="flex items-start gap-3 rounded-2xl bg-alerta px-4 py-3 font-bold text-alerta-foreground">
-            <AlertTriangle className="mt-0.5 size-5 shrink-0" />
-            {AVISO_TECLADO}
-          </p>
-        )}
-
-        {painel && (
-          <a
-            href={painel}
-            target="_blank"
-            rel="noreferrer"
-            className="flex items-center justify-center gap-2 rounded-2xl bg-secondary px-4 py-5 text-xl font-extrabold text-secondary-foreground active:scale-[0.99]"
-          >
-            <ExternalLink className="size-5" /> Abrir o painel de pilotagem
-          </a>
-        )}
-
-        {codigos.controle && (
-          <CaixaCodigo
-            titulo={codigos.tituloControle}
-            aviso={
-              modo.id === "teclado"
-                ? "Vai no micro:bit ligado ao computador pelo cabo"
-                : "Vai no micro:bit que fica na sua mão"
-            }
-            codigo={codigos.controle}
-            icone={<Gamepad2 className="size-8" />}
-            cor="bg-secondary text-secondary-foreground"
-            aoCopiar={marcarCopiado}
-          />
-        )}
+        <a
+          href={painel}
+          target="_blank"
+          rel="noreferrer"
+          className="flex items-center justify-center gap-2 rounded-2xl bg-secondary px-4 py-5 text-xl font-extrabold text-secondary-foreground active:scale-[0.99]"
+        >
+          <ExternalLink className="size-5" /> Abrir o painel de pilotagem
+        </a>
 
         <CaixaCodigo
           titulo={codigos.tituloRobo}
           aviso="Vai no micro:bit que está preso no robô"
           codigo={codigos.robo}
-          icone={<Bot className="size-8" />}
-          cor="bg-primary text-primary-foreground"
           aoCopiar={marcarCopiado}
         />
 

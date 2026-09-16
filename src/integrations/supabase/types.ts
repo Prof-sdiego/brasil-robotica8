@@ -21,6 +21,7 @@ export type Database = {
           ajustes_melhorias: Json
           atribuicao_botoes: Json
           aviso_catalogo: boolean
+          aviso_modo: boolean
           checklist: Json
           codigo_acesso: string
           codigo_copiado_em: string | null
@@ -47,6 +48,7 @@ export type Database = {
           ajustes_melhorias?: Json
           atribuicao_botoes?: Json
           aviso_catalogo?: boolean
+          aviso_modo?: boolean
           checklist?: Json
           codigo_acesso: string
           codigo_copiado_em?: string | null
@@ -73,6 +75,7 @@ export type Database = {
           ajustes_melhorias?: Json
           atribuicao_botoes?: Json
           aviso_catalogo?: boolean
+          aviso_modo?: boolean
           checklist?: Json
           codigo_acesso?: string
           codigo_copiado_em?: string | null

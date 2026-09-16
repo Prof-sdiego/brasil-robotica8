@@ -19,7 +19,6 @@ import {
 import { codigosDaEquipe } from "@/lib/codigosPessoais";
 import { AVISO_ULTIMO_PROGRAMACAO, ajudantesDeProgramacao, papeisFaltantes } from "@/lib/equipeStatus";
 import { salvarIntegrantesPorId, useEquipes } from "@/lib/equipes";
-import { modoDe } from "@/lib/modos";
 import { duracaoEstimada, montarCodigo } from "@/lib/gerador-codigo";
 import type { Equipe, Especialidade, Integrante, Papel } from "@/lib/tipos";
 
@@ -126,10 +125,6 @@ function DetalheEquipe() {
 
       <section className="cartao-toque p-5">
         <h3 className="text-xl">Melhorias e justificativa</h3>
-        <p className="mt-1 font-bold">
-          <span aria-hidden>{modoDe(equipe.modoPilotagem).icone}</span> Modo de pilotagem:{" "}
-          {modoDe(equipe.modoPilotagem).nome}
-        </p>
         <div className="mt-2 flex flex-wrap gap-2">
           {equipe.melhorias.length === 0 && (
             <p className="font-semibold text-muted-foreground">Nada escolhido.</p>
@@ -204,11 +199,7 @@ function DetalheEquipe() {
 
       <section className="cartao-toque p-5">
         <h3 className="text-xl">Código gerado</h3>
-        <p className="mt-3 font-bold">Controle</p>
-        <pre className="mt-1 max-h-60 overflow-auto rounded-xl bg-muted p-3 font-mono text-xs">
-          {codigos.controle}
-        </pre>
-        <p className="mt-3 font-bold">Robô</p>
+        <p className="mt-3 font-bold">Robô por Bluetooth</p>
         <pre className="mt-1 max-h-60 overflow-auto rounded-xl bg-muted p-3 font-mono text-xs">
           {codigos.robo}
         </pre>
