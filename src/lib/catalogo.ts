@@ -23,11 +23,23 @@ export const PAPEIS: { papel: Papel; vagas: number; descricao: string; icone: st
     descricao: "Responsável pelo código e por este site",
     icone: "💻",
   },
-  { papel: "Staff", vagas: 3, descricao: "Apoio geral da equipe (até 3 pessoas)", icone: "🙌" },
+  {
+    papel: "Ajudante",
+    vagas: 3,
+    descricao: "Ajuda o programador (até 3 pessoas, pelo menos 1)",
+    icone: "🙌",
+  },
+  { papel: "Designer", vagas: 1, descricao: "Cuida da decoração do robô (opcional)", icone: "🎨" },
 ];
 
-export const PAPEIS_OBRIGATORIOS: Papel[] = ["Piloto", "Copiloto", "Engenheiro", "Programador"];
-export const MAXIMO_INTEGRANTES = 7;
+export const PAPEIS_OBRIGATORIOS: Papel[] = [
+  "Piloto",
+  "Copiloto",
+  "Engenheiro",
+  "Programador",
+  "Ajudante",
+];
+export const MAXIMO_INTEGRANTES = 8;
 
 export type Intensidade = "muito" | "medio" | "pouco" | "nada";
 
@@ -298,7 +310,10 @@ export const ITENS_CHECKLIST: { id: string; texto: string }[] = [
   { id: "coreografias", texto: "Coreografias montadas e testadas" },
   { id: "balao", texto: "Balão e suporte instalados" },
   { id: "ensaio", texto: "Ensaio feito com a turma" },
+  { id: "decoracao", texto: "Decoração feita, sem passar das medidas" },
+  { id: "peso", texto: "Peso conferido depois de decorar" },
 ];
+
 
 /** O item 4 muda de texto conforme o modo de pilotagem da equipe. */
 export function itensChecklist(modo: string): { id: string; texto: string }[] {
