@@ -4,7 +4,12 @@
 import type { Papel } from "./tipos";
 
 export const PAPEIS: { papel: Papel; vagas: number; descricao: string; icone: string }[] = [
-  { papel: "Piloto", vagas: 1, descricao: "Controla o robô durante a batalha", icone: "🎮" },
+  {
+    papel: "Piloto",
+    vagas: 1,
+    descricao: "Controla o robô durante a batalha. O piloto usa o próprio celular para dirigir.",
+    icone: "🎮",
+  },
   {
     papel: "Copiloto",
     vagas: 1,
@@ -299,12 +304,16 @@ export const MOVIMENTOS: Movimento[] = [
   },
 ];
 
+/** Item do checklist que mostra, no painel do professor, se a equipe tem celular compatível. */
+export const ITEM_CELULAR_TESTADO = "celular_testado";
+
 export const ITENS_CHECKLIST: { id: string; texto: string }[] = [
   { id: "chassi", texto: "Chassi montado" },
   { id: "motores", texto: "Motores ligados na placa" },
-  { id: "robotbit", texto: "Extensão robotbit instalada nos dois projetos" },
-  { id: "codigo_instalado", texto: "Código instalado nos dois micro:bit" },
-  { id: "anda_reto", texto: "Robô anda reto quando inclino o controle" },
+  { id: "robotbit", texto: "Extensões robotbit e bluetooth instaladas no projeto" },
+  { id: "codigo_instalado", texto: "Código instalado no micro:bit do robô" },
+  { id: ITEM_CELULAR_TESTADO, texto: "Celular Android da equipe testado e conectando" },
+  { id: "anda_reto", texto: "Robô anda reto quando inclino o celular" },
   { id: "giro360", texto: "GIRO360 calibrado (o robô dá exatamente uma volta)" },
   { id: "melhorias", texto: "Melhorias escolhidas e justificadas" },
   { id: "coreografias", texto: "Coreografias montadas e testadas" },
@@ -314,31 +323,15 @@ export const ITENS_CHECKLIST: { id: string; texto: string }[] = [
   { id: "peso", texto: "Peso conferido depois de decorar" },
 ];
 
-
-/** O item 4 muda de texto conforme o modo de pilotagem da equipe. */
-export function itensChecklist(modo: string): { id: string; texto: string }[] {
-  return ITENS_CHECKLIST.map((item) =>
-    item.id === "codigo_instalado"
-      ? {
-          ...item,
-          texto:
-            modo === "celular"
-              ? "Código instalado no micro:bit do robô"
-              : "Código instalado nos dois micro:bit",
-        }
-      : item,
-  );
-}
-
 export type ParteInstrucoes = { titulo: string; icone: string; passos: string[]; nota?: string };
 
 export const INSTRUCOES_INSTALACAO: ParteInstrucoes[] = [
   {
-    titulo: "Antes de tudo: vocês têm dois micro:bit",
-    icone: "🎮",
+    titulo: "Antes de tudo: um micro:bit só",
+    icone: "📱",
     passos: [
-      "Um fica na sua mão — é o CONTROLE. O outro fica encaixado no carrinho — é o ROBÔ.",
-      "Cada um recebe um código diferente. Não troquem. Se colocarem o código do robô no controle, nada funciona.",
+      "O micro:bit fica encaixado no carrinho — é o cérebro do robô.",
+      "Quem dirige é o celular da equipe, falando por Bluetooth com esse micro:bit. Não existe micro:bit de controle.",
     ],
   },
   {

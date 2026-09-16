@@ -14,6 +14,7 @@ import {
   Wand2,
   Wrench,
   Joystick,
+  Smartphone,
 } from "lucide-react";
 import { useEffect } from "react";
 
@@ -21,7 +22,7 @@ import { BarraProgresso } from "@/components/BarraProgresso";
 import { ManualBotoes } from "@/components/ManualBotoes";
 import type { Area } from "@/lib/acessos";
 import { listarFaltantes, papeisFaltantes } from "@/lib/equipeStatus";
-import { modoDe } from "@/lib/modos";
+import { AVISO_MODO_MUDOU } from "@/lib/modos";
 import { sairDaEquipe, useTutorialVisto } from "@/lib/sessao";
 import { useAluno } from "@/lib/useAluno";
 
@@ -59,14 +60,6 @@ const CARTOES = [
     descricao: "Painel do piloto",
     icone: Joystick,
     cor: "bg-primary text-primary-foreground",
-  },
-  {
-    para: "/pilotagem" as const,
-    area: "programa" as Area,
-    titulo: "Como pilotar",
-    descricao: "Escolham o modo",
-    icone: Joystick,
-    cor: "bg-info text-info-foreground",
   },
   {
     para: "/melhorias" as const,
@@ -120,7 +113,7 @@ const CARTOES = [
     para: "/codigo" as const,
     area: "codigo" as Area,
     titulo: "Meu código",
-    descricao: "Controle e robô",
+    descricao: "O código do robô",
     icone: Code2,
     cor: "bg-info text-info-foreground",
   },
@@ -128,7 +121,7 @@ const CARTOES = [
 
 function Painel() {
   const navigate = useNavigate();
-  const { equipe, integrante, areas, carregando, codigo } = useAluno();
+  const { equipe, integrante, areas, carregando, codigo, salvar } = useAluno();
   const { pronto: tutorialPronto, visto: tutorialVisto } = useTutorialVisto(codigo);
 
   useEffect(() => {
@@ -190,12 +183,11 @@ function Painel() {
             <Radio className="size-7" /> Grupo de rádio {equipe.grupoRadio}
           </p>
           <p className="mt-1 text-sm font-semibold leading-snug">
-            Ele já está no código. Não mude esse número, ou seu robô vai obedecer ao controle de
-            outra equipe.
+            Ele já está no código. Não mude esse número: é o que separa o seu robô dos robôs das
+            outras equipes.
           </p>
           <p className="mt-3 text-lg font-extrabold">
-            <span aria-hidden>{modoDe(equipe.modoPilotagem).icone}</span> Pilotagem:{" "}
-            {modoDe(equipe.modoPilotagem).nome}
+            <span aria-hidden>📱</span> Vocês pilotam pelo celular, por Bluetooth
           </p>
         </div>
       </div>
@@ -204,6 +196,19 @@ function Painel() {
         <h2 className="mb-2 text-xl">Nosso progresso</h2>
         <BarraProgresso feitos={feitos} total={equipe.checklist.length} />
       </div>
+
+      {equipe.avisoModo && (
+        <button
+          onClick={() => salvar({ avisoModo: false })}
+          className="mt-4 flex w-full items-start gap-2 rounded-2xl bg-info px-4 py-4 text-left font-bold text-info-foreground"
+        >
+          <Smartphone className="mt-0.5 size-5 shrink-0" />
+          <span>
+            {AVISO_MODO_MUDOU}
+            <span className="mt-1 block text-sm">Toque para esconder este aviso.</span>
+          </span>
+        </button>
+      )}
 
       {travado && (
         <p className="mt-4 flex items-start gap-2 rounded-2xl bg-alerta px-4 py-4 font-bold text-alerta-foreground">

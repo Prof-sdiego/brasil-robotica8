@@ -1,10 +1,10 @@
 /** Telas do tutorial "Como funciona". Textos fixos, escritos à mão. */
 export const TELAS_TUTORIAL: { icone: string; titulo: string; texto: string }[] = [
   {
-    icone: "🕹️",
-    titulo: "Dois micro:bit",
+    icone: "📱",
+    titulo: "Um micro:bit e o celular",
     texto:
-      "Vocês têm dois micro:bit. Um fica na sua mão (o controle) e o outro no carrinho (o robô). Cada um recebe um código diferente.",
+      "Seu robô tem um micro:bit. Ele é o cérebro do carrinho. O celular de vocês conversa com ele por Bluetooth, sem fio nenhum.",
   },
   {
     icone: "✍️",

@@ -65,8 +65,8 @@ function TelaBotoes() {
       />
       <main className="mx-auto max-w-3xl space-y-5 px-4 py-5 pb-16">
         <p className="rounded-2xl bg-info px-4 py-3 font-bold text-info-foreground">
-          O controle só avisa qual botão foi apertado. Quem decide o que acontece é o robô — por
-          isso funciona igual nos três modos de pilotagem.
+          O celular só avisa qual botão foi apertado. Quem decide o que acontece é o robô — por
+          isso todas as melhorias funcionam do mesmo jeito.
         </p>
 
         {escolhidasDeBotao.length === 0 && (

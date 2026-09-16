@@ -16,10 +16,7 @@ import { atribuicaoEfetiva, VALOR_COREOGRAFIA } from "./botoes";
 import { MOVIMENTOS } from "./catalogo";
 import {
   COMUNICACAO_BLUETOOTH,
-  COMUNICACAO_RADIO,
   CORPO_PILOTAR_DIRETO,
-  MODELO_CONTROLE,
-  MODELO_CONTROLE_TECLADO,
   MODELO_ROBO,
 } from "./modelos-codigo";
 import type { AjustesMelhorias } from "./ajustes";
@@ -351,16 +348,12 @@ function aplicarMarcadores(modelo: string, valores: Partial<Record<Marcador, str
 }
 
 export type CodigoGerado = {
-  /** null no modo celular: lá não existe micro:bit de controle. */
-  controle: string | null;
-  tituloControle: string;
   robo: string;
   tituloRobo: string;
 };
 
-/** Monta os códigos da equipe colando trechos fixos nos marcadores. */
+/** Monta o código do robô colando trechos fixos nos marcadores. */
 export function montarCodigo(equipe: Equipe): CodigoGerado {
-  const modo = equipe.modoPilotagem || "inclinacao";
   const ajustes = equipe.ajustes;
   const usaTurbo = equipe.melhorias.includes("turbo");
   const usaArranqueSuave = equipe.melhorias.includes("arranque_suave");
@@ -424,19 +417,13 @@ export function montarCodigo(equipe: Equipe): CodigoGerado {
     robo[marcadorDoBotao[botao]] = corpo;
   }
 
-  robo.COMUNICACAO = modo === "celular" ? COMUNICACAO_BLUETOOTH : COMUNICACAO_RADIO;
-
-  const controle =
-    modo === "celular"
-      ? null
-      : aplicarMarcadores(modo === "teclado" ? MODELO_CONTROLE_TECLADO : MODELO_CONTROLE, base);
+  // Só existe um jeito de pilotar: o celular falando por Bluetooth com o robô.
+  robo.COMUNICACAO = COMUNICACAO_BLUETOOTH;
 
   return {
-    controle,
-    tituloControle: modo === "teclado" ? "CONTROLE POR TECLADO" : "CONTROLE",
     // Duas passadas: os trechos colados (comunicação, melhorias) também têm marcadores.
     robo: aplicarMarcadores(aplicarMarcadores(MODELO_ROBO, robo), robo),
-    tituloRobo: modo === "celular" ? "ROBÔ POR BLUETOOTH" : "ROBÔ",
+    tituloRobo: "ROBÔ POR BLUETOOTH",
   };
 }
 

@@ -20,7 +20,6 @@ import { Route as EngenhariaRouteImport } from './routes/engenharia'
 import { Route as EquipeRouteImport } from './routes/equipe'
 import { Route as MelhoriasRouteImport } from './routes/melhorias'
 import { Route as PainelRouteImport } from './routes/painel'
-import { Route as PilotagemRouteImport } from './routes/pilotagem'
 import { Route as PilotarRouteImport } from './routes/pilotar'
 import { Route as ProfessorRouteImport } from './routes/professor'
 import { Route as ProgramadorRouteImport } from './routes/programador'
@@ -85,11 +84,6 @@ const PainelRoute = PainelRouteImport.update({
   path: '/painel',
   getParentRoute: () => rootRouteImport,
 } as any)
-const PilotagemRoute = PilotagemRouteImport.update({
-  id: '/pilotagem',
-  path: '/pilotagem',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const PilotarRoute = PilotarRouteImport.update({
   id: '/pilotar',
   path: '/pilotar',
@@ -143,7 +137,6 @@ export interface FileRoutesByFullPath {
   '/equipe': typeof EquipeRoute
   '/melhorias': typeof MelhoriasRoute
   '/painel': typeof PainelRoute
-  '/pilotagem': typeof PilotagemRoute
   '/pilotar': typeof PilotarRoute
   '/professor': typeof ProfessorRouteWithChildren
   '/programador': typeof ProgramadorRoute
@@ -165,7 +158,6 @@ export interface FileRoutesByTo {
   '/equipe': typeof EquipeRoute
   '/melhorias': typeof MelhoriasRoute
   '/painel': typeof PainelRoute
-  '/pilotagem': typeof PilotagemRoute
   '/pilotar': typeof PilotarRoute
   '/programador': typeof ProgramadorRoute
   '/tutorial': typeof TutorialRoute
@@ -187,7 +179,6 @@ export interface FileRoutesById {
   '/equipe': typeof EquipeRoute
   '/melhorias': typeof MelhoriasRoute
   '/painel': typeof PainelRoute
-  '/pilotagem': typeof PilotagemRoute
   '/pilotar': typeof PilotarRoute
   '/professor': typeof ProfessorRouteWithChildren
   '/programador': typeof ProgramadorRoute
@@ -211,7 +202,6 @@ export interface FileRouteTypes {
     | '/equipe'
     | '/melhorias'
     | '/painel'
-    | '/pilotagem'
     | '/pilotar'
     | '/professor'
     | '/programador'
@@ -233,7 +223,6 @@ export interface FileRouteTypes {
     | '/equipe'
     | '/melhorias'
     | '/painel'
-    | '/pilotagem'
     | '/pilotar'
     | '/programador'
     | '/tutorial'
@@ -254,7 +243,6 @@ export interface FileRouteTypes {
     | '/equipe'
     | '/melhorias'
     | '/painel'
-    | '/pilotagem'
     | '/pilotar'
     | '/professor'
     | '/programador'
@@ -277,7 +265,6 @@ export interface RootRouteChildren {
   EquipeRoute: typeof EquipeRoute
   MelhoriasRoute: typeof MelhoriasRoute
   PainelRoute: typeof PainelRoute
-  PilotagemRoute: typeof PilotagemRoute
   PilotarRoute: typeof PilotarRoute
   ProfessorRoute: typeof ProfessorRouteWithChildren
   ProgramadorRoute: typeof ProgramadorRoute
@@ -361,13 +348,6 @@ declare module '@tanstack/react-router' {
       path: '/painel'
       fullPath: '/painel'
       preLoaderRoute: typeof PainelRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/pilotagem': {
-      id: '/pilotagem'
-      path: '/pilotagem'
-      fullPath: '/pilotagem'
-      preLoaderRoute: typeof PilotagemRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/pilotar': {
@@ -459,7 +439,6 @@ const rootRouteChildren: RootRouteChildren = {
   EquipeRoute: EquipeRoute,
   MelhoriasRoute: MelhoriasRoute,
   PainelRoute: PainelRoute,
-  PilotagemRoute: PilotagemRoute,
   PilotarRoute: PilotarRoute,
   ProfessorRoute: ProfessorRouteWithChildren,
   ProgramadorRoute: ProgramadorRoute,
