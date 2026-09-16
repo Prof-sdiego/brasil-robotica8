@@ -83,6 +83,8 @@ function DetalheEquipe() {
         </div>
       </header>
 
+      <CadastroIntegrantes equipe={equipe} />
+
       <section className="cartao-toque p-5">
         <h3 className="text-xl">Integrantes ({equipe.integrantes.length} de 8)</h3>
         {equipe.integrantes.length === 0 ? (
@@ -91,15 +93,10 @@ function DetalheEquipe() {
           <ul className="mt-3 space-y-2">
             {equipe.integrantes.map((integrante) => (
               <li key={integrante.id} className="flex flex-wrap items-center gap-2 font-bold">
-                <Etiqueta tom="primaria">{integrante.papel}</Etiqueta> {integrante.nome}
+                <Etiqueta tom="primaria">{papelCompleto(integrante)}</Etiqueta> {integrante.nome}
                 <span className="font-mono text-sm text-muted-foreground">
                   código {codigosPessoais[integrante.id]}
                 </span>
-                {integrante.papel === "Ajudante" && (
-                  <Etiqueta tom={integrante.podeEditar ? "sucesso" : "neutra"}>
-                    {integrante.podeEditar ? "pode editar o programa" : "só checklist e código"}
-                  </Etiqueta>
-                )}
               </li>
             ))}
           </ul>
