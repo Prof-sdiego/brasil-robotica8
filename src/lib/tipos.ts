@@ -10,14 +10,17 @@ export type Papel =
 
 export type Botao = "A" | "B" | "AB";
 
+/** Especialidade do Ajudante, escolhida pelo programador. */
+export type Especialidade = "programacao" | "engenharia" | "design";
+
 export type Integrante = {
   id: string;
   nome: string;
   papel: Papel;
   /** Código pessoal de 4 caracteres. Vazio = o site usa o código derivado do id. */
   codigo?: string;
-  /** Só para Ajudante: chave que libera mexer no programa. */
-  podeEditar?: boolean;
+  /** Só para Ajudante: o que ele vê e edita. */
+  especialidade?: Especialidade;
 };
 
 export type MovimentoNaSequencia = {

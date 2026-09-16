@@ -1,6 +1,6 @@
 // Quem vê o quê. Cada papel entra com o seu código pessoal e abre só a sua parte.
 
-import type { Integrante, Papel } from "./tipos";
+import type { Especialidade, Integrante, Papel } from "./tipos";
 
 export type Area =
   | "equipe"
@@ -23,6 +23,46 @@ const TODAS: Area[] = [
   "ajustes",
 ];
 
+export const ESPECIALIDADES: { id: Especialidade; nome: string; icone: string; descricao: string }[] =
+  [
+    {
+      id: "programacao",
+      nome: "Ajudante de Programação",
+      icone: "💻",
+      descricao: "Mexe nas melhorias, nas coreografias e no código, como o programador.",
+    },
+    {
+      id: "engenharia",
+      nome: "Ajudante de Engenharia",
+      icone: "🔧",
+      descricao: "Vê o checklist e o Manual de Engenharia.",
+    },
+    {
+      id: "design",
+      nome: "Ajudante de Design",
+      icone: "🎨",
+      descricao: "Vê o checklist e o Manual de Design.",
+    },
+  ];
+
+export function especialidadeDe(integrante: Integrante): Especialidade {
+  return integrante.especialidade ?? "programacao";
+}
+
+export function nomeEspecialidade(especialidade: Especialidade): string {
+  return ESPECIALIDADES.find((e) => e.id === especialidade)?.nome ?? "Ajudante";
+}
+
+/** "Marina — Ajudante de Engenharia" (ou só o papel, para os outros). */
+export function papelCompleto(integrante: Integrante): string {
+  if (integrante.papel !== "Ajudante") return integrante.papel;
+  return nomeEspecialidade(especialidadeDe(integrante));
+}
+
+export function nomeComPapel(integrante: Integrante): string {
+  return `${integrante.nome} — ${papelCompleto(integrante)}`;
+}
+
 /** Áreas liberadas para este integrante. */
 export function areasDoIntegrante(integrante: Integrante | null): Area[] {
   if (!integrante) return TODAS; // programador provisório, antes de se cadastrar
@@ -36,10 +76,13 @@ export function areasDoIntegrante(integrante: Integrante | null): Area[] {
       return ["checklist", "engenharia"];
     case "Designer":
       return ["checklist", "design"];
-    case "Ajudante":
-      return integrante.podeEditar
-        ? ["programa", "codigo", "checklist", "ajustes", "pilotar"]
-        : ["checklist", "codigo"];
+    case "Ajudante": {
+      const especialidade = especialidadeDe(integrante);
+      if (especialidade === "engenharia") return ["checklist", "engenharia"];
+      if (especialidade === "design") return ["checklist", "design"];
+      // Programação: tudo o que o programador vê, menos a tela Equipe.
+      return TODAS.filter((area) => area !== "equipe");
+    }
     default:
       return [];
   }
@@ -68,5 +111,14 @@ export const DESCRICAO_ACESSO: Record<Papel, string> = {
   Copiloto: "Entra direto no painel de pilotagem.",
   Engenheiro: "Vê o checklist e o Manual de Engenharia.",
   Designer: "Vê o checklist e o Manual de Design.",
-  Ajudante: "Ajuda o programador, se estiver com a chave ligada.",
+  Ajudante: "Depende da especialidade escolhida.",
 };
+
+/** Frase de acesso já considerando a especialidade do ajudante. */
+export function descricaoAcesso(integrante: Integrante): string {
+  if (integrante.papel !== "Ajudante") return DESCRICAO_ACESSO[integrante.papel];
+  return (
+    ESPECIALIDADES.find((e) => e.id === especialidadeDe(integrante))?.descricao ??
+    DESCRICAO_ACESSO.Ajudante
+  );
+}

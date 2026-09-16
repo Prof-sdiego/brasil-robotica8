@@ -1,15 +1,27 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowLeft } from "lucide-react";
+import { useQueryClient } from "@tanstack/react-query";
+import { ArrowLeft, Trash2, UserPlus } from "lucide-react";
+import { useState } from "react";
+import { toast } from "sonner";
 
 import { BarraProgresso } from "@/components/BarraProgresso";
 import { ManualBotoes } from "@/components/ManualBotoes";
 import { Etiqueta } from "@/components/Etiqueta";
-import { ITENS_CHECKLIST, MELHORIAS, MELODIAS, MOVIMENTOS } from "@/lib/catalogo";
+import { ESPECIALIDADES, especialidadeDe, papelCompleto } from "@/lib/acessos";
+import {
+  ITENS_CHECKLIST,
+  MAXIMO_INTEGRANTES,
+  MELHORIAS,
+  MELODIAS,
+  MOVIMENTOS,
+  PAPEIS,
+} from "@/lib/catalogo";
 import { codigosDaEquipe } from "@/lib/codigosPessoais";
-import { papeisFaltantes } from "@/lib/equipeStatus";
-import { useEquipes } from "@/lib/equipes";
+import { AVISO_ULTIMO_PROGRAMACAO, ajudantesDeProgramacao, papeisFaltantes } from "@/lib/equipeStatus";
+import { salvarIntegrantesPorId, useEquipes } from "@/lib/equipes";
 import { modoDe } from "@/lib/modos";
 import { duracaoEstimada, montarCodigo } from "@/lib/gerador-codigo";
+import type { Equipe, Especialidade, Integrante, Papel } from "@/lib/tipos";
 
 export const Route = createFileRoute("/professor/equipe/$id")({
   head: () => ({
@@ -83,6 +95,8 @@ function DetalheEquipe() {
         </div>
       </header>
 
+      <CadastroIntegrantes equipe={equipe} />
+
       <section className="cartao-toque p-5">
         <h3 className="text-xl">Integrantes ({equipe.integrantes.length} de 8)</h3>
         {equipe.integrantes.length === 0 ? (
@@ -91,15 +105,10 @@ function DetalheEquipe() {
           <ul className="mt-3 space-y-2">
             {equipe.integrantes.map((integrante) => (
               <li key={integrante.id} className="flex flex-wrap items-center gap-2 font-bold">
-                <Etiqueta tom="primaria">{integrante.papel}</Etiqueta> {integrante.nome}
+                <Etiqueta tom="primaria">{papelCompleto(integrante)}</Etiqueta> {integrante.nome}
                 <span className="font-mono text-sm text-muted-foreground">
                   código {codigosPessoais[integrante.id]}
                 </span>
-                {integrante.papel === "Ajudante" && (
-                  <Etiqueta tom={integrante.podeEditar ? "sucesso" : "neutra"}>
-                    {integrante.podeEditar ? "pode editar o programa" : "só checklist e código"}
-                  </Etiqueta>
-                )}
               </li>
             ))}
           </ul>
@@ -205,5 +214,162 @@ function DetalheEquipe() {
         </pre>
       </section>
     </main>
+  );
+}
+
+function CadastroIntegrantes({ equipe }: { equipe: Equipe }) {
+  const queryClient = useQueryClient();
+  const [nome, setNome] = useState("");
+  const [papel, setPapel] = useState<Papel>("Programador");
+  const [especialidade, setEspecialidade] = useState<Especialidade>("programacao");
+  const [salvando, setSalvando] = useState(false);
+
+  const integrantes = equipe.integrantes;
+
+  async function gravar(novos: Integrante[]) {
+    setSalvando(true);
+    try {
+      await salvarIntegrantesPorId(equipe.id, novos);
+      await queryClient.invalidateQueries({ queryKey: ["equipes"] });
+    } catch {
+      toast.error("Não foi possível salvar. Tente de novo.");
+    } finally {
+      setSalvando(false);
+    }
+  }
+
+  function vagasLivres(alvo: Papel) {
+    const definicao = PAPEIS.find((p) => p.papel === alvo);
+    return (definicao?.vagas ?? 0) - integrantes.filter((i) => i.papel === alvo).length;
+  }
+
+  async function adicionar() {
+    if (!nome.trim()) return;
+    if (integrantes.length >= MAXIMO_INTEGRANTES) {
+      toast.error("A equipe já tem 8 pessoas.");
+      return;
+    }
+    if (vagasLivres(papel) <= 0) {
+      toast.error(`Não há mais vaga de ${papel} nesta equipe.`);
+      return;
+    }
+    const novo: Integrante = {
+      id: crypto.randomUUID(),
+      nome: nome.trim(),
+      papel,
+      ...(papel === "Ajudante" ? { especialidade } : {}),
+    };
+    await gravar([...integrantes, novo]);
+    setNome("");
+    toast.success(`${novo.nome} cadastrado como ${papelCompleto(novo)}.`);
+  }
+
+  async function trocarEspecialidade(id: string, nova: Especialidade) {
+    const alvo = integrantes.find((i) => i.id === id);
+    if (!alvo) return;
+    if (
+      nova !== "programacao" &&
+      especialidadeDe(alvo) === "programacao" &&
+      ajudantesDeProgramacao(integrantes).length <= 1
+    ) {
+      toast.error(AVISO_ULTIMO_PROGRAMACAO);
+      return;
+    }
+    await gravar(integrantes.map((i) => (i.id === id ? { ...i, especialidade: nova } : i)));
+  }
+
+  return (
+    <section className="cartao-toque p-5">
+      <h3 className="text-xl">Cadastrar pessoas nesta equipe</h3>
+      <p className="mt-1 text-sm font-semibold text-muted-foreground">
+        Útil para já deixar o programador cadastrado antes da aula. O código pessoal aparece na
+        lista abaixo.
+      </p>
+
+      <div className="mt-3 grid gap-3 sm:grid-cols-3">
+        <input
+          value={nome}
+          onChange={(e) => setNome(e.target.value)}
+          placeholder="Nome da pessoa"
+          className="rounded-xl border-2 border-input bg-background px-3 py-3 text-base font-bold outline-none focus:border-ring"
+        />
+        <select
+          value={papel}
+          onChange={(e) => setPapel(e.target.value as Papel)}
+          aria-label="Papel"
+          className="rounded-xl border-2 border-input bg-background px-3 py-3 text-base font-bold"
+        >
+          {PAPEIS.map((p) => (
+            <option key={p.papel} value={p.papel} disabled={vagasLivres(p.papel) <= 0}>
+              {p.papel}
+              {vagasLivres(p.papel) <= 0 ? " (sem vaga)" : ""}
+            </option>
+          ))}
+        </select>
+        {papel === "Ajudante" ? (
+          <select
+            value={especialidade}
+            onChange={(e) => setEspecialidade(e.target.value as Especialidade)}
+            aria-label="Especialidade do ajudante"
+            className="rounded-xl border-2 border-input bg-background px-3 py-3 text-base font-bold"
+          >
+            {ESPECIALIDADES.map((e) => (
+              <option key={e.id} value={e.id}>
+                {e.nome}
+              </option>
+            ))}
+          </select>
+        ) : (
+          <span />
+        )}
+      </div>
+
+      <button
+        onClick={adicionar}
+        disabled={salvando || !nome.trim()}
+        className="mt-3 flex items-center gap-2 rounded-2xl bg-sucesso px-5 py-3 font-extrabold text-sucesso-foreground disabled:opacity-50"
+      >
+        <UserPlus className="size-5" /> Cadastrar pessoa
+      </button>
+
+      {integrantes.length > 0 && (
+        <ul className="mt-4 space-y-2">
+          {integrantes.map((integrante) => (
+            <li
+              key={integrante.id}
+              className="flex flex-wrap items-center gap-2 rounded-xl bg-muted p-3 font-bold"
+            >
+              <span>{integrante.nome}</span>
+              <Etiqueta tom="neutra">{papelCompleto(integrante)}</Etiqueta>
+              {integrante.papel === "Ajudante" && (
+                <select
+                  value={especialidadeDe(integrante)}
+                  onChange={(e) =>
+                    trocarEspecialidade(integrante.id, e.target.value as Especialidade)
+                  }
+                  aria-label={`Especialidade de ${integrante.nome}`}
+                  className="rounded-lg border-2 border-input bg-background px-2 py-2 text-sm font-bold"
+                >
+                  {ESPECIALIDADES.map((e) => (
+                    <option key={e.id} value={e.id}>
+                      {e.nome}
+                    </option>
+                  ))}
+                </select>
+              )}
+              <button
+                onClick={() =>
+                  gravar(integrantes.filter((outro) => outro.id !== integrante.id))
+                }
+                aria-label={`Remover ${integrante.nome}`}
+                className="ml-auto flex size-10 items-center justify-center rounded-xl bg-destructive text-destructive-foreground"
+              >
+                <Trash2 className="size-4" />
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
+    </section>
   );
 }

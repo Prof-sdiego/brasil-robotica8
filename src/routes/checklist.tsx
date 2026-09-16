@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 
 import { BarraProgresso } from "@/components/BarraProgresso";
 import { Cabecalho } from "@/components/Cabecalho";
+import { nomeComPapel } from "@/lib/acessos";
 import { itensChecklist } from "@/lib/catalogo";
 import { useAluno } from "@/lib/useAluno";
 
@@ -33,7 +34,7 @@ function TelaChecklist() {
   const [quem, setQuem] = useState("");
 
   useEffect(() => {
-    if (integrante && !quem) setQuem(integrante.nome);
+    if (integrante && !quem) setQuem(nomeComPapel(integrante));
   }, [integrante, quem]);
 
   if (carregando || !equipe) {
@@ -81,9 +82,9 @@ function TelaChecklist() {
               className="mt-1 w-full rounded-xl border-2 border-input bg-background px-3 py-3 text-base font-bold"
             >
               <option value="">Escolha o seu nome</option>
-              {equipe.integrantes.map((integrante) => (
-                <option key={integrante.id} value={integrante.nome}>
-                  {integrante.nome} — {integrante.papel}
+              {equipe.integrantes.map((pessoa) => (
+                <option key={pessoa.id} value={nomeComPapel(pessoa)}>
+                  {nomeComPapel(pessoa)}
                 </option>
               ))}
             </select>

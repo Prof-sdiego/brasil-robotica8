@@ -13,11 +13,21 @@ import {
 import { useEffect, useRef, useState } from "react";
 
 import { Cabecalho } from "@/components/Cabecalho";
-import { DESCRICAO_ACESSO } from "@/lib/acessos";
+import {
+  ESPECIALIDADES,
+  descricaoAcesso,
+  especialidadeDe,
+  papelCompleto,
+} from "@/lib/acessos";
 import { MAXIMO_INTEGRANTES, PAPEIS } from "@/lib/catalogo";
 import { codigosDaEquipe, novoCodigoPessoal } from "@/lib/codigosPessoais";
-import { AVISO_ULTIMA_CHAVE, ajudantesComChave, listarFaltantes, papeisFaltantes } from "@/lib/equipeStatus";
-import type { Integrante, Papel } from "@/lib/tipos";
+import {
+  AVISO_ULTIMO_PROGRAMACAO,
+  ajudantesDeProgramacao,
+  listarFaltantes,
+  papeisFaltantes,
+} from "@/lib/equipeStatus";
+import type { Especialidade, Integrante, Papel } from "@/lib/tipos";
 import { useAluno } from "@/lib/useAluno";
 
 export const Route = createFileRoute("/equipe")({
@@ -43,6 +53,7 @@ function TelaEquipe() {
   const { equipe, carregando, salvar, salvando } = useAluno({ area: "equipe" });
   const [nome, setNome] = useState("");
   const [papel, setPapel] = useState<Papel | "">("");
+  const [especialidade, setEspecialidade] = useState<Especialidade>("programacao");
   const [aberto, setAberto] = useState(false);
   const [festa, setFesta] = useState(false);
   const [recado, setRecado] = useState("");
@@ -81,12 +92,20 @@ function TelaEquipe() {
     if (!nome.trim() || !papel) return;
     if (integrantes.length >= MAXIMO_INTEGRANTES) return;
     if (vagasLivres(papel) <= 0) return;
-    const primeiroAjudante = papel === "Ajudante" && ajudantesComChave(integrantes).length === 0;
+    if (
+      papel === "Ajudante" &&
+      especialidade !== "programacao" &&
+      ajudantesDeProgramacao(integrantes).length === 0
+    ) {
+      setRecado(AVISO_ULTIMO_PROGRAMACAO);
+      setTimeout(() => setRecado(""), 6000);
+      return;
+    }
     const novo: Integrante = {
       id: crypto.randomUUID(),
       nome: nome.trim(),
       papel,
-      ...(primeiroAjudante ? { podeEditar: true } : {}),
+      ...(papel === "Ajudante" ? { especialidade } : {}),
     };
     salvar({ integrantes: [...integrantes, novo] });
     setNome("");
@@ -111,22 +130,26 @@ function TelaEquipe() {
     setTimeout(() => setRecado(""), 3000);
   }
 
-  function alternarChave(id: string) {
+  function trocarEspecialidade(id: string, nova: Especialidade) {
     const alvo = integrantes.find((i) => i.id === id);
     if (!alvo) return;
-    if (alvo.podeEditar && ajudantesComChave(integrantes).length <= 1) {
-      setRecado(AVISO_ULTIMA_CHAVE);
+    if (
+      nova !== "programacao" &&
+      especialidadeDe(alvo) === "programacao" &&
+      ajudantesDeProgramacao(integrantes).length <= 1
+    ) {
+      setRecado(AVISO_ULTIMO_PROGRAMACAO);
       setTimeout(() => setRecado(""), 6000);
       return;
     }
     salvar({
-      integrantes: integrantes.map((i) => (i.id === id ? { ...i, podeEditar: !i.podeEditar } : i)),
+      integrantes: integrantes.map((i) => (i.id === id ? { ...i, especialidade: nova } : i)),
     });
   }
 
   async function copiarLista() {
     const texto = integrantes
-      .map((i) => `${i.nome} — ${i.papel} — código ${codigos[i.id]}`)
+      .map((i) => `${i.nome} — ${papelCompleto(i)} — código ${codigos[i.id]}`)
       .join("\n");
     try {
       await navigator.clipboard.writeText(
@@ -144,7 +167,7 @@ function TelaEquipe() {
     const tiras = integrantes
       .map(
         (i) =>
-          `<div class="tira"><p class="papel">${i.papel}</p><p class="nome">${i.nome}</p>` +
+          `<div class="tira"><p class="papel">${papelCompleto(i)}</p><p class="nome">${i.nome}</p>` +
           `<p class="linha">Equipe: <b>${equipe!.codigoAcesso}</b></p>` +
           `<p class="linha">Seu código: <b class="cod">${codigos[i.id]}</b></p></div>`,
       )
@@ -231,7 +254,9 @@ function TelaEquipe() {
                   {PAPEIS.find((p) => p.papel === integrante.papel)?.icone}
                 </span>
                 <div className="min-w-0 flex-1">
-                  <p className="truncate text-lg font-bold">{integrante.nome}</p>
+                  <p className="truncate text-lg font-bold">
+                    {integrante.nome} — {papelCompleto(integrante)}
+                  </p>
                   <select
                     value={integrante.papel}
                     onChange={(e) => trocarPapel(integrante.id, e.target.value as Papel)}
@@ -272,39 +297,39 @@ function TelaEquipe() {
                 </button>
               </div>
               <p className="mt-2 text-xs font-semibold text-muted-foreground">
-                {DESCRICAO_ACESSO[integrante.papel]}
+                {descricaoAcesso(integrante)}
               </p>
 
               {integrante.papel === "Ajudante" && (
-                <button
-                  onClick={() => alternarChave(integrante.id)}
-                  className={`mt-3 flex w-full items-center justify-between gap-3 rounded-xl px-4 py-3 text-left font-bold ${
-                    integrante.podeEditar
-                      ? "bg-sucesso text-sucesso-foreground"
-                      : "bg-muted text-muted-foreground"
-                  }`}
-                >
-                  <span>
-                    Pode editar o programa
-                    <span className="block text-xs font-semibold opacity-90">
-                      {integrante.podeEditar
-                        ? "Mexe em melhorias, coreografias, botões e ajustes."
-                        : "Só vê o checklist e a tela do código."}
-                    </span>
-                  </span>
-                  <span
-                    className={`flex h-8 w-14 shrink-0 items-center rounded-full p-1 ${
-                      integrante.podeEditar ? "bg-card/40" : "bg-card"
-                    }`}
-                    aria-hidden
-                  >
-                    <span
-                      className={`size-6 rounded-full bg-primary transition-transform ${
-                        integrante.podeEditar ? "translate-x-6" : ""
-                      }`}
-                    />
-                  </span>
-                </button>
+                <div className="mt-3 rounded-xl bg-muted p-3">
+                  <p className="text-sm font-bold">Especialidade do ajudante</p>
+                  <div className="mt-2 grid gap-2">
+                    {ESPECIALIDADES.map((e) => {
+                      const escolhida = especialidadeDe(integrante) === e.id;
+                      return (
+                        <button
+                          key={e.id}
+                          onClick={() => trocarEspecialidade(integrante.id, e.id)}
+                          className={`flex items-start gap-2 rounded-xl border-2 p-3 text-left font-bold ${
+                            escolhida
+                              ? "border-primary bg-primary text-primary-foreground"
+                              : "border-input bg-card"
+                          }`}
+                        >
+                          <span className="text-xl" aria-hidden>
+                            {e.icone}
+                          </span>
+                          <span>
+                            {e.nome}
+                            <span className="block text-xs font-semibold opacity-80">
+                              {e.descricao}
+                            </span>
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
               )}
             </div>
           ))}
@@ -351,6 +376,34 @@ function TelaEquipe() {
                 );
               })}
             </div>
+            {papel === "Ajudante" && (
+              <div className="rounded-2xl bg-muted p-3">
+                <p className="text-sm font-bold">Qual a especialidade deste ajudante?</p>
+                <div className="mt-2 grid gap-2">
+                  {ESPECIALIDADES.map((e) => (
+                    <button
+                      key={e.id}
+                      onClick={() => setEspecialidade(e.id)}
+                      className={`flex items-start gap-2 rounded-xl border-2 p-3 text-left font-bold ${
+                        especialidade === e.id
+                          ? "border-primary bg-primary text-primary-foreground"
+                          : "border-input bg-card"
+                      }`}
+                    >
+                      <span className="text-xl" aria-hidden>
+                        {e.icone}
+                      </span>
+                      <span>
+                        {e.nome}
+                        <span className="block text-xs font-semibold opacity-80">
+                          {e.descricao}
+                        </span>
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
             <div className="flex gap-3">
               <button
                 onClick={adicionar}

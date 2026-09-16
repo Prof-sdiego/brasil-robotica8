@@ -61,16 +61,22 @@ const PAPEIS_VALIDOS: Papel[] = [
   "Designer",
 ];
 
-/** "Staff" virou "Ajudante"; e sempre um ajudante fica com a chave do programa ligada. */
+/** "Staff" virou "Ajudante"; e sempre um ajudante é de Programação. */
 function integrantesNormalizados(valor: unknown): Integrante[] {
-  const bruto = lista<Integrante & { papel: string }>(valor);
-  const integrantes: Integrante[] = bruto.map((i) => ({
-    ...i,
-    papel: (PAPEIS_VALIDOS.includes(i.papel as Papel) ? i.papel : "Ajudante") as Papel,
-  }));
+  const bruto = lista<Integrante & { papel: string; podeEditar?: boolean }>(valor);
+  const integrantes: Integrante[] = bruto.map((i) => {
+    const papel = (PAPEIS_VALIDOS.includes(i.papel as Papel) ? i.papel : "Ajudante") as Papel;
+    const { podeEditar, especialidade, ...resto } = i;
+    if (papel !== "Ajudante") return { ...resto, papel };
+    return {
+      ...resto,
+      papel,
+      especialidade: i.especialidade ?? (podeEditar === false ? "engenharia" : "programacao"),
+    };
+  });
   const ajudantes = integrantes.filter((i) => i.papel === "Ajudante");
-  if (ajudantes.length > 0 && !ajudantes.some((i) => i.podeEditar)) {
-    ajudantes[0]!.podeEditar = true;
+  if (ajudantes.length > 0 && !ajudantes.some((i) => i.especialidade === "programacao")) {
+    ajudantes[0]!.especialidade = "programacao";
   }
   return integrantes;
 }
@@ -325,5 +331,14 @@ export async function atualizarCadastro(id: string, dados: CadastroEquipe) {
 
 export async function removerEquipe(id: string) {
   const { error } = await supabase.from("equipes").delete().eq("id", id);
+  if (error) throw error;
+}
+
+/** Usado pelo painel do professor, que trabalha pelo id da equipe. */
+export async function salvarIntegrantesPorId(id: string, integrantes: Integrante[]) {
+  const { error } = await supabase
+    .from("equipes")
+    .update({ integrantes: integrantes as unknown as never })
+    .eq("id", id);
   if (error) throw error;
 }
