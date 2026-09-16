@@ -66,8 +66,8 @@ function integrantesNormalizados(valor: unknown): Integrante[] {
   const bruto = lista<Integrante & { papel: string; podeEditar?: boolean }>(valor);
   const integrantes: Integrante[] = bruto.map((i) => {
     const papel = (PAPEIS_VALIDOS.includes(i.papel as Papel) ? i.papel : "Ajudante") as Papel;
-    const { podeEditar, ...resto } = i;
-    if (papel !== "Ajudante") return { ...resto, papel, especialidade: undefined };
+    const { podeEditar, especialidade, ...resto } = i;
+    if (papel !== "Ajudante") return { ...resto, papel };
     return {
       ...resto,
       papel,
