@@ -167,7 +167,7 @@ function TelaEquipe() {
     const tiras = integrantes
       .map(
         (i) =>
-          `<div class="tira"><p class="papel">${i.papel}</p><p class="nome">${i.nome}</p>` +
+          `<div class="tira"><p class="papel">${papelCompleto(i)}</p><p class="nome">${i.nome}</p>` +
           `<p class="linha">Equipe: <b>${equipe!.codigoAcesso}</b></p>` +
           `<p class="linha">Seu código: <b class="cod">${codigos[i.id]}</b></p></div>`,
       )
@@ -374,6 +374,34 @@ function TelaEquipe() {
                 );
               })}
             </div>
+            {papel === "Ajudante" && (
+              <div className="rounded-2xl bg-muted p-3">
+                <p className="text-sm font-bold">Qual a especialidade deste ajudante?</p>
+                <div className="mt-2 grid gap-2">
+                  {ESPECIALIDADES.map((e) => (
+                    <button
+                      key={e.id}
+                      onClick={() => setEspecialidade(e.id)}
+                      className={`flex items-start gap-2 rounded-xl border-2 p-3 text-left font-bold ${
+                        especialidade === e.id
+                          ? "border-primary bg-primary text-primary-foreground"
+                          : "border-input bg-card"
+                      }`}
+                    >
+                      <span className="text-xl" aria-hidden>
+                        {e.icone}
+                      </span>
+                      <span>
+                        {e.nome}
+                        <span className="block text-xs font-semibold opacity-80">
+                          {e.descricao}
+                        </span>
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
             <div className="flex gap-3">
               <button
                 onClick={adicionar}
