@@ -43,13 +43,23 @@ export const Route = createFileRoute("/painel")({
 const CARTOES = [
   {
     para: "/equipe" as const,
+    area: "equipe" as Area,
     titulo: "Equipe",
-    descricao: "Quem faz o quê",
+    descricao: "Quem faz o quê e os códigos",
     icone: Users,
     cor: "bg-secondary text-secondary-foreground",
   },
   {
+    para: "/pilotar" as const,
+    area: "pilotar" as Area,
+    titulo: "Pilotar",
+    descricao: "Painel do piloto",
+    icone: Joystick,
+    cor: "bg-primary text-primary-foreground",
+  },
+  {
     para: "/pilotagem" as const,
+    area: "programa" as Area,
     titulo: "Como pilotar",
     descricao: "Escolham o modo",
     icone: Joystick,
@@ -57,6 +67,7 @@ const CARTOES = [
   },
   {
     para: "/melhorias" as const,
+    area: "programa" as Area,
     titulo: "Melhorias",
     descricao: "Escolham até 3",
     icone: Sparkles,
@@ -64,6 +75,7 @@ const CARTOES = [
   },
   {
     para: "/botoes" as const,
+    area: "programa" as Area,
     titulo: "Botões",
     descricao: "O que A, B e A+B fazem",
     icone: Gamepad2,
@@ -71,6 +83,7 @@ const CARTOES = [
   },
   {
     para: "/coreografias" as const,
+    area: "programa" as Area,
     titulo: "Coreografias",
     descricao: "Montem as sequências",
     icone: Wand2,
@@ -78,13 +91,31 @@ const CARTOES = [
   },
   {
     para: "/ajustes" as const,
+    area: "ajustes" as Area,
     titulo: "Ajustes",
     descricao: "Todos os números do robô",
     icone: SlidersHorizontal,
     cor: "bg-alerta text-alerta-foreground",
   },
   {
+    para: "/engenharia" as const,
+    area: "engenharia" as Area,
+    titulo: "Manual de Engenharia",
+    descricao: "Problemas e soluções",
+    icone: Wrench,
+    cor: "bg-secondary text-secondary-foreground",
+  },
+  {
+    para: "/design" as const,
+    area: "design" as Area,
+    titulo: "Manual de Design",
+    descricao: "Medidas e peso da decoração",
+    icone: Palette,
+    cor: "bg-accent text-accent-foreground",
+  },
+  {
     para: "/codigo" as const,
+    area: "codigo" as Area,
     titulo: "Meu código",
     descricao: "Controle e robô",
     icone: Code2,
@@ -94,7 +125,7 @@ const CARTOES = [
 
 function Painel() {
   const navigate = useNavigate();
-  const { equipe, carregando, codigo } = useAluno();
+  const { equipe, integrante, areas, carregando, codigo } = useAluno();
   const { pronto: tutorialPronto, visto: tutorialVisto } = useTutorialVisto(codigo);
 
   useEffect(() => {
@@ -105,9 +136,12 @@ function Painel() {
     return <p className="p-8 text-center text-lg font-bold">Carregando...</p>;
   }
 
+  const eProgramador = !integrante || integrante.papel === "Programador";
   const faltantes = papeisFaltantes(equipe.integrantes);
   const travado = faltantes.length > 0;
-  const avisoTrava = `Faltam: ${listarFaltantes(faltantes)}. Cadastre a equipe completa para liberar o resto do site.`;
+  const avisoTrava = eProgramador
+    ? `Faltam: ${listarFaltantes(faltantes)}. Cadastre a equipe completa para liberar o resto do site.`
+    : `Faltam: ${listarFaltantes(faltantes)}. Avise o programador: o site só abre com a equipe completa.`;
   const feitos = equipe.checklist.filter((item) => item.marcado).length;
   const atualizado = new Date(equipe.atualizadoEm).toLocaleString("pt-BR", {
     dateStyle: "short",
