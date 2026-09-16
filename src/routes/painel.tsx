@@ -253,40 +253,40 @@ function Painel() {
         })}
       </div>
 
-      {travado ? (
-        <div
-          aria-disabled
-          className="cartao-toque mt-4 flex items-center gap-4 p-5 opacity-50 grayscale"
-        >
-          <span className="flex size-16 items-center justify-center rounded-2xl bg-muted text-muted-foreground">
-            <Lock className="size-8" />
-          </span>
-          <span>
-            <span className="block font-display text-2xl font-bold">Checklist</span>
-            <span className="block text-sm font-semibold text-muted-foreground">
-              Bloqueado até a equipe estar completa
+      {areas.includes("checklist") &&
+        (travado ? (
+          <div
+            aria-disabled
+            className="cartao-toque mt-4 flex items-center gap-4 p-5 opacity-50 grayscale"
+          >
+            <span className="flex size-16 items-center justify-center rounded-2xl bg-muted text-muted-foreground">
+              <Lock className="size-8" />
             </span>
-          </span>
-        </div>
-      ) : (
-        <Link
-          to="/checklist"
-          className="cartao-toque mt-4 flex items-center gap-4 p-5 active:cartao-toque-ativo"
-        >
-          <span className="flex size-16 items-center justify-center rounded-2xl bg-sucesso text-sucesso-foreground">
-            <CheckSquare className="size-8" />
-          </span>
-          <span>
-            <span className="block font-display text-2xl font-bold">Checklist</span>
-            <span className="block text-sm font-semibold text-muted-foreground">
-              {feitos} de {equipe.checklist.length} itens prontos
+            <span>
+              <span className="block font-display text-2xl font-bold">Checklist</span>
+              <span className="block text-sm font-semibold text-muted-foreground">
+                Bloqueado até a equipe estar completa
+              </span>
             </span>
-          </span>
-        </Link>
-      )}
+          </div>
+        ) : (
+          <Link
+            to="/checklist"
+            className="cartao-toque mt-4 flex items-center gap-4 p-5 active:cartao-toque-ativo"
+          >
+            <span className="flex size-16 items-center justify-center rounded-2xl bg-sucesso text-sucesso-foreground">
+              <CheckSquare className="size-8" />
+            </span>
+            <span>
+              <span className="block font-display text-2xl font-bold">Checklist</span>
+              <span className="block text-sm font-semibold text-muted-foreground">
+                {feitos} de {equipe.checklist.length} itens prontos
+              </span>
+            </span>
+          </Link>
+        ))}
 
-
-      {!travado && (
+      {!travado && (areas.includes("programa") || areas.includes("pilotar")) && (
         <div className="mt-4">
           <ManualBotoes equipe={equipe} />
         </div>
