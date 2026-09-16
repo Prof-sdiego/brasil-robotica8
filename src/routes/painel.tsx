@@ -6,17 +6,20 @@ import {
   HelpCircle,
   Lock,
   LogOut,
+  Palette,
   Radio,
   SlidersHorizontal,
   Sparkles,
   Users,
   Wand2,
+  Wrench,
   Joystick,
 } from "lucide-react";
 import { useEffect } from "react";
 
 import { BarraProgresso } from "@/components/BarraProgresso";
 import { ManualBotoes } from "@/components/ManualBotoes";
+import type { Area } from "@/lib/acessos";
 import { listarFaltantes, papeisFaltantes } from "@/lib/equipeStatus";
 import { modoDe } from "@/lib/modos";
 import { sairDaEquipe, useTutorialVisto } from "@/lib/sessao";
