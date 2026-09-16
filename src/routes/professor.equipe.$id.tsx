@@ -5,6 +5,8 @@ import { BarraProgresso } from "@/components/BarraProgresso";
 import { ManualBotoes } from "@/components/ManualBotoes";
 import { Etiqueta } from "@/components/Etiqueta";
 import { ITENS_CHECKLIST, MELHORIAS, MELODIAS, MOVIMENTOS } from "@/lib/catalogo";
+import { codigosDaEquipe } from "@/lib/codigosPessoais";
+import { papeisFaltantes } from "@/lib/equipeStatus";
 import { useEquipes } from "@/lib/equipes";
 import { modoDe } from "@/lib/modos";
 import { duracaoEstimada, montarCodigo } from "@/lib/gerador-codigo";
@@ -55,6 +57,8 @@ function DetalheEquipe() {
 
   const codigos = montarCodigo(equipe);
   const feitos = equipe.checklist.filter((i) => i.marcado).length;
+  const codigosPessoais = codigosDaEquipe(equipe.integrantes);
+  const faltando = papeisFaltantes(equipe.integrantes);
 
   return (
     <main className="mx-auto max-w-4xl space-y-5 px-4 py-5 pb-16">
@@ -89,7 +93,7 @@ function DetalheEquipe() {
               <li key={integrante.id} className="flex flex-wrap items-center gap-2 font-bold">
                 <Etiqueta tom="primaria">{integrante.papel}</Etiqueta> {integrante.nome}
                 <span className="font-mono text-sm text-muted-foreground">
-                  código {codigos[integrante.id]}
+                  código {codigosPessoais[integrante.id]}
                 </span>
                 {integrante.papel === "Ajudante" && (
                   <Etiqueta tom={integrante.podeEditar ? "sucesso" : "neutra"}>
