@@ -160,6 +160,11 @@ function Painel() {
               Turma {equipe.turma}
             </p>
             <h1 className="text-3xl sm:text-4xl">{equipe.nomeEquipe}</h1>
+            {integrante && (
+              <p className="mt-1 text-lg font-bold">
+                {integrante.nome} · {integrante.papel}
+              </p>
+            )}
           </div>
           <div className="flex shrink-0 flex-col items-end gap-2">
             <Link
@@ -207,7 +212,7 @@ function Painel() {
       )}
 
       <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2">
-        {CARTOES.map((cartao) => {
+        {CARTOES.filter((cartao) => areas.includes(cartao.area)).map((cartao) => {
           const bloqueado = travado && cartao.para !== "/equipe";
           if (bloqueado) {
             return (
