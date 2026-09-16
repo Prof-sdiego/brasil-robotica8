@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 
 import { BarraProgresso } from "@/components/BarraProgresso";
 import { Cabecalho } from "@/components/Cabecalho";
+import { nomeComPapel } from "@/lib/acessos";
 import { itensChecklist } from "@/lib/catalogo";
 import { useAluno } from "@/lib/useAluno";
 
@@ -33,7 +34,7 @@ function TelaChecklist() {
   const [quem, setQuem] = useState("");
 
   useEffect(() => {
-    if (integrante && !quem) setQuem(integrante.nome);
+    if (integrante && !quem) setQuem(nomeComPapel(integrante));
   }, [integrante, quem]);
 
   if (carregando || !equipe) {
