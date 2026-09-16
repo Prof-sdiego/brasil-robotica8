@@ -3,7 +3,14 @@ import { useCallback, useEffect, useRef } from "react";
 
 import { supabase } from "@/integrations/supabase/client";
 import { ITENS_CHECKLIST } from "./catalogo";
-import type { Botao, Equipe, EquipeEditavel, ItemChecklist } from "./tipos";
+import type {
+  Botao,
+  Equipe,
+  EquipeEditavel,
+  Integrante,
+  ItemChecklist,
+  Papel,
+} from "./tipos";
 
 function atribuicao(valor: unknown): Partial<Record<Botao, string>> {
   if (!valor || typeof valor !== "object" || Array.isArray(valor)) return {};
