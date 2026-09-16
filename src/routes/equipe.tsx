@@ -53,6 +53,7 @@ function TelaEquipe() {
   const { equipe, carregando, salvar, salvando } = useAluno({ area: "equipe" });
   const [nome, setNome] = useState("");
   const [papel, setPapel] = useState<Papel | "">("");
+  const [especialidade, setEspecialidade] = useState<Especialidade>("programacao");
   const [aberto, setAberto] = useState(false);
   const [festa, setFesta] = useState(false);
   const [recado, setRecado] = useState("");
@@ -91,12 +92,20 @@ function TelaEquipe() {
     if (!nome.trim() || !papel) return;
     if (integrantes.length >= MAXIMO_INTEGRANTES) return;
     if (vagasLivres(papel) <= 0) return;
-    const primeiroAjudante = papel === "Ajudante" && ajudantesComChave(integrantes).length === 0;
+    if (
+      papel === "Ajudante" &&
+      especialidade !== "programacao" &&
+      ajudantesDeProgramacao(integrantes).length === 0
+    ) {
+      setRecado(AVISO_ULTIMO_PROGRAMACAO);
+      setTimeout(() => setRecado(""), 6000);
+      return;
+    }
     const novo: Integrante = {
       id: crypto.randomUUID(),
       nome: nome.trim(),
       papel,
-      ...(primeiroAjudante ? { podeEditar: true } : {}),
+      ...(papel === "Ajudante" ? { especialidade } : {}),
     };
     salvar({ integrantes: [...integrantes, novo] });
     setNome("");
