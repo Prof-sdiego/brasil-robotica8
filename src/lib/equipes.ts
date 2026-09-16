@@ -333,3 +333,12 @@ export async function removerEquipe(id: string) {
   const { error } = await supabase.from("equipes").delete().eq("id", id);
   if (error) throw error;
 }
+
+/** Usado pelo painel do professor, que trabalha pelo id da equipe. */
+export async function salvarIntegrantesPorId(id: string, integrantes: Integrante[]) {
+  const { error } = await supabase
+    .from("equipes")
+    .update({ integrantes: integrantes as unknown as never })
+    .eq("id", id);
+  if (error) throw error;
+}
