@@ -6,17 +6,20 @@ import {
   HelpCircle,
   Lock,
   LogOut,
+  Palette,
   Radio,
   SlidersHorizontal,
   Sparkles,
   Users,
   Wand2,
+  Wrench,
   Joystick,
 } from "lucide-react";
 import { useEffect } from "react";
 
 import { BarraProgresso } from "@/components/BarraProgresso";
 import { ManualBotoes } from "@/components/ManualBotoes";
+import type { Area } from "@/lib/acessos";
 import { listarFaltantes, papeisFaltantes } from "@/lib/equipeStatus";
 import { modoDe } from "@/lib/modos";
 import { sairDaEquipe, useTutorialVisto } from "@/lib/sessao";
@@ -43,13 +46,23 @@ export const Route = createFileRoute("/painel")({
 const CARTOES = [
   {
     para: "/equipe" as const,
+    area: "equipe" as Area,
     titulo: "Equipe",
-    descricao: "Quem faz o quê",
+    descricao: "Quem faz o quê e os códigos",
     icone: Users,
     cor: "bg-secondary text-secondary-foreground",
   },
   {
+    para: "/pilotar" as const,
+    area: "pilotar" as Area,
+    titulo: "Pilotar",
+    descricao: "Painel do piloto",
+    icone: Joystick,
+    cor: "bg-primary text-primary-foreground",
+  },
+  {
     para: "/pilotagem" as const,
+    area: "programa" as Area,
     titulo: "Como pilotar",
     descricao: "Escolham o modo",
     icone: Joystick,
@@ -57,6 +70,7 @@ const CARTOES = [
   },
   {
     para: "/melhorias" as const,
+    area: "programa" as Area,
     titulo: "Melhorias",
     descricao: "Escolham até 3",
     icone: Sparkles,
@@ -64,6 +78,7 @@ const CARTOES = [
   },
   {
     para: "/botoes" as const,
+    area: "programa" as Area,
     titulo: "Botões",
     descricao: "O que A, B e A+B fazem",
     icone: Gamepad2,
@@ -71,6 +86,7 @@ const CARTOES = [
   },
   {
     para: "/coreografias" as const,
+    area: "programa" as Area,
     titulo: "Coreografias",
     descricao: "Montem as sequências",
     icone: Wand2,
@@ -78,13 +94,31 @@ const CARTOES = [
   },
   {
     para: "/ajustes" as const,
+    area: "ajustes" as Area,
     titulo: "Ajustes",
     descricao: "Todos os números do robô",
     icone: SlidersHorizontal,
     cor: "bg-alerta text-alerta-foreground",
   },
   {
+    para: "/engenharia" as const,
+    area: "engenharia" as Area,
+    titulo: "Manual de Engenharia",
+    descricao: "Problemas e soluções",
+    icone: Wrench,
+    cor: "bg-secondary text-secondary-foreground",
+  },
+  {
+    para: "/design" as const,
+    area: "design" as Area,
+    titulo: "Manual de Design",
+    descricao: "Medidas e peso da decoração",
+    icone: Palette,
+    cor: "bg-accent text-accent-foreground",
+  },
+  {
     para: "/codigo" as const,
+    area: "codigo" as Area,
     titulo: "Meu código",
     descricao: "Controle e robô",
     icone: Code2,
@@ -94,7 +128,7 @@ const CARTOES = [
 
 function Painel() {
   const navigate = useNavigate();
-  const { equipe, carregando, codigo } = useAluno();
+  const { equipe, integrante, areas, carregando, codigo } = useAluno();
   const { pronto: tutorialPronto, visto: tutorialVisto } = useTutorialVisto(codigo);
 
   useEffect(() => {
@@ -105,9 +139,12 @@ function Painel() {
     return <p className="p-8 text-center text-lg font-bold">Carregando...</p>;
   }
 
+  const eProgramador = !integrante || integrante.papel === "Programador";
   const faltantes = papeisFaltantes(equipe.integrantes);
   const travado = faltantes.length > 0;
-  const avisoTrava = `Faltam: ${listarFaltantes(faltantes)}. Cadastre a equipe completa para liberar o resto do site.`;
+  const avisoTrava = eProgramador
+    ? `Faltam: ${listarFaltantes(faltantes)}. Cadastre a equipe completa para liberar o resto do site.`
+    : `Faltam: ${listarFaltantes(faltantes)}. Avise o programador: o site só abre com a equipe completa.`;
   const feitos = equipe.checklist.filter((item) => item.marcado).length;
   const atualizado = new Date(equipe.atualizadoEm).toLocaleString("pt-BR", {
     dateStyle: "short",
@@ -123,6 +160,11 @@ function Painel() {
               Turma {equipe.turma}
             </p>
             <h1 className="text-3xl sm:text-4xl">{equipe.nomeEquipe}</h1>
+            {integrante && (
+              <p className="mt-1 text-lg font-bold">
+                {integrante.nome} · {integrante.papel}
+              </p>
+            )}
           </div>
           <div className="flex shrink-0 flex-col items-end gap-2">
             <Link
@@ -170,7 +212,7 @@ function Painel() {
       )}
 
       <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2">
-        {CARTOES.map((cartao) => {
+        {CARTOES.filter((cartao) => areas.includes(cartao.area)).map((cartao) => {
           const bloqueado = travado && cartao.para !== "/equipe";
           if (bloqueado) {
             return (
@@ -211,40 +253,40 @@ function Painel() {
         })}
       </div>
 
-      {travado ? (
-        <div
-          aria-disabled
-          className="cartao-toque mt-4 flex items-center gap-4 p-5 opacity-50 grayscale"
-        >
-          <span className="flex size-16 items-center justify-center rounded-2xl bg-muted text-muted-foreground">
-            <Lock className="size-8" />
-          </span>
-          <span>
-            <span className="block font-display text-2xl font-bold">Checklist</span>
-            <span className="block text-sm font-semibold text-muted-foreground">
-              Bloqueado até a equipe estar completa
+      {areas.includes("checklist") &&
+        (travado ? (
+          <div
+            aria-disabled
+            className="cartao-toque mt-4 flex items-center gap-4 p-5 opacity-50 grayscale"
+          >
+            <span className="flex size-16 items-center justify-center rounded-2xl bg-muted text-muted-foreground">
+              <Lock className="size-8" />
             </span>
-          </span>
-        </div>
-      ) : (
-        <Link
-          to="/checklist"
-          className="cartao-toque mt-4 flex items-center gap-4 p-5 active:cartao-toque-ativo"
-        >
-          <span className="flex size-16 items-center justify-center rounded-2xl bg-sucesso text-sucesso-foreground">
-            <CheckSquare className="size-8" />
-          </span>
-          <span>
-            <span className="block font-display text-2xl font-bold">Checklist</span>
-            <span className="block text-sm font-semibold text-muted-foreground">
-              {feitos} de {equipe.checklist.length} itens prontos
+            <span>
+              <span className="block font-display text-2xl font-bold">Checklist</span>
+              <span className="block text-sm font-semibold text-muted-foreground">
+                Bloqueado até a equipe estar completa
+              </span>
             </span>
-          </span>
-        </Link>
-      )}
+          </div>
+        ) : (
+          <Link
+            to="/checklist"
+            className="cartao-toque mt-4 flex items-center gap-4 p-5 active:cartao-toque-ativo"
+          >
+            <span className="flex size-16 items-center justify-center rounded-2xl bg-sucesso text-sucesso-foreground">
+              <CheckSquare className="size-8" />
+            </span>
+            <span>
+              <span className="block font-display text-2xl font-bold">Checklist</span>
+              <span className="block text-sm font-semibold text-muted-foreground">
+                {feitos} de {equipe.checklist.length} itens prontos
+              </span>
+            </span>
+          </Link>
+        ))}
 
-
-      {!travado && (
+      {!travado && (areas.includes("programa") || areas.includes("pilotar")) && (
         <div className="mt-4">
           <ManualBotoes equipe={equipe} />
         </div>

@@ -61,7 +61,7 @@ const DICAS_PROBLEMAS = [
 ];
 
 function TelaAjustes() {
-  const { equipe, carregando, salvar, salvando } = useAluno({ exigirEquipeCompleta: true });
+  const { equipe, carregando, salvar, salvando, podeAvancado } = useAluno({ exigirEquipeCompleta: true, area: "ajustes" });
   const [avancadosAbertos, setAvancadosAbertos] = useState(false);
   const [calibrando, setCalibrando] = useState(false);
   const [dicasAbertas, setDicasAbertas] = useState(false);
@@ -189,7 +189,7 @@ function TelaAjustes() {
           )}
         </section>
 
-        {SECOES_AJUSTES.filter((s) => s.avancada).map((secao) => (
+        {(podeAvancado ? SECOES_AJUSTES.filter((s) => s.avancada) : []).map((secao) => (
           <section key={secao.id} className="cartao-toque mb-5 p-5">
             <button
               onClick={() => setAvancadosAbertos(!avancadosAbertos)}

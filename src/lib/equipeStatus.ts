@@ -14,6 +14,18 @@ export function temProgramador(integrantes: Integrante[]): boolean {
   return integrantes.some((i) => i.papel === "Programador");
 }
 
+export function ajudantes(integrantes: Integrante[]): Integrante[] {
+  return integrantes.filter((i) => i.papel === "Ajudante");
+}
+
+/** Pelo menos um ajudante precisa ficar com a chave do programa ligada. */
+export function ajudantesComChave(integrantes: Integrante[]): Integrante[] {
+  return ajudantes(integrantes).filter((i) => i.podeEditar);
+}
+
+export const AVISO_ULTIMA_CHAVE =
+  "Deixe pelo menos um ajudante com acesso. Se você faltar no dia, alguém precisa conseguir mexer no programa.";
+
 /** "Piloto e Engenheiro" / "Piloto, Copiloto e Engenheiro" */
 export function listarFaltantes(faltantes: Papel[]): string {
   if (faltantes.length === 0) return "";

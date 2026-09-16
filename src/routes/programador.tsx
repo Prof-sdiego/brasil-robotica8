@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 
 import { salvarEquipeAgora } from "@/lib/equipes";
 import { temProgramador } from "@/lib/equipeStatus";
+import { guardarIntegrante } from "@/lib/sessao";
 import type { Integrante } from "@/lib/tipos";
 import { useAluno } from "@/lib/useAluno";
 
@@ -47,7 +48,8 @@ function TelaProgramador() {
     const integrantes = [...(equipe?.integrantes ?? []), novo];
     salvar({ integrantes });
     await salvarEquipeAgora(codigo, { integrantes });
-    navigate({ to: "/painel" });
+    guardarIntegrante(novo.id);
+    navigate({ to: "/equipe" });
   }
 
   return (

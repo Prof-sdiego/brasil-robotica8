@@ -3,7 +3,14 @@ import { useCallback, useEffect, useRef } from "react";
 
 import { supabase } from "@/integrations/supabase/client";
 import { ITENS_CHECKLIST } from "./catalogo";
-import type { Botao, Equipe, EquipeEditavel, ItemChecklist } from "./tipos";
+import type {
+  Botao,
+  Equipe,
+  EquipeEditavel,
+  Integrante,
+  ItemChecklist,
+  Papel,
+} from "./tipos";
 
 function atribuicao(valor: unknown): Partial<Record<Botao, string>> {
   if (!valor || typeof valor !== "object" || Array.isArray(valor)) return {};
@@ -43,6 +50,29 @@ type LinhaEquipe = {
 
 function lista<T>(valor: unknown): T[] {
   return Array.isArray(valor) ? (valor as T[]) : [];
+}
+
+const PAPEIS_VALIDOS: Papel[] = [
+  "Piloto",
+  "Copiloto",
+  "Engenheiro",
+  "Programador",
+  "Ajudante",
+  "Designer",
+];
+
+/** "Staff" virou "Ajudante"; e sempre um ajudante fica com a chave do programa ligada. */
+function integrantesNormalizados(valor: unknown): Integrante[] {
+  const bruto = lista<Integrante & { papel: string }>(valor);
+  const integrantes: Integrante[] = bruto.map((i) => ({
+    ...i,
+    papel: (PAPEIS_VALIDOS.includes(i.papel as Papel) ? i.papel : "Ajudante") as Papel,
+  }));
+  const ajudantes = integrantes.filter((i) => i.papel === "Ajudante");
+  if (ajudantes.length > 0 && !ajudantes.some((i) => i.podeEditar)) {
+    ajudantes[0]!.podeEditar = true;
+  }
+  return integrantes;
 }
 
 export function checklistCompleto(itens: ItemChecklist[]): ItemChecklist[] {
@@ -98,7 +128,7 @@ function paraEquipe(linha: LinhaEquipe): Equipe {
     melhorias: lista<string>(linha.melhorias),
     melodiaAbertura: linha.melodia_abertura,
     coreografias: lista(linha.coreografias),
-    integrantes: lista(linha.integrantes),
+    integrantes: integrantesNormalizados(linha.integrantes),
     checklist: checklistCompleto(lista<ItemChecklist>(linha.checklist)),
     justificativa: linha.justificativa ?? "",
     codigoGerado: linha.codigo_gerado,

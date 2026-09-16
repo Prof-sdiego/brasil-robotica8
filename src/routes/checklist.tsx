@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { CheckSquare } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { BarraProgresso } from "@/components/BarraProgresso";
 import { Cabecalho } from "@/components/Cabecalho";
@@ -26,8 +26,15 @@ export const Route = createFileRoute("/checklist")({
 });
 
 function TelaChecklist() {
-  const { equipe, carregando, salvar, salvando } = useAluno({ exigirEquipeCompleta: true });
+  const { equipe, integrante, carregando, salvar, salvando } = useAluno({
+    exigirEquipeCompleta: true,
+    area: "checklist",
+  });
   const [quem, setQuem] = useState("");
+
+  useEffect(() => {
+    if (integrante && !quem) setQuem(integrante.nome);
+  }, [integrante, quem]);
 
   if (carregando || !equipe) {
     return <p className="p-8 text-center text-lg font-bold">Carregando...</p>;

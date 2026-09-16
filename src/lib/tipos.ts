@@ -1,6 +1,12 @@
 // Tipos do modelo de dados da Oficina de Robótica.
 
-export type Papel = "Piloto" | "Copiloto" | "Engenheiro" | "Programador" | "Staff";
+export type Papel =
+  | "Piloto"
+  | "Copiloto"
+  | "Engenheiro"
+  | "Programador"
+  | "Ajudante"
+  | "Designer";
 
 export type Botao = "A" | "B" | "AB";
 
@@ -8,6 +14,10 @@ export type Integrante = {
   id: string;
   nome: string;
   papel: Papel;
+  /** Código pessoal de 4 caracteres. Vazio = o site usa o código derivado do id. */
+  codigo?: string;
+  /** Só para Ajudante: chave que libera mexer no programa. */
+  podeEditar?: boolean;
 };
 
 export type MovimentoNaSequencia = {

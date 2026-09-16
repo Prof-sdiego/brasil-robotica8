@@ -5,6 +5,8 @@ import { BarraProgresso } from "@/components/BarraProgresso";
 import { ManualBotoes } from "@/components/ManualBotoes";
 import { Etiqueta } from "@/components/Etiqueta";
 import { ITENS_CHECKLIST, MELHORIAS, MELODIAS, MOVIMENTOS } from "@/lib/catalogo";
+import { codigosDaEquipe } from "@/lib/codigosPessoais";
+import { papeisFaltantes } from "@/lib/equipeStatus";
 import { useEquipes } from "@/lib/equipes";
 import { modoDe } from "@/lib/modos";
 import { duracaoEstimada, montarCodigo } from "@/lib/gerador-codigo";
@@ -55,6 +57,8 @@ function DetalheEquipe() {
 
   const codigos = montarCodigo(equipe);
   const feitos = equipe.checklist.filter((i) => i.marcado).length;
+  const codigosPessoais = codigosDaEquipe(equipe.integrantes);
+  const faltando = papeisFaltantes(equipe.integrantes);
 
   return (
     <main className="mx-auto max-w-4xl space-y-5 px-4 py-5 pb-16">
@@ -80,17 +84,30 @@ function DetalheEquipe() {
       </header>
 
       <section className="cartao-toque p-5">
-        <h3 className="text-xl">Integrantes</h3>
+        <h3 className="text-xl">Integrantes ({equipe.integrantes.length} de 8)</h3>
         {equipe.integrantes.length === 0 ? (
           <p className="mt-2 font-semibold text-muted-foreground">Ninguém cadastrado.</p>
         ) : (
           <ul className="mt-3 space-y-2">
             {equipe.integrantes.map((integrante) => (
-              <li key={integrante.id} className="flex items-center gap-2 font-bold">
+              <li key={integrante.id} className="flex flex-wrap items-center gap-2 font-bold">
                 <Etiqueta tom="primaria">{integrante.papel}</Etiqueta> {integrante.nome}
+                <span className="font-mono text-sm text-muted-foreground">
+                  código {codigosPessoais[integrante.id]}
+                </span>
+                {integrante.papel === "Ajudante" && (
+                  <Etiqueta tom={integrante.podeEditar ? "sucesso" : "neutra"}>
+                    {integrante.podeEditar ? "pode editar o programa" : "só checklist e código"}
+                  </Etiqueta>
+                )}
               </li>
             ))}
           </ul>
+        )}
+        {faltando.length > 0 && (
+          <p className="mt-3 rounded-xl bg-alerta px-3 py-2 font-bold text-alerta-foreground">
+            Falta cadastrar: {faltando.join(", ")}
+          </p>
         )}
       </section>
 
