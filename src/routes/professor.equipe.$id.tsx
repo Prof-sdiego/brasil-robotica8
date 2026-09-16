@@ -225,6 +225,7 @@ function CadastroIntegrantes({ equipe }: { equipe: Equipe }) {
   const [salvando, setSalvando] = useState(false);
 
   const integrantes = equipe.integrantes;
+  const codigosPessoais = codigosDaEquipe(integrantes);
 
   async function gravar(novos: Integrante[]) {
     setSalvando(true);
@@ -259,9 +260,12 @@ function CadastroIntegrantes({ equipe }: { equipe: Equipe }) {
       papel,
       ...(papel === "Ajudante" ? { especialidade } : {}),
     };
-    await gravar([...integrantes, novo]);
+    const novaLista = [...integrantes, novo];
+    await gravar(novaLista);
     setNome("");
-    toast.success(`${novo.nome} cadastrado como ${papelCompleto(novo)}.`);
+    toast.success(
+      `${novo.nome} cadastrado como ${papelCompleto(novo)}. Código pessoal: ${codigosDaEquipe(novaLista)[novo.id]}`,
+    );
   }
 
   async function trocarEspecialidade(id: string, nova: Especialidade) {
@@ -282,8 +286,8 @@ function CadastroIntegrantes({ equipe }: { equipe: Equipe }) {
     <section className="cartao-toque p-5">
       <h3 className="text-xl">Cadastrar pessoas nesta equipe</h3>
       <p className="mt-1 text-sm font-semibold text-muted-foreground">
-        Útil para já deixar o programador cadastrado antes da aula. O código pessoal aparece na
-        lista abaixo.
+        Útil para já deixar o programador cadastrado antes da aula. O código pessoal de cada um
+        aparece do lado do nome, pronto para copiar.
       </p>
 
       <div className="mt-3 grid gap-3 sm:grid-cols-3">
@@ -341,6 +345,9 @@ function CadastroIntegrantes({ equipe }: { equipe: Equipe }) {
             >
               <span>{integrante.nome}</span>
               <Etiqueta tom="neutra">{papelCompleto(integrante)}</Etiqueta>
+              <span className="rounded-lg bg-background px-2 py-1 font-mono text-sm">
+                {codigosPessoais[integrante.id]}
+              </span>
               {integrante.papel === "Ajudante" && (
                 <select
                   value={especialidadeDe(integrante)}
