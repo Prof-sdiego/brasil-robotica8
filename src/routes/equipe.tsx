@@ -254,7 +254,9 @@ function TelaEquipe() {
                   {PAPEIS.find((p) => p.papel === integrante.papel)?.icone}
                 </span>
                 <div className="min-w-0 flex-1">
-                  <p className="truncate text-lg font-bold">{integrante.nome}</p>
+                  <p className="truncate text-lg font-bold">
+                    {integrante.nome} — {papelCompleto(integrante)}
+                  </p>
                   <select
                     value={integrante.papel}
                     onChange={(e) => trocarPapel(integrante.id, e.target.value as Papel)}
