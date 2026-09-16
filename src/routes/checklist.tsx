@@ -82,9 +82,9 @@ function TelaChecklist() {
               className="mt-1 w-full rounded-xl border-2 border-input bg-background px-3 py-3 text-base font-bold"
             >
               <option value="">Escolha o seu nome</option>
-              {equipe.integrantes.map((integrante) => (
-                <option key={integrante.id} value={integrante.nome}>
-                  {integrante.nome} — {integrante.papel}
+              {equipe.integrantes.map((pessoa) => (
+                <option key={pessoa.id} value={nomeComPapel(pessoa)}>
+                  {nomeComPapel(pessoa)}
                 </option>
               ))}
             </select>
