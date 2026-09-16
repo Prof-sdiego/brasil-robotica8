@@ -13,11 +13,21 @@ import {
 import { useEffect, useRef, useState } from "react";
 
 import { Cabecalho } from "@/components/Cabecalho";
-import { DESCRICAO_ACESSO } from "@/lib/acessos";
+import {
+  ESPECIALIDADES,
+  descricaoAcesso,
+  especialidadeDe,
+  papelCompleto,
+} from "@/lib/acessos";
 import { MAXIMO_INTEGRANTES, PAPEIS } from "@/lib/catalogo";
 import { codigosDaEquipe, novoCodigoPessoal } from "@/lib/codigosPessoais";
-import { AVISO_ULTIMA_CHAVE, ajudantesComChave, listarFaltantes, papeisFaltantes } from "@/lib/equipeStatus";
-import type { Integrante, Papel } from "@/lib/tipos";
+import {
+  AVISO_ULTIMO_PROGRAMACAO,
+  ajudantesDeProgramacao,
+  listarFaltantes,
+  papeisFaltantes,
+} from "@/lib/equipeStatus";
+import type { Especialidade, Integrante, Papel } from "@/lib/tipos";
 import { useAluno } from "@/lib/useAluno";
 
 export const Route = createFileRoute("/equipe")({
