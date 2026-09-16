@@ -80,17 +80,30 @@ function DetalheEquipe() {
       </header>
 
       <section className="cartao-toque p-5">
-        <h3 className="text-xl">Integrantes</h3>
+        <h3 className="text-xl">Integrantes ({equipe.integrantes.length} de 8)</h3>
         {equipe.integrantes.length === 0 ? (
           <p className="mt-2 font-semibold text-muted-foreground">Ninguém cadastrado.</p>
         ) : (
           <ul className="mt-3 space-y-2">
             {equipe.integrantes.map((integrante) => (
-              <li key={integrante.id} className="flex items-center gap-2 font-bold">
+              <li key={integrante.id} className="flex flex-wrap items-center gap-2 font-bold">
                 <Etiqueta tom="primaria">{integrante.papel}</Etiqueta> {integrante.nome}
+                <span className="font-mono text-sm text-muted-foreground">
+                  código {codigos[integrante.id]}
+                </span>
+                {integrante.papel === "Ajudante" && (
+                  <Etiqueta tom={integrante.podeEditar ? "sucesso" : "neutra"}>
+                    {integrante.podeEditar ? "pode editar o programa" : "só checklist e código"}
+                  </Etiqueta>
+                )}
               </li>
             ))}
           </ul>
+        )}
+        {faltando.length > 0 && (
+          <p className="mt-3 rounded-xl bg-alerta px-3 py-2 font-bold text-alerta-foreground">
+            Falta cadastrar: {faltando.join(", ")}
+          </p>
         )}
       </section>
 
