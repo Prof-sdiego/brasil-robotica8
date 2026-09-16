@@ -128,7 +128,7 @@ function paraEquipe(linha: LinhaEquipe): Equipe {
     melhorias: lista<string>(linha.melhorias),
     melodiaAbertura: linha.melodia_abertura,
     coreografias: lista(linha.coreografias),
-    integrantes: lista(linha.integrantes),
+    integrantes: integrantesNormalizados(linha.integrantes),
     checklist: checklistCompleto(lista<ItemChecklist>(linha.checklist)),
     justificativa: linha.justificativa ?? "",
     codigoGerado: linha.codigo_gerado,
