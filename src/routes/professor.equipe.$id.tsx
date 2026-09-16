@@ -1,15 +1,27 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowLeft } from "lucide-react";
+import { useQueryClient } from "@tanstack/react-query";
+import { ArrowLeft, Trash2, UserPlus } from "lucide-react";
+import { useState } from "react";
+import { toast } from "sonner";
 
 import { BarraProgresso } from "@/components/BarraProgresso";
 import { ManualBotoes } from "@/components/ManualBotoes";
 import { Etiqueta } from "@/components/Etiqueta";
-import { ITENS_CHECKLIST, MELHORIAS, MELODIAS, MOVIMENTOS } from "@/lib/catalogo";
+import { ESPECIALIDADES, especialidadeDe, papelCompleto } from "@/lib/acessos";
+import {
+  ITENS_CHECKLIST,
+  MAXIMO_INTEGRANTES,
+  MELHORIAS,
+  MELODIAS,
+  MOVIMENTOS,
+  PAPEIS,
+} from "@/lib/catalogo";
 import { codigosDaEquipe } from "@/lib/codigosPessoais";
-import { papeisFaltantes } from "@/lib/equipeStatus";
-import { useEquipes } from "@/lib/equipes";
+import { AVISO_ULTIMO_PROGRAMACAO, ajudantesDeProgramacao, papeisFaltantes } from "@/lib/equipeStatus";
+import { salvarIntegrantesPorId, useEquipes } from "@/lib/equipes";
 import { modoDe } from "@/lib/modos";
 import { duracaoEstimada, montarCodigo } from "@/lib/gerador-codigo";
+import type { Equipe, Especialidade, Integrante, Papel } from "@/lib/tipos";
 
 export const Route = createFileRoute("/professor/equipe/$id")({
   head: () => ({
