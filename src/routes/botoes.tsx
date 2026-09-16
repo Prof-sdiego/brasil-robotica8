@@ -33,7 +33,7 @@ export const Route = createFileRoute("/botoes")({
 });
 
 function TelaBotoes() {
-  const { equipe, carregando, salvar, salvando } = useAluno({ exigirEquipeCompleta: true });
+  const { equipe, carregando, salvar, salvando } = useAluno({ exigirEquipeCompleta: true, area: "programa" });
 
   if (carregando || !equipe) {
     return <p className="p-8 text-center text-lg font-bold">Carregando...</p>;

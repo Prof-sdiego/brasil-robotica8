@@ -27,7 +27,7 @@ export const Route = createFileRoute("/equipe")({
 });
 
 function TelaEquipe() {
-  const { equipe, carregando, salvar, salvando } = useAluno();
+  const { equipe, carregando, salvar, salvando } = useAluno({ area: "equipe" });
   const [nome, setNome] = useState("");
   const [papel, setPapel] = useState<Papel | "">("");
   const [aberto, setAberto] = useState(false);

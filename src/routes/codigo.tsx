@@ -98,7 +98,7 @@ function CaixaCodigo({
 }
 
 function TelaCodigo() {
-  const { equipe, carregando, salvar, salvando } = useAluno({ exigirEquipeCompleta: true });
+  const { equipe, carregando, salvar, salvando } = useAluno({ exigirEquipeCompleta: true, area: "codigo" });
 
   const codigos = useMemo(() => (equipe ? montarCodigo(equipe) : null), [equipe]);
 

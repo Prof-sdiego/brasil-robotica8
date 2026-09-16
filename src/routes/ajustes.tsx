@@ -61,7 +61,7 @@ const DICAS_PROBLEMAS = [
 ];
 
 function TelaAjustes() {
-  const { equipe, carregando, salvar, salvando } = useAluno({ exigirEquipeCompleta: true });
+  const { equipe, carregando, salvar, salvando, podeAvancado } = useAluno({ exigirEquipeCompleta: true, area: "ajustes" });
   const [avancadosAbertos, setAvancadosAbertos] = useState(false);
   const [calibrando, setCalibrando] = useState(false);
   const [dicasAbertas, setDicasAbertas] = useState(false);

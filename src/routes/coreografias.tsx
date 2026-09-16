@@ -30,7 +30,7 @@ export const Route = createFileRoute("/coreografias")({
 const MAXIMO_MOVIMENTOS = 12;
 
 function TelaCoreografias() {
-  const { equipe, carregando, salvar, salvando } = useAluno({ exigirEquipeCompleta: true });
+  const { equipe, carregando, salvar, salvando } = useAluno({ exigirEquipeCompleta: true, area: "programa" });
   const [abertaEscolhida, setAberta] = useState<Coreografia["gatilho"]>("A");
 
   if (carregando || !equipe) {
