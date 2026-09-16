@@ -169,6 +169,7 @@ function VisaoGeral() {
           const vagos = papeisVagos(equipe);
           const parada = paradaHaUmaSemana(equipe);
           const radioRepetido = radiosRepetidos.has(equipe.grupoRadio);
+          const temDesigner = equipe.integrantes.some((i) => i.papel === "Designer");
           const problema = vagos.length > 0 || parada || radioRepetido;
           return (
             <Link
