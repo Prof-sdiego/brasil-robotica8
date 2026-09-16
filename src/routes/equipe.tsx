@@ -295,39 +295,39 @@ function TelaEquipe() {
                 </button>
               </div>
               <p className="mt-2 text-xs font-semibold text-muted-foreground">
-                {DESCRICAO_ACESSO[integrante.papel]}
+                {descricaoAcesso(integrante)}
               </p>
 
               {integrante.papel === "Ajudante" && (
-                <button
-                  onClick={() => alternarChave(integrante.id)}
-                  className={`mt-3 flex w-full items-center justify-between gap-3 rounded-xl px-4 py-3 text-left font-bold ${
-                    integrante.podeEditar
-                      ? "bg-sucesso text-sucesso-foreground"
-                      : "bg-muted text-muted-foreground"
-                  }`}
-                >
-                  <span>
-                    Pode editar o programa
-                    <span className="block text-xs font-semibold opacity-90">
-                      {integrante.podeEditar
-                        ? "Mexe em melhorias, coreografias, botões e ajustes."
-                        : "Só vê o checklist e a tela do código."}
-                    </span>
-                  </span>
-                  <span
-                    className={`flex h-8 w-14 shrink-0 items-center rounded-full p-1 ${
-                      integrante.podeEditar ? "bg-card/40" : "bg-card"
-                    }`}
-                    aria-hidden
-                  >
-                    <span
-                      className={`size-6 rounded-full bg-primary transition-transform ${
-                        integrante.podeEditar ? "translate-x-6" : ""
-                      }`}
-                    />
-                  </span>
-                </button>
+                <div className="mt-3 rounded-xl bg-muted p-3">
+                  <p className="text-sm font-bold">Especialidade do ajudante</p>
+                  <div className="mt-2 grid gap-2">
+                    {ESPECIALIDADES.map((e) => {
+                      const escolhida = especialidadeDe(integrante) === e.id;
+                      return (
+                        <button
+                          key={e.id}
+                          onClick={() => trocarEspecialidade(integrante.id, e.id)}
+                          className={`flex items-start gap-2 rounded-xl border-2 p-3 text-left font-bold ${
+                            escolhida
+                              ? "border-primary bg-primary text-primary-foreground"
+                              : "border-input bg-card"
+                          }`}
+                        >
+                          <span className="text-xl" aria-hidden>
+                            {e.icone}
+                          </span>
+                          <span>
+                            {e.nome}
+                            <span className="block text-xs font-semibold opacity-80">
+                              {e.descricao}
+                            </span>
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
               )}
             </div>
           ))}
