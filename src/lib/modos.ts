@@ -1,6 +1,27 @@
 // Os três modos de pilotagem. Todas as melhorias funcionam nos três.
 
+import { rotulosDosBotoes } from "./botoes";
+import type { Equipe } from "./tipos";
+
 export type ModoPilotagem = "inclinacao" | "teclado" | "celular";
+
+/** Endereço do painel de pilotagem, com os rótulos dos botões dentro. */
+export function enderecoDoPainel(equipe: Equipe): string | null {
+  const modo = equipe.modoPilotagem || "inclinacao";
+  const { ba, bb, bab } = rotulosDosBotoes(equipe);
+  const partes = [
+    `ba=${encodeURIComponent(ba)}`,
+    `bb=${encodeURIComponent(bb)}`,
+    `bab=${encodeURIComponent(bab)}`,
+  ];
+  if (modo === "teclado") return `/pilotar-teclado.html?${partes.join("&")}`;
+  if (modo === "celular") {
+    return `/pilotar-celular.html?senha=${encodeURIComponent(
+      equipe.senhaRobo,
+    )}&nome=${encodeURIComponent(equipe.nomeMicrobit)}&${partes.join("&")}`;
+  }
+  return null;
+}
 
 export type DescricaoModo = {
   id: ModoPilotagem;

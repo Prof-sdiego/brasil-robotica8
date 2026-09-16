@@ -24,9 +24,9 @@ export function useAluno(opcoes: Opcoes = {}) {
   const { salvar, salvando } = useSalvarEquipe(codigo);
 
   const integrante: Integrante | null =
-    (equipe && integranteId
+    equipe && integranteId
       ? (equipe.integrantes.find((i) => i.id === integranteId) ?? null)
-      : null) ?? null;
+      : null;
   const areas = areasDoIntegrante(integrante);
 
   useEffect(() => {
