@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 
 import { BarraProgresso } from "@/components/BarraProgresso";
 import { Etiqueta } from "@/components/Etiqueta";
-import { MELHORIAS, PAPEIS_OBRIGATORIOS } from "@/lib/catalogo";
+import { MELHORIAS, PAPEIS, PAPEIS_OBRIGATORIOS } from "@/lib/catalogo";
 import { useEquipes } from "@/lib/equipes";
 import { MODOS, modoDe } from "@/lib/modos";
 import type { Equipe } from "@/lib/tipos";
