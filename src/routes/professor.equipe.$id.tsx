@@ -225,6 +225,7 @@ function CadastroIntegrantes({ equipe }: { equipe: Equipe }) {
   const [salvando, setSalvando] = useState(false);
 
   const integrantes = equipe.integrantes;
+  const codigosPessoais = codigosDaEquipe(integrantes);
 
   async function gravar(novos: Integrante[]) {
     setSalvando(true);
@@ -253,15 +254,12 @@ function CadastroIntegrantes({ equipe }: { equipe: Equipe }) {
       toast.error(`Não há mais vaga de ${papel} nesta equipe.`);
       return;
     }
-    const novo: Integrante = {
-      id: crypto.randomUUID(),
-      nome: nome.trim(),
-      papel,
-      ...(papel === "Ajudante" ? { especialidade } : {}),
-    };
-    await gravar([...integrantes, novo]);
+    const novaLista = [...integrantes, novo];
+    await gravar(novaLista);
     setNome("");
-    toast.success(`${novo.nome} cadastrado como ${papelCompleto(novo)}.`);
+    toast.success(
+      `${novo.nome} cadastrado como ${papelCompleto(novo)}. Código pessoal: ${codigosDaEquipe(novaLista)[novo.id]}`,
+    );
   }
 
   async function trocarEspecialidade(id: string, nova: Especialidade) {
