@@ -130,22 +130,26 @@ function TelaEquipe() {
     setTimeout(() => setRecado(""), 3000);
   }
 
-  function alternarChave(id: string) {
+  function trocarEspecialidade(id: string, nova: Especialidade) {
     const alvo = integrantes.find((i) => i.id === id);
     if (!alvo) return;
-    if (alvo.podeEditar && ajudantesComChave(integrantes).length <= 1) {
-      setRecado(AVISO_ULTIMA_CHAVE);
+    if (
+      nova !== "programacao" &&
+      especialidadeDe(alvo) === "programacao" &&
+      ajudantesDeProgramacao(integrantes).length <= 1
+    ) {
+      setRecado(AVISO_ULTIMO_PROGRAMACAO);
       setTimeout(() => setRecado(""), 6000);
       return;
     }
     salvar({
-      integrantes: integrantes.map((i) => (i.id === id ? { ...i, podeEditar: !i.podeEditar } : i)),
+      integrantes: integrantes.map((i) => (i.id === id ? { ...i, especialidade: nova } : i)),
     });
   }
 
   async function copiarLista() {
     const texto = integrantes
-      .map((i) => `${i.nome} — ${i.papel} — código ${codigos[i.id]}`)
+      .map((i) => `${i.nome} — ${papelCompleto(i)} — código ${codigos[i.id]}`)
       .join("\n");
     try {
       await navigator.clipboard.writeText(
