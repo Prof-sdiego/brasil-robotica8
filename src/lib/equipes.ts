@@ -39,6 +39,7 @@ type LinhaEquipe = {
   codigo_copiado_em: string | null;
   aviso_catalogo: boolean;
   aviso_modo: boolean;
+  aviso_velocidade: boolean;
   melhorias: unknown;
   melodia_abertura: string | null;
   coreografias: unknown;
@@ -129,6 +130,7 @@ function paraEquipe(linha: LinhaEquipe): Equipe {
     codigoCopiadoEm: linha.codigo_copiado_em,
     avisoCatalogo: linha.aviso_catalogo === true,
     avisoModo: linha.aviso_modo === true,
+    avisoVelocidade: linha.aviso_velocidade === true,
     melhorias: lista<string>(linha.melhorias),
     melodiaAbertura: linha.melodia_abertura,
     coreografias: lista(linha.coreografias),
@@ -158,6 +160,9 @@ function paraLinha(dados: EquipeEditavel) {
     ...(dados.codigoCopiadoEm !== undefined ? { codigo_copiado_em: dados.codigoCopiadoEm } : {}),
     ...(dados.avisoCatalogo !== undefined ? { aviso_catalogo: dados.avisoCatalogo } : {}),
     ...(dados.avisoModo !== undefined ? { aviso_modo: dados.avisoModo } : {}),
+    ...(dados.avisoVelocidade !== undefined
+      ? { aviso_velocidade: dados.avisoVelocidade }
+      : {}),
     ...(dados.melhorias !== undefined ? { melhorias: dados.melhorias } : {}),
     ...(dados.melodiaAbertura !== undefined ? { melodia_abertura: dados.melodiaAbertura } : {}),
     ...(dados.coreografias !== undefined

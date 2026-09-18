@@ -60,6 +60,8 @@ export type Equipe = {
   avisoCatalogo: boolean;
   /** Aviso de que a equipe passou a pilotar pelo celular. */
   avisoModo: boolean;
+  /** Aviso de que o teto de velocidade mudou para 200. */
+  avisoVelocidade: boolean;
   melhorias: string[];
   melodiaAbertura: string | null;
   coreografias: Coreografia[];
@@ -83,6 +85,7 @@ export type EquipeEditavel = Partial<
     | "codigoCopiadoEm"
     | "avisoCatalogo"
     | "avisoModo"
+    | "avisoVelocidade"
     | "melhorias"
     | "melodiaAbertura"
     | "coreografias"
