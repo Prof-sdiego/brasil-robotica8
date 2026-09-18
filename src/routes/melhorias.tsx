@@ -67,6 +67,13 @@ function TelaMelhorias() {
       setAviso("Vocês já escolheram 3. Desmarquem uma antes de escolher outra.");
       return;
     }
+    const brigaEsquiva =
+      (id === "esquiva" && novas.includes("arranque_suave")) ||
+      (id === "arranque_suave" && novas.includes("esquiva"));
+    if (brigaEsquiva) {
+      setAviso("Esquiva e Arranque Suave não funcionam bem juntos. Escolham uma das duas.");
+      return;
+    }
     salvar({
       melhorias: [...novas, id],
       ajustesAtualizadosEm: new Date().toISOString(),

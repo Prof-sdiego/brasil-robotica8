@@ -82,6 +82,17 @@ export const MELHORIAS: Melhoria[] = [
     ocupaBotao: true,
   },
   {
+    id: "esquiva",
+    nome: "Esquiva",
+    icone: "🐍",
+    frase:
+      "Aperta o botão e o robô passa a serpentear sozinho enquanto anda para frente, ficando muito mais difícil de acertar. Aperta de novo e volta ao normal. Girar e dar ré continuam funcionando igual.",
+    batalha: "muito",
+    demonstracao: "medio",
+    ocupaBotao: true,
+    aviso: "Não funciona junto com o Arranque suave. Escolham uma das duas.",
+  },
+  {
     id: "contra_ataque",
     nome: "Contra-ataque automático",
     icone: "💥",

@@ -58,6 +58,7 @@ export type Marcador = (typeof MARCADORES)[number];
 export const ORDEM_MODULOS: string[] = [
   "bipe_re",
   "arranque_suave",
+  "esquiva",
   "contra_ataque",
   "som_abertura",
   "turbo",
@@ -78,6 +79,7 @@ export const PARAMETROS_MELHORIAS: Record<string, Record<string, string>> = {
     CA_DESCANSO: "descanso",
   },
   arranque_suave: { RAMPA: "suavidade" },
+  esquiva: { ESQ_FORCA: "forca_esquiva", ESQ_TEMPO: "tempo_lado" },
   bipe_re: { RE_ALTURA: "altura_bipe", RE_INTERVALO: "intervalo_bipe" },
   som_abertura: {},
 };
@@ -206,6 +208,54 @@ basic.forever(function () {
 })`,
     },
   },
+  esquiva: {
+    robo: {
+      ROBO_VARS: `let ESQ_FORCA: number = {{ESQ_FORCA}}
+let ESQ_TEMPO: number = {{ESQ_TEMPO}}
+let esquiva: boolean = false
+let esquivaLado: number = 1
+let trocaEm: number = 0
+let ultEsq: number = 0
+let ultDir: number = 0`,
+      ROBO_FUNCS: `// aplica o serpenteio por cima da direção que o piloto pediu
+function comEsquiva(esq: number, dir: number) {
+    ultEsq = esq
+    ultDir = dir
+    // só serpenteia quando os dois motores vão para frente
+    if (esquiva && esq > 0 && dir > 0) {
+        let e: number = esq - ESQ_FORCA * esquivaLado
+        let d: number = dir + ESQ_FORCA * esquivaLado
+        if (e > 255) { e = 255 }
+        if (e < -255) { e = -255 }
+        if (d > 255) { d = 255 }
+        if (d < -255) { d = -255 }
+        mover(Math.idiv(e * VEL_ATUAL, 255), Math.idiv(d * VEL_ATUAL, 255))
+    } else {
+        mover(Math.idiv(esq * VEL_ATUAL, 255), Math.idiv(dir * VEL_ATUAL, 255))
+    }
+}`,
+      ROBO_LOOPS: `
+basic.forever(function () {
+    if (esquiva && !ocupado && input.runningTime() > trocaEm) {
+        trocaEm = input.runningTime() + ESQ_TEMPO
+        esquivaLado = esquivaLado * -1
+        comEsquiva(ultEsq, ultDir)
+    }
+    basic.pause(20)
+})`,
+    },
+    corpoBotao: `    if (esquiva) {
+        esquiva = false
+        music.playTone(392, 100)
+    } else {
+        esquiva = true
+        trocaEm = input.runningTime() + ESQ_TEMPO
+        music.playTone(880, 80)
+        music.playTone(1047, 80)
+    }
+    setaAtual = -1
+    seta(0)`,
+  },
   som_abertura: {},
   bipe_re: {
     robo: {
@@ -227,6 +277,21 @@ basic.forever(function () {
 };
 
 /** Com Arranque suave, a função pilotar guarda o alvo em vez de mover direto. */
+/** Com Esquiva, a função pilotar passa a mover pelo comEsquiva. */
+export const CORPO_PILOTAR_ESQUIVA = `    comEsquiva(esq, dir)
+
+    if (esq == 0 && dir == 0) {
+        seta(0)
+    } else if (esq > 0 && dir > 0) {
+        seta(1)
+    } else if (esq < 0 && dir < 0) {
+        seta(2)
+    } else if (esq < dir) {
+        seta(3)
+    } else {
+        seta(4)
+    }`;
+
 export const CORPO_PILOTAR_SUAVE = `    alvoEsq = Math.idiv(esq * VEL_ATUAL, 255)
     alvoDir = Math.idiv(dir * VEL_ATUAL, 255)
     if (esq == 0 && dir == 0) { seta(0) }
@@ -365,7 +430,11 @@ export function montarCodigo(equipe: Equipe): CodigoGerado {
     robo[marcador] = juntarTrechos(equipe, marcador);
   }
 
-  robo.CORPO_PILOTAR = usaArranqueSuave ? CORPO_PILOTAR_SUAVE : CORPO_PILOTAR_DIRETO;
+  robo.CORPO_PILOTAR = equipe.melhorias.includes("esquiva")
+    ? CORPO_PILOTAR_ESQUIVA
+    : usaArranqueSuave
+      ? CORPO_PILOTAR_SUAVE
+      : CORPO_PILOTAR_DIRETO;
 
   // A melodia de abertura entra no setup do robô.
   const melodia = equipe.melhorias.includes("som_abertura") ? equipe.melodiaAbertura : null;

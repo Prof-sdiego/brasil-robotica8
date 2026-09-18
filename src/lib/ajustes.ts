@@ -184,6 +184,28 @@ export const SECOES_AJUSTES: SecaoAjustes[] = [
 
 /** Campos de ajuste que cada melhoria abre quando é escolhida. */
 export const AJUSTES_MELHORIAS: Record<string, CampoAjuste[]> = {
+  esquiva: [
+    {
+      tipo: "deslizante",
+      id: "forca_esquiva",
+      nome: "Força da esquiva",
+      ajuda: "O quanto ele desvia para os lados. Alto demais e ele quase não sai do lugar.",
+      min: 20,
+      max: 120,
+      padrao: 60,
+    },
+    {
+      tipo: "deslizante",
+      id: "tempo_lado",
+      nome: "Tempo de cada lado",
+      ajuda: "Quanto tempo ele puxa para um lado antes de trocar. Menor = serpente mais nervosa.",
+      min: 150,
+      max: 600,
+      padrao: 320,
+      passo: 10,
+      unidade: "ms",
+    },
+  ],
   turbo: [
     {
       tipo: "deslizante",
