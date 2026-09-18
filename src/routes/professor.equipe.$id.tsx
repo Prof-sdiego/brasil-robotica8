@@ -262,14 +262,6 @@ function CadastroIntegrantes({ equipe }: { equipe: Equipe }) {
   async function trocarEspecialidade(id: string, nova: Especialidade) {
     const alvo = integrantes.find((i) => i.id === id);
     if (!alvo) return;
-    if (
-      nova !== "programacao" &&
-      especialidadeDe(alvo) === "programacao" &&
-      ajudantesDeProgramacao(integrantes).length <= 1
-    ) {
-      toast.error(AVISO_ULTIMO_PROGRAMACAO);
-      return;
-    }
     await gravar(integrantes.map((i) => (i.id === id ? { ...i, especialidade: nova } : i)));
   }
 

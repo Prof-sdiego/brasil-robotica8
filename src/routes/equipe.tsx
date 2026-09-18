@@ -92,15 +92,6 @@ function TelaEquipe() {
     if (!nome.trim() || !papel) return;
     if (integrantes.length >= MAXIMO_INTEGRANTES) return;
     if (vagasLivres(papel) <= 0) return;
-    if (
-      papel === "Ajudante" &&
-      especialidade !== "programacao" &&
-      ajudantesDeProgramacao(integrantes).length === 0
-    ) {
-      setRecado(AVISO_ULTIMO_PROGRAMACAO);
-      setTimeout(() => setRecado(""), 6000);
-      return;
-    }
     const novo: Integrante = {
       id: crypto.randomUUID(),
       nome: nome.trim(),
@@ -133,15 +124,6 @@ function TelaEquipe() {
   function trocarEspecialidade(id: string, nova: Especialidade) {
     const alvo = integrantes.find((i) => i.id === id);
     if (!alvo) return;
-    if (
-      nova !== "programacao" &&
-      especialidadeDe(alvo) === "programacao" &&
-      ajudantesDeProgramacao(integrantes).length <= 1
-    ) {
-      setRecado(AVISO_ULTIMO_PROGRAMACAO);
-      setTimeout(() => setRecado(""), 6000);
-      return;
-    }
     salvar({
       integrantes: integrantes.map((i) => (i.id === id ? { ...i, especialidade: nova } : i)),
     });

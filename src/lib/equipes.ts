@@ -75,10 +75,6 @@ function integrantesNormalizados(valor: unknown): Integrante[] {
       especialidade: i.especialidade ?? (podeEditar === false ? "engenharia" : "programacao"),
     };
   });
-  const ajudantes = integrantes.filter((i) => i.papel === "Ajudante");
-  if (ajudantes.length > 0 && !ajudantes.some((i) => i.especialidade === "programacao")) {
-    ajudantes[0]!.especialidade = "programacao";
-  }
   return integrantes;
 }
 
