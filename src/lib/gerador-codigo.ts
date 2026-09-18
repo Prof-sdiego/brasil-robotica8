@@ -430,7 +430,11 @@ export function montarCodigo(equipe: Equipe): CodigoGerado {
     robo[marcador] = juntarTrechos(equipe, marcador);
   }
 
-  robo.CORPO_PILOTAR = usaArranqueSuave ? CORPO_PILOTAR_SUAVE : CORPO_PILOTAR_DIRETO;
+  robo.CORPO_PILOTAR = equipe.melhorias.includes("esquiva")
+    ? CORPO_PILOTAR_ESQUIVA
+    : usaArranqueSuave
+      ? CORPO_PILOTAR_SUAVE
+      : CORPO_PILOTAR_DIRETO;
 
   // A melodia de abertura entra no setup do robô.
   const melodia = equipe.melhorias.includes("som_abertura") ? equipe.melodiaAbertura : null;
