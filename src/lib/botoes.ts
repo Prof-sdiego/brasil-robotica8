@@ -14,7 +14,7 @@ export const NOME_BOTAO: Record<Botao, string> = {
 };
 
 /** Melhorias que ocupam um botão. */
-export const MELHORIAS_DE_BOTAO = ["turbo", "marcha_lenta", "empinada"];
+export const MELHORIAS_DE_BOTAO = ["turbo", "marcha_lenta"];
 
 export const VALOR_COREOGRAFIA = "coreografia";
 
