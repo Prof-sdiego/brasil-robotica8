@@ -58,6 +58,7 @@ export type Marcador = (typeof MARCADORES)[number];
 export const ORDEM_MODULOS: string[] = [
   "bipe_re",
   "arranque_suave",
+  "esquiva",
   "contra_ataque",
   "som_abertura",
   "turbo",
@@ -78,6 +79,7 @@ export const PARAMETROS_MELHORIAS: Record<string, Record<string, string>> = {
     CA_DESCANSO: "descanso",
   },
   arranque_suave: { RAMPA: "suavidade" },
+  esquiva: { ESQ_FORCA: "forca_esquiva", ESQ_TEMPO: "tempo_lado" },
   bipe_re: { RE_ALTURA: "altura_bipe", RE_INTERVALO: "intervalo_bipe" },
   som_abertura: {},
 };
