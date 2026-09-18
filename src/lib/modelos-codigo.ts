@@ -502,6 +502,41 @@ function tremida(vezes: number) {
     parar(); basic.pause(70)
 }
 
+function ziguezagueFrente(vezes: number, tempo: number) {
+    for (let i = 0; i < vezes; i++) {
+        if (!ocupado) { return }
+        seta(1)
+        mover(VEL_COREO, Math.idiv(VEL_COREO * 45, 100))
+        espera(tempo)
+        if (!ocupado) { return }
+        mover(Math.idiv(VEL_COREO * 45, 100), VEL_COREO)
+        espera(tempo)
+    }
+    parar(); basic.pause(70)
+}
+
+function ziguezagueTras(vezes: number, tempo: number) {
+    for (let i = 0; i < vezes; i++) {
+        if (!ocupado) { return }
+        seta(2)
+        mover(-VEL_COREO, Math.idiv(-VEL_COREO * 45, 100))
+        espera(tempo)
+        if (!ocupado) { return }
+        mover(Math.idiv(-VEL_COREO * 45, 100), -VEL_COREO)
+        espera(tempo)
+    }
+    parar(); basic.pause(70)
+}
+
+function ziguezague(vezes: number, tamanho: number) {
+    for (let i = 0; i < vezes; i++) {
+        if (!ocupado) { return }
+        curvaDireita(tamanho)
+        if (!ocupado) { return }
+        curvaEsquerda(tamanho)
+    }
+}
+
 function apitar(altura: number, tempo: number) {
     if (!ocupado) { return }
     music.playTone(altura, tempo)
