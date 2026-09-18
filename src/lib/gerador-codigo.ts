@@ -62,7 +62,6 @@ export const ORDEM_MODULOS: string[] = [
   "som_abertura",
   "turbo",
   "marcha_lenta",
-  "empinada",
 ];
 
 /**
@@ -72,7 +71,6 @@ export const ORDEM_MODULOS: string[] = [
 export const PARAMETROS_MELHORIAS: Record<string, Record<string, string>> = {
   turbo: { TURBO_DURACAO: "duracao_turbo", TURBO_RECARGA: "recarga" },
   marcha_lenta: { VEL_LENTA: "velocidade_lenta" },
-  empinada: { EMP_RECUO: "recuo", EMP_ARRANQUE: "arranque" },
   contra_ataque: {
     IMPACTO: "sensibilidade_impacto",
     CA_RECUO: "tempo_recuo",
@@ -136,21 +134,6 @@ let lenta: boolean = false`,
     }
     setaAtual = -1
     seta(0)`,
-  },
-  empinada: {
-    robo: {
-      ROBO_VARS: `let EMP_RECUO: number = {{EMP_RECUO}}
-let EMP_ARRANQUE: number = {{EMP_ARRANQUE}}`,
-    },
-    corpoBotao: `    seta(2)
-    mover(-255, -255)
-    espera(EMP_RECUO)
-    parar()
-    espera(70)
-    seta(1)
-    mover(255, 255)
-    espera(EMP_ARRANQUE)
-    parar()`,
   },
   contra_ataque: {
     robo: {

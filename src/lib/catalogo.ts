@@ -82,17 +82,6 @@ export const MELHORIAS: Melhoria[] = [
     ocupaBotao: true,
   },
   {
-    id: "empinada",
-    nome: "Empinada",
-    icone: "🛹",
-    frase: "Ré curta e arranque seco. A ré joga o peso para trás e o robô levanta a frente.",
-    batalha: "pouco",
-    demonstracao: "muito",
-    ocupaBotao: true,
-    aviso:
-      "Para empinar, precisa de peso atrás do eixo traseiro. Peso em cima das rodas não adianta.",
-  },
-  {
     id: "contra_ataque",
     nome: "Contra-ataque automático",
     icone: "💥",

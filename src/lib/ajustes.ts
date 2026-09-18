@@ -229,30 +229,6 @@ export const AJUSTES_MELHORIAS: Record<string, CampoAjuste[]> = {
       padrao: 110,
     },
   ],
-  empinada: [
-    {
-      tipo: "deslizante",
-      id: "recuo",
-      nome: "Recuo",
-      ajuda: "A ré curta que joga o peso para trás.",
-      min: 80,
-      max: 400,
-      padrao: 160,
-      passo: 10,
-      unidade: "ms",
-    },
-    {
-      tipo: "deslizante",
-      id: "arranque",
-      nome: "Arranque",
-      ajuda: "Quanto tempo ele dispara para frente.",
-      min: 300,
-      max: 1200,
-      padrao: 700,
-      passo: 50,
-      unidade: "ms",
-    },
-  ],
   contra_ataque: [
     {
       tipo: "deslizante",
