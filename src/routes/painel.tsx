@@ -210,6 +210,19 @@ function Painel() {
         </button>
       )}
 
+      {equipe.avisoVelocidade && (
+        <button
+          onClick={() => salvar({ avisoVelocidade: false })}
+          className="mt-4 flex w-full items-start gap-2 rounded-2xl bg-info px-4 py-4 text-left font-bold text-info-foreground"
+        >
+          <Gamepad2 className="mt-0.5 size-5 shrink-0" />
+          <span>
+            O limite de velocidade mudou para 200. Gerem o código de novo.
+            <span className="mt-1 block text-sm">Toque para esconder este aviso.</span>
+          </span>
+        </button>
+      )}
+
       {travado && (
         <p className="mt-4 flex items-start gap-2 rounded-2xl bg-alerta px-4 py-4 font-bold text-alerta-foreground">
           <Lock className="mt-0.5 size-5 shrink-0" /> {avisoTrava}
