@@ -17,7 +17,7 @@ import {
   PAPEIS,
 } from "@/lib/catalogo";
 import { codigosDaEquipe } from "@/lib/codigosPessoais";
-import { AVISO_ULTIMO_PROGRAMACAO, ajudantesDeProgramacao, papeisFaltantes } from "@/lib/equipeStatus";
+import { papeisFaltantes } from "@/lib/equipeStatus";
 import { salvarIntegrantesPorId, useEquipes } from "@/lib/equipes";
 import { duracaoEstimada, montarCodigo } from "@/lib/gerador-codigo";
 import type { Equipe, Especialidade, Integrante, Papel } from "@/lib/tipos";

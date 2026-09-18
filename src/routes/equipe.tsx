@@ -22,8 +22,6 @@ import {
 import { MAXIMO_INTEGRANTES, PAPEIS } from "@/lib/catalogo";
 import { codigosDaEquipe, novoCodigoPessoal } from "@/lib/codigosPessoais";
 import {
-  AVISO_ULTIMO_PROGRAMACAO,
-  ajudantesDeProgramacao,
   listarFaltantes,
   papeisFaltantes,
 } from "@/lib/equipeStatus";

@@ -62,7 +62,7 @@ const PAPEIS_VALIDOS: Papel[] = [
   "Designer",
 ];
 
-/** "Staff" virou "Ajudante"; e sempre um ajudante é de Programação. */
+/** "Staff" virou "Ajudante". */
 function integrantesNormalizados(valor: unknown): Integrante[] {
   const bruto = lista<Integrante & { papel: string; podeEditar?: boolean }>(valor);
   const integrantes: Integrante[] = bruto.map((i) => {
