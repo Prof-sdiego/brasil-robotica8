@@ -54,8 +54,8 @@ export const SECOES_AJUSTES: SecaoAjustes[] = [
         nome: "Velocidade normal",
         ajuda: "A velocidade do dia a dia do robô.",
         min: 120,
-        max: 255,
-        padrao: 255,
+        max: 200,
+        padrao: 200,
       },
       {
         tipo: "deslizante",
@@ -63,7 +63,7 @@ export const SECOES_AJUSTES: SecaoAjustes[] = [
         nome: "Força do giro",
         ajuda: "Quanto ele vira ao inclinar para o lado. Menor = curvas mais suaves.",
         min: 120,
-        max: 255,
+        max: 200,
         padrao: 140,
       },
     ],
@@ -91,8 +91,8 @@ export const SECOES_AJUSTES: SecaoAjustes[] = [
         nome: "Velocidade das coreografias",
         ajuda: "A velocidade usada nas sequências dos botões.",
         min: 150,
-        max: 255,
-        padrao: 255,
+        max: 200,
+        padrao: 200,
       },
       {
         tipo: "sim_nao",
@@ -185,16 +185,6 @@ export const SECOES_AJUSTES: SecaoAjustes[] = [
 /** Campos de ajuste que cada melhoria abre quando é escolhida. */
 export const AJUSTES_MELHORIAS: Record<string, CampoAjuste[]> = {
   turbo: [
-    {
-      tipo: "deslizante",
-      id: "velocidade_normal",
-      nome: "Velocidade normal",
-      ajuda:
-        "Sua velocidade do dia a dia. Precisa ser menor que 255, senão o turbo não teria o que dar a mais.",
-      min: 120,
-      max: 220,
-      padrao: 180,
-    },
     {
       tipo: "deslizante",
       id: "duracao_turbo",

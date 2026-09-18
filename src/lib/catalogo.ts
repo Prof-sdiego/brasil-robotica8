@@ -66,7 +66,7 @@ export const MELHORIAS: Melhoria[] = [
     nome: "Turbo",
     icone: "🚀",
     frase:
-      "Aperta o botão e o robô ganha alguns segundos de velocidade máxima. Depois precisa recarregar.",
+      "Aperta o botão e o robô vai a 255, a velocidade máxima do motor, por alguns segundos. Depois precisa recarregar. Sem turbo, o robô anda no máximo a 200.",
     batalha: "muito",
     demonstracao: "pouco",
     ocupaBotao: true,
