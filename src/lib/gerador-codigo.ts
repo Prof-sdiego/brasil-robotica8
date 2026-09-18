@@ -350,12 +350,8 @@ export function montarCodigo(equipe: Equipe): CodigoGerado {
     ZONA_CURVA: String(numeroAjuste(ajustes, "zona_curva")),
     GIRO: String(numeroAjuste(ajustes, "forca_giro")),
     RITMO: String(numeroAjuste(ajustes, "ritmo_envio")),
-    // Quem escolhe Turbo tem a velocidade normal reduzida: é o que o turbo dá a mais.
-    VEL_NORMAL: String(
-      usaTurbo
-        ? numeroAjusteMelhoria(equipe.ajustesMelhorias, "turbo", "velocidade_normal")
-        : numeroAjuste(ajustes, "velocidade_maxima"),
-    ),
+    // Teto geral: 200. Só o Turbo chega a 255.
+    VEL_NORMAL: String(Math.min(200, numeroAjuste(ajustes, "velocidade_maxima"))),
     GIRO360: String(numeroAjuste(ajustes, "giro360")),
     VEL_COREO: String(numeroAjuste(ajustes, "velocidade_coreografia")),
     INV_ESQ: ligadoAjuste(ajustes, "inverter_motor_esquerdo") ? "-1" : "1",
