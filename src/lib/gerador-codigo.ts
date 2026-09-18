@@ -313,6 +313,7 @@ export const LINHAS_MOVIMENTOS: Record<string, (params: number[]) => string> = {
   quadrado: (p) => `quadrado(${p[0]})`,
   piao: (p) => `piao(${p[0]})`,
   tremida: (p) => `tremida(${p[0]})`,
+  ziguezague: (p) => `ziguezague(${p[0]}, ${p[1]})`,
   apitar: (p) => `apitar(${p[0]}, ${p[1]})`,
 };
 

@@ -197,6 +197,8 @@ export type Movimento = {
   id: string;
   nome: string;
   icone: string;
+  /** Frase curta de ajuda mostrada no site (opcional). */
+  ajuda?: string;
   params: { nome: string; min: number; max: number; padrao: number; unidade: string }[];
   /** Duração estimada em segundos, a partir dos parâmetros escolhidos. */
   duracao: (params: number[]) => number;
@@ -263,6 +265,18 @@ export const MOVIMENTOS: Movimento[] = [
     icone: "↖️",
     params: [tempo()],
     duracao: (p) => (p[0] ?? 0) / 1000 + PAUSA,
+  },
+  {
+    id: "ziguezague",
+    nome: "Ziguezague",
+    icone: "⚡",
+    ajuda:
+      "O robô serpenteia avançando, uma curva para cada lado. Curvas curtas fazem um ziguezague apertado; curvas longas, um caminho mais largo.",
+    params: [
+      { nome: "Número de vezes", min: 1, max: 6, padrao: 3, unidade: "vezes" },
+      { nome: "Tamanho de cada curva", min: 200, max: 900, padrao: 500, unidade: "ms" },
+    ],
+    duracao: (p) => ((p[0] ?? 0) * 2 * (p[1] ?? 0)) / 1000 + PAUSA,
   },
   {
     id: "estrela",

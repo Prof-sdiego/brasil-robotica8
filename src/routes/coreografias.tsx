@@ -244,6 +244,9 @@ function TelaCoreografias() {
                   {movimento.icone}
                 </span>
                 <span className="text-sm font-bold leading-tight">{movimento.nome}</span>
+                {movimento.ajuda && (
+                  <span className="text-xs leading-snug opacity-70">{movimento.ajuda}</span>
+                )}
               </button>
             ))}
           </div>
