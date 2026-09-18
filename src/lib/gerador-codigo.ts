@@ -338,7 +338,6 @@ export type CodigoGerado = {
 /** Monta o código do robô colando trechos fixos nos marcadores. */
 export function montarCodigo(equipe: Equipe): CodigoGerado {
   const ajustes = equipe.ajustes;
-  const usaTurbo = equipe.melhorias.includes("turbo");
   const usaArranqueSuave = equipe.melhorias.includes("arranque_suave");
 
   const base: Partial<Record<Marcador, string>> = {
