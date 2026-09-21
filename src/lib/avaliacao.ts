@@ -71,14 +71,16 @@ export function useAlunos() {
   return useQuery({ queryKey: ["alunos"], queryFn: listarAlunos });
 }
 
-export async function buscarAlunoPorRa(ra: string): Promise<Aluno | null> {
-  const { data, error } = await supabase
-    .from("alunos")
-    .select("id, ra, nome, nascimento, turma")
-    .eq("ra", soDigitos(ra))
-    .maybeSingle();
-  if (error) throw error;
-  return (data as Aluno | null) ?? null;
+/** Aceita o RA com ou sem os zeros da frente, e com ou sem o dígito do fim. */
+export function acharAlunoPorRa(alunos: Aluno[], digitado: string): Aluno | null {
+  const alvo = soDigitos(digitado).replace(/^0+/, "");
+  if (alvo.length < 5) return null;
+  return (
+    alunos.find((aluno) => {
+      const ra = aluno.ra.replace(/^0+/, "");
+      return ra === alvo || alvo.startsWith(ra) || ra.startsWith(alvo);
+    }) ?? null
+  );
 }
 
 export function soDigitos(valor: string): string {
