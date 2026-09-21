@@ -106,6 +106,13 @@ function AreaProfessor() {
           >
             <Gamepad2 className="size-4" /> Pilotar
           </Link>
+          <Link
+            to="/professor/avaliacoes"
+            className="flex items-center gap-1 rounded-full bg-card/25 px-3 py-2 text-sm font-bold"
+            activeProps={{ className: "bg-card text-secondary" }}
+          >
+            <ClipboardList className="size-4" /> Avaliação
+          </Link>
           <button
             onClick={() => {
               sairDoProfessor();
