@@ -131,7 +131,7 @@ function TelaAvaliar() {
     if (etapa.tipo !== "notas" || !completo) return;
     setGravando(true);
     try {
-      const linhas: NotaNova[] = equipe.integrantes.map((alvo) => ({
+      const linhas: NotaNova[] = equipeAtual.integrantes.map((alvo) => ({
         avaliadoId: alvo.id,
         avaliadoNome: alvo.nome,
         participacao: nota(alvo.id, "participacao") ?? 0,
@@ -139,8 +139,8 @@ function TelaAvaliar() {
         colaboracao: nota(alvo.id, "colaboracao") ?? 0,
       }));
       await salvarAvaliacoes({
-        equipeId: equipe.id,
-        turma: equipe.turma,
+        equipeId: equipeAtual.id,
+        turma: equipeAtual.turma,
         avaliadorId: etapa.pessoa.id,
         avaliadorNome: etapa.pessoa.nome,
         avaliadorRa: etapa.ra,
@@ -158,13 +158,13 @@ function TelaAvaliar() {
   }
 
   async function faltou(pessoa: Integrante) {
-    await marcarFalta(equipe.id, pessoa.id, pessoa.nome);
+    await marcarFalta(equipeAtual.id, pessoa.id, pessoa.nome);
     recarregar();
     setRecado(`${pessoa.nome} ficou marcado como faltou. Dá para desfazer aqui embaixo.`);
   }
 
   async function reabrir(pessoa: Integrante) {
-    await apagarAvaliacoesDoAvaliador(equipe.id, pessoa.id);
+    await apagarAvaliacoesDoAvaliador(equipeAtual.id, pessoa.id);
     recarregar();
     setNotas({});
     setRecado(`As notas de ${pessoa.nome} foram apagadas. Ele precisa avaliar tudo de novo.`);
