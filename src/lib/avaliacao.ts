@@ -205,10 +205,149 @@ export function mesmoNome(a: string, b: string): boolean {
   return curto.every((parte) => longo.includes(parte));
 }
 
+// ---------- rodadas de avaliação ----------
+
+export type TipoRodada = "bimestral" | "checkpoint";
+
+export type Rodada = {
+  id: string;
+  nome: string;
+  tipo: TipoRodada;
+  bimestre: number;
+  codigo: string;
+  aberta: boolean;
+  criadaEm: string;
+};
+
+type LinhaRodada = {
+  id: string;
+  nome: string;
+  tipo: string;
+  bimestre: number;
+  codigo: string;
+  aberta: boolean;
+  created_at: string;
+};
+
+function paraRodada(l: LinhaRodada): Rodada {
+  return {
+    id: l.id,
+    nome: l.nome,
+    tipo: l.tipo === "checkpoint" ? "checkpoint" : "bimestral",
+    bimestre: l.bimestre,
+    codigo: l.codigo,
+    aberta: l.aberta,
+    criadaEm: l.created_at,
+  };
+}
+
+export async function listarRodadas(): Promise<Rodada[]> {
+  const { data, error } = await supabase
+    .from("avaliacao_rodadas")
+    .select("id, nome, tipo, bimestre, codigo, aberta, created_at")
+    .order("created_at");
+  if (error) throw error;
+  return ((data ?? []) as LinhaRodada[]).map(paraRodada);
+}
+
+export function useRodadas() {
+  return useQuery({ queryKey: ["avaliacao-rodadas"], queryFn: listarRodadas });
+}
+
+export async function criarRodada(dados: {
+  nome: string;
+  tipo: TipoRodada;
+  bimestre: number;
+  codigo: string;
+  aberta: boolean;
+}) {
+  const { error } = await supabase.from("avaliacao_rodadas").insert({
+    nome: dados.nome,
+    tipo: dados.tipo,
+    bimestre: dados.bimestre,
+    codigo: dados.codigo.trim().toUpperCase(),
+    aberta: dados.aberta,
+  });
+  if (error) throw error;
+}
+
+export async function mudarRodada(
+  id: string,
+  mudancas: Partial<{ nome: string; codigo: string; aberta: boolean }>,
+) {
+  const { error } = await supabase.from("avaliacao_rodadas").update(mudancas).eq("id", id);
+  if (error) throw error;
+}
+
+export async function apagarRodada(id: string) {
+  const { error } = await supabase.from("avaliacao_rodadas").delete().eq("id", id);
+  if (error) throw error;
+}
+
+/** Código sugerido para uma avaliação nova: 4 letras e números fáceis de ditar. */
+export function sugerirCodigo(): string {
+  const letras = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+  let saida = "";
+  for (let i = 0; i < 4; i += 1) {
+    saida += letras[Math.floor(Math.random() * letras.length)];
+  }
+  return saida;
+}
+
+export function mesmoCodigo(digitado: string, codigo: string): boolean {
+  const limpo = (v: string) => v.trim().toUpperCase().replace(/\s/g, "");
+  return limpo(digitado) !== "" && limpo(digitado) === limpo(codigo);
+}
+
+// ---------- liberação da equipe (primeiro a avaliar) ----------
+
+export type Liberacao = { rodadaId: string; equipeId: string; integranteId: string; nome: string };
+
+export async function listarLiberacoes(rodadaId?: string): Promise<Liberacao[]> {
+  let consulta = supabase
+    .from("avaliacao_liberacoes")
+    .select("rodada_id, equipe_id, integrante_id, nome");
+  if (rodadaId) consulta = consulta.eq("rodada_id", rodadaId);
+  const { data, error } = await consulta;
+  if (error) throw error;
+  return (
+    (data ?? []) as { rodada_id: string; equipe_id: string; integrante_id: string; nome: string }[]
+  ).map((l) => ({
+    rodadaId: l.rodada_id,
+    equipeId: l.equipe_id,
+    integranteId: l.integrante_id,
+    nome: l.nome,
+  }));
+}
+
+export function useLiberacoes(rodadaId?: string) {
+  return useQuery({
+    queryKey: ["avaliacao-liberacoes", rodadaId ?? "todas"],
+    queryFn: () => listarLiberacoes(rodadaId),
+    enabled: true,
+  });
+}
+
+export async function liberarEquipe(dados: {
+  rodadaId: string;
+  equipeId: string;
+  integranteId: string;
+  nome: string;
+}) {
+  const { error } = await supabase.from("avaliacao_liberacoes").insert({
+    rodada_id: dados.rodadaId,
+    equipe_id: dados.equipeId,
+    integrante_id: dados.integranteId,
+    nome: dados.nome,
+  });
+  if (error && !`${error.message}`.includes("duplicate")) throw error;
+}
+
 // ---------- avaliações ----------
 
 type LinhaAvaliacao = {
   id: string;
+  rodada_id: string | null;
   equipe_id: string;
   turma: string;
   avaliador_id: string;
@@ -222,11 +361,12 @@ type LinhaAvaliacao = {
 };
 
 const CAMPOS_AVALIACAO =
-  "id, equipe_id, turma, avaliador_id, avaliador_nome, avaliador_ra, avaliado_id, avaliado_nome, participacao, organizacao, colaboracao";
+  "id, rodada_id, equipe_id, turma, avaliador_id, avaliador_nome, avaliador_ra, avaliado_id, avaliado_nome, participacao, organizacao, colaboracao";
 
 function paraAvaliacao(linha: LinhaAvaliacao): Avaliacao {
   return {
     id: linha.id,
+    rodadaId: linha.rodada_id ?? "",
     equipeId: linha.equipe_id,
     turma: linha.turma,
     avaliadorId: linha.avaliador_id,
@@ -241,22 +381,31 @@ function paraAvaliacao(linha: LinhaAvaliacao): Avaliacao {
 }
 
 export async function listarAvaliacoes(equipeId?: string): Promise<Avaliacao[]> {
-  let consulta = supabase.from("avaliacoes").select(CAMPOS_AVALIACAO).eq("bimestre", BIMESTRE);
+  let consulta = supabase.from("avaliacoes").select(CAMPOS_AVALIACAO);
   if (equipeId) consulta = consulta.eq("equipe_id", equipeId);
   const { data, error } = await consulta;
   if (error) throw error;
   return ((data ?? []) as LinhaAvaliacao[]).map(paraAvaliacao);
 }
 
-export async function listarFaltas(equipeId?: string): Promise<(Falta & { equipeId: string })[]> {
+export async function listarFaltas(
+  equipeId?: string,
+): Promise<(Falta & { equipeId: string; rodadaId: string })[]> {
   let consulta = supabase
     .from("avaliacao_faltas")
-    .select("equipe_id, integrante_id, nome")
-    .eq("bimestre", BIMESTRE);
+    .select("rodada_id, equipe_id, integrante_id, nome");
   if (equipeId) consulta = consulta.eq("equipe_id", equipeId);
   const { data, error } = await consulta;
   if (error) throw error;
-  return ((data ?? []) as { equipe_id: string; integrante_id: string; nome: string }[]).map((l) => ({
+  return (
+    (data ?? []) as {
+      rodada_id: string | null;
+      equipe_id: string;
+      integrante_id: string;
+      nome: string;
+    }[]
+  ).map((l) => ({
+    rodadaId: l.rodada_id ?? "",
     equipeId: l.equipe_id,
     integranteId: l.integrante_id,
     nome: l.nome,
@@ -286,6 +435,8 @@ export type NotaNova = {
 };
 
 export async function salvarAvaliacoes(dados: {
+  rodadaId: string;
+  bimestre: number;
   equipeId: string;
   turma: string;
   avaliadorId: string;
@@ -294,7 +445,8 @@ export async function salvarAvaliacoes(dados: {
   notas: NotaNova[];
 }) {
   const linhas = dados.notas.map((nota) => ({
-    bimestre: BIMESTRE,
+    rodada_id: dados.rodadaId,
+    bimestre: dados.bimestre,
     equipe_id: dados.equipeId,
     turma: dados.turma,
     avaliador_id: dados.avaliadorId,
@@ -308,34 +460,44 @@ export async function salvarAvaliacoes(dados: {
   }));
   const { error } = await supabase
     .from("avaliacoes")
-    .upsert(linhas, { onConflict: "bimestre,equipe_id,avaliador_id,avaliado_id" });
+    .upsert(linhas, { onConflict: "rodada_id,equipe_id,avaliador_id,avaliado_id" });
   if (error) throw error;
 }
 
 /** Ao reabrir para editar, a nota antiga é apagada — ninguém lê o que já foi dado. */
-export async function apagarAvaliacoesDoAvaliador(equipeId: string, avaliadorId: string) {
+export async function apagarAvaliacoesDoAvaliador(
+  rodadaId: string,
+  equipeId: string,
+  avaliadorId: string,
+) {
   const { error } = await supabase
     .from("avaliacoes")
     .delete()
-    .eq("bimestre", BIMESTRE)
+    .eq("rodada_id", rodadaId)
     .eq("equipe_id", equipeId)
     .eq("avaliador_id", avaliadorId);
   if (error) throw error;
 }
 
-export async function marcarFalta(equipeId: string, integranteId: string, nome: string) {
+export async function marcarFalta(
+  rodadaId: string,
+  bimestre: number,
+  equipeId: string,
+  integranteId: string,
+  nome: string,
+) {
   const { error } = await supabase.from("avaliacao_faltas").upsert(
-    { bimestre: BIMESTRE, equipe_id: equipeId, integrante_id: integranteId, nome },
-    { onConflict: "bimestre,equipe_id,integrante_id" },
+    { rodada_id: rodadaId, bimestre, equipe_id: equipeId, integrante_id: integranteId, nome },
+    { onConflict: "rodada_id,equipe_id,integrante_id" },
   );
   if (error) throw error;
 }
 
-export async function desmarcarFalta(equipeId: string, integranteId: string) {
+export async function desmarcarFalta(rodadaId: string, equipeId: string, integranteId: string) {
   const { error } = await supabase
     .from("avaliacao_faltas")
     .delete()
-    .eq("bimestre", BIMESTRE)
+    .eq("rodada_id", rodadaId)
     .eq("equipe_id", equipeId)
     .eq("integrante_id", integranteId);
   if (error) throw error;
@@ -349,6 +511,8 @@ export function useRecarregarAvaliacoes(equipeId?: string) {
     queryClient.invalidateQueries({ queryKey: ["avaliacoes", "todas"] });
     queryClient.invalidateQueries({ queryKey: ["avaliacao-faltas", equipeId ?? "todas"] });
     queryClient.invalidateQueries({ queryKey: ["avaliacao-faltas", "todas"] });
+    queryClient.invalidateQueries({ queryKey: ["avaliacao-liberacoes"] });
+    queryClient.invalidateQueries({ queryKey: ["avaliacao-rodadas"] });
   };
 }
 
@@ -364,4 +528,80 @@ export function mediasRecebidas(avaliacoes: Avaliacao[]): Map<string, { media: n
     saida.set(id, { media: total / quantas, quantas });
   }
   return saida;
+}
+
+/**
+ * Média de uma pessoa em várias avaliações de checkpoint: primeiro a média de
+ * cada checkpoint, depois a média entre os checkpoints.
+ */
+export function mediaEntreCheckpoints(
+  avaliacoes: Avaliacao[],
+  avaliadoId: string,
+  rodadasCheckpoint: Rodada[],
+): { media: number | null; quantasRodadas: number } {
+  const medias: number[] = [];
+  for (const rodada of rodadasCheckpoint) {
+    const recebidas = avaliacoes.filter(
+      (a) => a.rodadaId === rodada.id && a.avaliadoId === avaliadoId,
+    );
+    if (recebidas.length === 0) continue;
+    medias.push(recebidas.reduce((total, a) => total + media(a), 0) / recebidas.length);
+  }
+  if (medias.length === 0) return { media: null, quantasRodadas: 0 };
+  return {
+    media: medias.reduce((t, v) => t + v, 0) / medias.length,
+    quantasRodadas: medias.length,
+  };
+}
+
+/** Planilha (CSV) com uma linha por nota dada, para baixar. */
+export function csvDasAvaliacoes(
+  avaliacoes: Avaliacao[],
+  rodadas: Rodada[],
+  nomeDaEquipe: (equipeId: string) => string,
+): string {
+  const cabecalho = [
+    "avaliacao",
+    "tipo",
+    "bimestre",
+    "turma",
+    "equipe",
+    "quem_avaliou",
+    "ra_de_quem_avaliou",
+    "avaliado",
+    "participacao",
+    "organizacao",
+    "colaboracao",
+    "media",
+  ];
+  const linhas = avaliacoes.map((a) => {
+    const rodada = rodadas.find((r) => r.id === a.rodadaId);
+    return [
+      rodada?.nome ?? "",
+      rodada?.tipo ?? "",
+      String(rodada?.bimestre ?? ""),
+      a.turma,
+      nomeDaEquipe(a.equipeId),
+      a.avaliadorNome,
+      a.avaliadorRa,
+      a.avaliadoNome,
+      String(a.participacao),
+      String(a.organizacao),
+      String(a.colaboracao),
+      media(a).toFixed(2),
+    ];
+  });
+  return [cabecalho, ...linhas]
+    .map((linha) => linha.map((c) => `"${String(c).replace(/"/g, '""')}"`).join(";"))
+    .join("\n");
+}
+
+export function baixarCsv(nomeArquivo: string, conteudo: string) {
+  const blob = new Blob([`\uFEFF${conteudo}`], { type: "text/csv;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = nomeArquivo;
+  link.click();
+  URL.revokeObjectURL(url);
 }
