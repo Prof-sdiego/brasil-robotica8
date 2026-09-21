@@ -71,14 +71,16 @@ export function useAlunos() {
   return useQuery({ queryKey: ["alunos"], queryFn: listarAlunos });
 }
 
-export async function buscarAlunoPorRa(ra: string): Promise<Aluno | null> {
-  const { data, error } = await supabase
-    .from("alunos")
-    .select("id, ra, nome, nascimento, turma")
-    .eq("ra", soDigitos(ra))
-    .maybeSingle();
-  if (error) throw error;
-  return (data as Aluno | null) ?? null;
+/** Aceita o RA com ou sem os zeros da frente, e com ou sem o dígito do fim. */
+export function acharAlunoPorRa(alunos: Aluno[], digitado: string): Aluno | null {
+  const alvo = soDigitos(digitado).replace(/^0+/, "");
+  if (alvo.length < 5) return null;
+  return (
+    alunos.find((aluno) => {
+      const ra = aluno.ra.replace(/^0+/, "");
+      return ra === alvo || alvo.startsWith(ra) || ra.startsWith(alvo);
+    }) ?? null
+  );
 }
 
 export function soDigitos(valor: string): string {
@@ -196,7 +198,11 @@ export function mesmoNome(a: string, b: string): boolean {
   const dois = simplificar(b);
   if (um.length === 0 || dois.length === 0) return false;
   if (um[0] !== dois[0]) return false;
-  return um.some((parte) => dois.includes(parte));
+  // o nome cadastrado na equipe costuma ser mais curto: todas as partes dele
+  // precisam aparecer no nome completo da lista da escola
+  const curto = um.length <= dois.length ? um : dois;
+  const longo = curto === um ? dois : um;
+  return curto.every((parte) => longo.includes(parte));
 }
 
 // ---------- avaliações ----------

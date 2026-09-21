@@ -13,6 +13,7 @@ import {
   Users,
   Wand2,
   Wrench,
+  ClipboardList,
   Joystick,
   Smartphone,
 } from "lucide-react";
@@ -116,6 +117,14 @@ const CARTOES = [
     descricao: "O código do robô",
     icone: Code2,
     cor: "bg-info text-info-foreground",
+  },
+  {
+    para: "/avaliar" as const,
+    area: "equipe" as Area,
+    titulo: "Avaliar a equipe",
+    descricao: "3º bimestre, um por vez",
+    icone: ClipboardList,
+    cor: "bg-alerta text-alerta-foreground",
   },
 ];
 
