@@ -14,6 +14,124 @@ export type Database = {
   }
   public: {
     Tables: {
+      alunos: {
+        Row: {
+          created_at: string
+          id: string
+          nascimento: string | null
+          nome: string
+          ra: string
+          turma: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          nascimento?: string | null
+          nome: string
+          ra: string
+          turma?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          nascimento?: string | null
+          nome?: string
+          ra?: string
+          turma?: string
+        }
+        Relationships: []
+      }
+      avaliacao_faltas: {
+        Row: {
+          bimestre: number
+          created_at: string
+          equipe_id: string
+          id: string
+          integrante_id: string
+          nome: string
+        }
+        Insert: {
+          bimestre?: number
+          created_at?: string
+          equipe_id: string
+          id?: string
+          integrante_id: string
+          nome?: string
+        }
+        Update: {
+          bimestre?: number
+          created_at?: string
+          equipe_id?: string
+          id?: string
+          integrante_id?: string
+          nome?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "avaliacao_faltas_equipe_id_fkey"
+            columns: ["equipe_id"]
+            isOneToOne: false
+            referencedRelation: "equipes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      avaliacoes: {
+        Row: {
+          avaliado_id: string
+          avaliado_nome: string
+          avaliador_id: string
+          avaliador_nome: string
+          avaliador_ra: string
+          bimestre: number
+          colaboracao: number
+          created_at: string
+          equipe_id: string
+          id: string
+          organizacao: number
+          participacao: number
+          turma: string
+        }
+        Insert: {
+          avaliado_id: string
+          avaliado_nome?: string
+          avaliador_id: string
+          avaliador_nome?: string
+          avaliador_ra?: string
+          bimestre?: number
+          colaboracao?: number
+          created_at?: string
+          equipe_id: string
+          id?: string
+          organizacao?: number
+          participacao?: number
+          turma?: string
+        }
+        Update: {
+          avaliado_id?: string
+          avaliado_nome?: string
+          avaliador_id?: string
+          avaliador_nome?: string
+          avaliador_ra?: string
+          bimestre?: number
+          colaboracao?: number
+          created_at?: string
+          equipe_id?: string
+          id?: string
+          organizacao?: number
+          participacao?: number
+          turma?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "avaliacoes_equipe_id_fkey"
+            columns: ["equipe_id"]
+            isOneToOne: false
+            referencedRelation: "equipes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       equipes: {
         Row: {
           ajustes: Json
