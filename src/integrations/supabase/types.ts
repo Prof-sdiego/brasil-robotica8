@@ -49,6 +49,7 @@ export type Database = {
           id: string
           integrante_id: string
           nome: string
+          rodada_id: string | null
         }
         Insert: {
           bimestre?: number
@@ -57,6 +58,7 @@ export type Database = {
           id?: string
           integrante_id: string
           nome?: string
+          rodada_id?: string | null
         }
         Update: {
           bimestre?: number
@@ -65,6 +67,7 @@ export type Database = {
           id?: string
           integrante_id?: string
           nome?: string
+          rodada_id?: string | null
         }
         Relationships: [
           {
@@ -74,7 +77,86 @@ export type Database = {
             referencedRelation: "equipes"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "avaliacao_faltas_rodada_id_fkey"
+            columns: ["rodada_id"]
+            isOneToOne: false
+            referencedRelation: "avaliacao_rodadas"
+            referencedColumns: ["id"]
+          },
         ]
+      }
+      avaliacao_liberacoes: {
+        Row: {
+          created_at: string
+          equipe_id: string
+          id: string
+          integrante_id: string
+          nome: string
+          rodada_id: string
+        }
+        Insert: {
+          created_at?: string
+          equipe_id: string
+          id?: string
+          integrante_id: string
+          nome?: string
+          rodada_id: string
+        }
+        Update: {
+          created_at?: string
+          equipe_id?: string
+          id?: string
+          integrante_id?: string
+          nome?: string
+          rodada_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "avaliacao_liberacoes_equipe_id_fkey"
+            columns: ["equipe_id"]
+            isOneToOne: false
+            referencedRelation: "equipes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "avaliacao_liberacoes_rodada_id_fkey"
+            columns: ["rodada_id"]
+            isOneToOne: false
+            referencedRelation: "avaliacao_rodadas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      avaliacao_rodadas: {
+        Row: {
+          aberta: boolean
+          bimestre: number
+          codigo: string
+          created_at: string
+          id: string
+          nome: string
+          tipo: string
+        }
+        Insert: {
+          aberta?: boolean
+          bimestre?: number
+          codigo?: string
+          created_at?: string
+          id?: string
+          nome: string
+          tipo?: string
+        }
+        Update: {
+          aberta?: boolean
+          bimestre?: number
+          codigo?: string
+          created_at?: string
+          id?: string
+          nome?: string
+          tipo?: string
+        }
+        Relationships: []
       }
       avaliacoes: {
         Row: {
@@ -90,6 +172,7 @@ export type Database = {
           id: string
           organizacao: number
           participacao: number
+          rodada_id: string | null
           turma: string
         }
         Insert: {
@@ -105,6 +188,7 @@ export type Database = {
           id?: string
           organizacao?: number
           participacao?: number
+          rodada_id?: string | null
           turma?: string
         }
         Update: {
@@ -120,6 +204,7 @@ export type Database = {
           id?: string
           organizacao?: number
           participacao?: number
+          rodada_id?: string | null
           turma?: string
         }
         Relationships: [
@@ -128,6 +213,13 @@ export type Database = {
             columns: ["equipe_id"]
             isOneToOne: false
             referencedRelation: "equipes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "avaliacoes_rodada_id_fkey"
+            columns: ["rodada_id"]
+            isOneToOne: false
+            referencedRelation: "avaliacao_rodadas"
             referencedColumns: ["id"]
           },
         ]

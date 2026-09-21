@@ -15,6 +15,13 @@
       "when": 1789997007233,
       "tag": "0001_avaliacao_entre_pares",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1789997782182,
+      "tag": "0002_avaliacao_rodadas",
+      "breakpoints": true
     }
   ]
 }
