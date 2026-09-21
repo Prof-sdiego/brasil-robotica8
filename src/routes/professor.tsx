@@ -1,6 +1,6 @@
 import { createFileRoute, Link, Outlet } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { GraduationCap, ListPlus, LayoutGrid, LogOut, Lock, Gamepad2 } from "lucide-react";
+import { ClipboardList, GraduationCap, ListPlus, LayoutGrid, LogOut, Lock, Gamepad2 } from "lucide-react";
 import { useState } from "react";
 
 import { conferirSenhaProfessor } from "@/lib/professor.functions";

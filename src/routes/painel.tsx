@@ -13,6 +13,7 @@ import {
   Users,
   Wand2,
   Wrench,
+  ClipboardList,
   Joystick,
   Smartphone,
 } from "lucide-react";
