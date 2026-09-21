@@ -39,7 +39,7 @@ export const Route = createFileRoute("/avaliar")({
       },
     ],
   }),
-  component: TelaAvaliar;
+  component: TelaAvaliar,
 });
 
 type Etapa =
