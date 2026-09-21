@@ -38,6 +38,7 @@ export type Aluno = {
 
 export type Avaliacao = {
   id: string;
+  rodadaId: string;
   equipeId: string;
   turma: string;
   avaliadorId: string;
