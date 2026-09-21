@@ -198,7 +198,11 @@ export function mesmoNome(a: string, b: string): boolean {
   const dois = simplificar(b);
   if (um.length === 0 || dois.length === 0) return false;
   if (um[0] !== dois[0]) return false;
-  return um.some((parte) => dois.includes(parte));
+  // o nome cadastrado na equipe costuma ser mais curto: todas as partes dele
+  // precisam aparecer no nome completo da lista da escola
+  const curto = um.length <= dois.length ? um : dois;
+  const longo = curto === um ? dois : um;
+  return curto.every((parte) => longo.includes(parte));
 }
 
 // ---------- avaliações ----------
