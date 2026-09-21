@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowLeft, CheckCircle2, ClipboardList, Lock, UserX } from "lucide-react";
-import { useMemo, useState } from "react";
+import { ArrowLeft, CheckCircle2, ClipboardList, KeyRound, Lock, UserX } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
 
 import { nomeComPapel } from "@/lib/acessos";
 import {
@@ -9,16 +9,21 @@ import {
   conferirNascimento,
   CRITERIOS,
   desmarcarFalta,
+  liberarEquipe,
   marcarFalta,
+  mesmoCodigo,
   mesmoNome,
   salvarAvaliacoes,
   sortearPergunta,
   useAlunos,
   useAvaliacoes,
   useFaltas,
+  useLiberacoes,
   useRecarregarAvaliacoes,
+  useRodadas,
   type NotaNova,
   type Pergunta,
+  type Rodada,
 } from "@/lib/avaliacao";
 import type { Integrante } from "@/lib/tipos";
 import { useAluno } from "@/lib/useAluno";
@@ -35,7 +40,7 @@ export const Route = createFileRoute("/avaliar")({
       { property: "og:title", content: "Avaliar a equipe — Oficina de Robótica" },
       {
         property: "og:description",
-        content: "Avaliação do 3º bimestre feita pela própria equipe, uma pessoa por vez.",
+        content: "Avaliação feita pela própria equipe, uma pessoa por vez.",
       },
     ],
   }),
@@ -50,25 +55,45 @@ type Etapa =
 function TelaAvaliar() {
   const { equipe, carregando } = useAluno({ area: "equipe" });
   const { data: alunos } = useAlunos();
+  const { data: rodadas } = useRodadas();
   const { data: avaliacoes } = useAvaliacoes(equipe?.id);
   const { data: faltas } = useFaltas(equipe?.id);
+  const { data: liberacoes } = useLiberacoes();
   const recarregar = useRecarregarAvaliacoes(equipe?.id);
+
+  const abertas = useMemo(() => (rodadas ?? []).filter((r) => r.aberta), [rodadas]);
+  const [rodadaId, setRodadaId] = useState("");
+  const rodada: Rodada | null = abertas.find((r) => r.id === rodadaId) ?? abertas[0] ?? null;
 
   const [etapa, setEtapa] = useState<Etapa>({ tipo: "fila" });
   const [ra, setRa] = useState("");
   const [resposta, setResposta] = useState("");
+  const [codigo, setCodigo] = useState("");
   const [erro, setErro] = useState("");
   const [notas, setNotas] = useState<Record<string, Record<string, number>>>({});
   const [gravando, setGravando] = useState(false);
   const [recado, setRecado] = useState("");
 
-  const jaAvaliaram = useMemo(
-    () => new Set((avaliacoes ?? []).map((a) => a.avaliadorId)),
-    [avaliacoes],
+  useEffect(() => {
+    setEtapa({ tipo: "fila" });
+    setNotas({});
+    setRecado("");
+  }, [rodada?.id]);
+
+  const daRodada = useMemo(
+    () => (avaliacoes ?? []).filter((a) => a.rodadaId === rodada?.id),
+    [avaliacoes, rodada?.id],
   );
+  const jaAvaliaram = useMemo(() => new Set(daRodada.map((a) => a.avaliadorId)), [daRodada]);
   const faltaram = useMemo(
-    () => new Set((faltas ?? []).map((f) => f.integranteId)),
-    [faltas],
+    () =>
+      new Set(
+        (faltas ?? []).filter((f) => f.rodadaId === rodada?.id).map((f) => f.integranteId),
+      ),
+    [faltas, rodada?.id],
+  );
+  const liberada = (liberacoes ?? []).some(
+    (l) => l.rodadaId === rodada?.id && l.equipeId === equipe?.id,
   );
 
   if (carregando || !equipe) {
@@ -76,21 +101,47 @@ function TelaAvaliar() {
   }
 
   const equipeAtual = equipe;
+
+  if (!rodada) {
+    return (
+      <main className="mx-auto max-w-xl px-4 py-8">
+        <Link to="/painel" className="flex items-center gap-1 font-bold text-primary">
+          <ArrowLeft className="size-4" /> Voltar ao painel
+        </Link>
+        <h1 className="mt-3 text-3xl">Avaliar a equipe</h1>
+        <p className="mt-4 rounded-2xl bg-muted px-4 py-5 text-lg font-bold text-muted-foreground">
+          Nenhuma avaliação está aberta agora. O professor abre quando for a hora.
+        </p>
+      </main>
+    );
+  }
+
+  const rodadaAtual = rodada;
+  const programador = equipe.integrantes.find((i) => i.papel === "Programador") ?? null;
   const pendentes = equipe.integrantes.filter(
     (i) => !jaAvaliaram.has(i.id) && !faltaram.has(i.id),
   );
-  const proxima = pendentes[0] ?? null;
+  const soOProgramador = !liberada;
+  const fila = soOProgramador
+    ? pendentes.filter((i) => i.papel === "Programador")
+    : pendentes;
+  const proxima = fila[0] ?? null;
 
   function comecar(pessoa: Integrante) {
     setRa("");
     setResposta("");
+    setCodigo("");
     setErro("");
     setEtapa({ tipo: "confirmar", pessoa, pergunta: sortearPergunta() });
   }
 
-  function confirmar(evento: React.FormEvent) {
+  async function confirmar(evento: React.FormEvent) {
     evento.preventDefault();
     if (etapa.tipo !== "confirmar") return;
+    if (!liberada && !mesmoCodigo(codigo, rodadaAtual.codigo)) {
+      setErro("Esse código não é o desta avaliação. Peça ao professor.");
+      return;
+    }
     const aluno = acharAlunoPorRa(alunos ?? [], ra);
     if (!aluno) {
       setErro("Não achei esse RA na lista da escola. Confira os números.");
@@ -103,6 +154,15 @@ function TelaAvaliar() {
     if (!conferirNascimento(aluno, etapa.pergunta, resposta)) {
       setErro("A data de nascimento não bate. Tente de novo.");
       return;
+    }
+    if (!liberada) {
+      await liberarEquipe({
+        rodadaId: rodadaAtual.id,
+        equipeId: equipeAtual.id,
+        integranteId: etapa.pessoa.id,
+        nome: etapa.pessoa.nome,
+      });
+      recarregar();
     }
     setErro("");
     setNotas({});
@@ -139,6 +199,8 @@ function TelaAvaliar() {
         colaboracao: nota(alvo.id, "colaboracao") ?? 0,
       }));
       await salvarAvaliacoes({
+        rodadaId: rodadaAtual.id,
+        bimestre: rodadaAtual.bimestre,
         equipeId: equipeAtual.id,
         turma: equipeAtual.turma,
         avaliadorId: etapa.pessoa.id,
@@ -158,13 +220,13 @@ function TelaAvaliar() {
   }
 
   async function faltou(pessoa: Integrante) {
-    await marcarFalta(equipeAtual.id, pessoa.id, pessoa.nome);
+    await marcarFalta(rodadaAtual.id, rodadaAtual.bimestre, equipeAtual.id, pessoa.id, pessoa.nome);
     recarregar();
     setRecado(`${pessoa.nome} ficou marcado como faltou. Dá para desfazer aqui embaixo.`);
   }
 
   async function reabrir(pessoa: Integrante) {
-    await apagarAvaliacoesDoAvaliador(equipeAtual.id, pessoa.id);
+    await apagarAvaliacoesDoAvaliador(rodadaAtual.id, equipeAtual.id, pessoa.id);
     recarregar();
     setNotas({});
     setRecado(`As notas de ${pessoa.nome} foram apagadas. Ele precisa avaliar tudo de novo.`);
@@ -250,6 +312,23 @@ function TelaAvaliar() {
           <p className="font-semibold text-muted-foreground">
             Confirme com o seu RA e responda a pergunta. Isso evita alguém avaliar no seu lugar.
           </p>
+          {!liberada && (
+            <>
+              <label className="flex items-center gap-2 font-bold" htmlFor="codigo">
+                <KeyRound className="size-5 text-primary" /> Código desta avaliação
+              </label>
+              <p className="text-sm font-semibold text-muted-foreground">
+                O professor dita o código. Ele é pedido só uma vez por equipe, para o programador.
+              </p>
+              <input
+                id="codigo"
+                value={codigo}
+                onChange={(e) => setCodigo(e.target.value)}
+                autoComplete="off"
+                className="w-full rounded-xl border-2 border-input bg-background px-4 py-4 text-center text-2xl font-extrabold uppercase tracking-widest outline-none focus:border-ring"
+              />
+            </>
+          )}
           <label className="block font-bold" htmlFor="ra">
             Seu RA
           </label>
@@ -278,7 +357,7 @@ function TelaAvaliar() {
           )}
           <button
             type="submit"
-            disabled={!ra.trim() || !resposta.trim()}
+            disabled={!ra.trim() || !resposta.trim() || (!liberada && !codigo.trim())}
             className="w-full rounded-2xl bg-primary px-4 py-5 text-xl font-extrabold text-primary-foreground shadow-cartao disabled:opacity-50"
           >
             Sou eu, começar
@@ -304,11 +383,45 @@ function TelaAvaliar() {
         <ClipboardList className="size-8 text-primary" /> Avaliar a equipe
       </h1>
       <p className="mt-2 font-semibold text-muted-foreground">
-        Avaliação do 3º bimestre. Passem o celular de mão em mão: o site chama uma pessoa por vez.
+        Passem o celular de mão em mão: o site chama uma pessoa por vez.
+      </p>
+
+      {abertas.length > 1 && (
+        <label className="mt-4 block font-bold">
+          Qual avaliação?
+          <select
+            value={rodadaAtual.id}
+            onChange={(e) => setRodadaId(e.target.value)}
+            className="mt-2 w-full rounded-xl border-2 border-input bg-card px-4 py-4 text-lg font-bold"
+          >
+            {abertas.map((r) => (
+              <option key={r.id} value={r.id}>
+                {r.nome}
+              </option>
+            ))}
+          </select>
+        </label>
+      )}
+
+      <p className="mt-4 rounded-2xl bg-info px-4 py-4 font-extrabold text-info-foreground">
+        {rodadaAtual.nome}
+        <span className="block text-sm font-bold">
+          {rodadaAtual.tipo === "checkpoint" ? "Checkpoint" : "Avaliação do bimestre"} ·{" "}
+          {rodadaAtual.bimestre}º bimestre
+        </span>
       </p>
 
       {recado && (
         <p className="mt-4 rounded-2xl bg-info px-4 py-4 font-bold text-info-foreground">{recado}</p>
+      )}
+
+      {soOProgramador && (
+        <p className="mt-4 flex items-start gap-2 rounded-2xl bg-alerta px-4 py-4 font-bold text-alerta-foreground">
+          <KeyRound className="mt-1 size-5 shrink-0" />
+          {programador
+            ? `${programador.nome} começa: o programador digita o código desta avaliação uma vez e libera a equipe.`
+            : "A equipe ainda não tem programador cadastrado. Ele precisa começar."}
+        </p>
       )}
 
       {proxima ? (
@@ -333,7 +446,7 @@ function TelaAvaliar() {
             </button>
           </div>
         </section>
-      ) : (
+      ) : soOProgramador ? null : (
         <p className="mt-5 flex items-center gap-2 rounded-2xl bg-sucesso px-4 py-5 text-lg font-extrabold text-sucesso-foreground">
           <CheckCircle2 className="size-6" /> Todo mundo da equipe já passou por aqui.
         </p>
@@ -375,7 +488,7 @@ function TelaAvaliar() {
               {faltouAgora && (
                 <button
                   onClick={async () => {
-                    await desmarcarFalta(equipe.id, pessoa.id);
+                    await desmarcarFalta(rodadaAtual.id, equipe.id, pessoa.id);
                     recarregar();
                   }}
                   className="rounded-xl bg-muted px-3 py-2 text-sm font-bold text-muted-foreground"
