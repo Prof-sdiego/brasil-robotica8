@@ -75,6 +75,7 @@ function TelaAvaliar() {
     return <p className="p-8 text-center text-lg font-bold">Carregando...</p>;
   }
 
+  const equipeAtual = equipe;
   const pendentes = equipe.integrantes.filter(
     (i) => !jaAvaliaram.has(i.id) && !faltaram.has(i.id),
   );
