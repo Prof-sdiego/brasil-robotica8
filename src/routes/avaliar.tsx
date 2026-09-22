@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowLeft, CheckCircle2, ClipboardList, KeyRound, Lock, UserX } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import { nomeComPapel } from "@/lib/acessos";
 import {
@@ -73,10 +73,18 @@ function TelaAvaliar() {
   const [notas, setNotas] = useState<Record<string, Record<string, number>>>({});
   const [gravando, setGravando] = useState(false);
   const [recado, setRecado] = useState("");
+  const [travadas, setTravadas] = useState<Record<string, boolean>>({});
+  const temporizadores = useRef(new Map<string, number>());
+
+  useEffect(() => {
+    const todos = temporizadores.current;
+    return () => todos.forEach((t) => window.clearTimeout(t));
+  }, []);
 
   useEffect(() => {
     setEtapa({ tipo: "fila" });
     setNotas({});
+    setTravadas({});
     setRecado("");
   }, [rodada?.id]);
 
@@ -166,6 +174,7 @@ function TelaAvaliar() {
     }
     setErro("");
     setNotas({});
+    setTravadas({});
     setEtapa({ tipo: "notas", pessoa: etapa.pessoa, ra: aluno.ra });
   }
 
@@ -175,10 +184,19 @@ function TelaAvaliar() {
   }
 
   function mudarNota(avaliadoId: string, criterio: string, valor: number) {
+    const chave = `${avaliadoId}:${criterio}`;
+    if (travadas[chave]) return;
     setNotas((atual) => ({
       ...atual,
       [avaliadoId]: { ...(atual[avaliadoId] ?? {}), [criterio]: valor },
     }));
+    const anterior = temporizadores.current.get(chave);
+    if (anterior) window.clearTimeout(anterior);
+    const id = window.setTimeout(() => {
+      setTravadas((atual) => ({ ...atual, [chave]: true }));
+      temporizadores.current.delete(chave);
+    }, 1000);
+    temporizadores.current.set(chave, id);
   }
 
   const completo =
@@ -211,6 +229,7 @@ function TelaAvaliar() {
       recarregar();
       setRecado(`Notas de ${etapa.pessoa.nome} guardadas. Ninguém mais consegue vê-las.`);
       setNotas({});
+      setTravadas({});
       setEtapa({ tipo: "fila" });
     } catch {
       setErro("Não deu para guardar agora. Tente de novo.");
@@ -229,6 +248,7 @@ function TelaAvaliar() {
     await apagarAvaliacoesDoAvaliador(rodadaAtual.id, equipeAtual.id, pessoa.id);
     recarregar();
     setNotas({});
+    setTravadas({});
     setRecado(`As notas de ${pessoa.nome} foram apagadas. Ele precisa avaliar tudo de novo.`);
   }
 
@@ -248,31 +268,44 @@ function TelaAvaliar() {
               {alvo.id === pessoa.id ? `${alvo.nome} (você)` : alvo.nome}
             </h2>
             <p className="text-sm font-bold text-muted-foreground">{nomeComPapel(alvo)}</p>
-            {CRITERIOS.map((criterio) => (
-              <div key={criterio.id} className="mt-4">
-                <p className="font-bold">{criterio.nome}</p>
-                <p className="text-sm font-semibold text-muted-foreground">{criterio.ajuda}</p>
-                <div className="mt-2 flex flex-wrap gap-2">
-                  {Array.from({ length: 11 }, (_, valor) => {
-                    const escolhida = nota(alvo.id, criterio.id) === valor;
-                    return (
-                      <button
-                        key={valor}
-                        type="button"
-                        onClick={() => mudarNota(alvo.id, criterio.id, valor)}
-                        className={`size-11 rounded-xl text-lg font-extrabold ${
-                          escolhida
-                            ? "bg-primary text-primary-foreground"
-                            : "bg-muted text-muted-foreground"
-                        }`}
-                      >
-                        {valor}
-                      </button>
-                    );
-                  })}
+            {CRITERIOS.map((criterio) => {
+              const travada = travadas[`${alvo.id}:${criterio.id}`];
+              return travada ? (
+                <div
+                  key={criterio.id}
+                  className="mt-4 flex items-center justify-between rounded-xl bg-muted/50 px-3 py-3"
+                >
+                  <p className="font-bold text-muted-foreground">{criterio.nome}</p>
+                  <p className="flex items-center gap-1 font-extrabold text-muted-foreground">
+                    <CheckCircle2 className="size-4" /> nota registrada
+                  </p>
                 </div>
-              </div>
-            ))}
+              ) : (
+                <div key={criterio.id} className="mt-4">
+                  <p className="font-bold">{criterio.nome}</p>
+                  <p className="text-sm font-semibold text-muted-foreground">{criterio.ajuda}</p>
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    {Array.from({ length: 11 }, (_, valor) => {
+                      const escolhida = nota(alvo.id, criterio.id) === valor;
+                      return (
+                        <button
+                          key={valor}
+                          type="button"
+                          onClick={() => mudarNota(alvo.id, criterio.id, valor)}
+                          className={`size-11 rounded-xl text-lg font-extrabold ${
+                            escolhida
+                              ? "bg-primary text-primary-foreground"
+                              : "bg-muted text-muted-foreground"
+                          }`}
+                        >
+                          {valor}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              );
+            })}
           </section>
         ))}
 
