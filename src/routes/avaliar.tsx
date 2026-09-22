@@ -84,6 +84,7 @@ function TelaAvaliar() {
   useEffect(() => {
     setEtapa({ tipo: "fila" });
     setNotas({});
+    setTravadas({});
     setRecado("");
   }, [rodada?.id]);
 
@@ -182,10 +183,19 @@ function TelaAvaliar() {
   }
 
   function mudarNota(avaliadoId: string, criterio: string, valor: number) {
+    const chave = `${avaliadoId}:${criterio}`;
+    if (travadas[chave]) return;
     setNotas((atual) => ({
       ...atual,
       [avaliadoId]: { ...(atual[avaliadoId] ?? {}), [criterio]: valor },
     }));
+    const anterior = temporizadores.current.get(chave);
+    if (anterior) window.clearTimeout(anterior);
+    const id = window.setTimeout(() => {
+      setTravadas((atual) => ({ ...atual, [chave]: true }));
+      temporizadores.current.delete(chave);
+    }, 1000);
+    temporizadores.current.set(chave, id);
   }
 
   const completo =
