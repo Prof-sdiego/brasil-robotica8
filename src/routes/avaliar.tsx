@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowLeft, CheckCircle2, ClipboardList, KeyRound, Lock, UserX } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import { nomeComPapel } from "@/lib/acessos";
 import {
@@ -73,6 +73,13 @@ function TelaAvaliar() {
   const [notas, setNotas] = useState<Record<string, Record<string, number>>>({});
   const [gravando, setGravando] = useState(false);
   const [recado, setRecado] = useState("");
+  const [travadas, setTravadas] = useState<Record<string, boolean>>({});
+  const temporizadores = useRef(new Map<string, number>());
+
+  useEffect(() => {
+    const todos = temporizadores.current;
+    return () => todos.forEach((t) => window.clearTimeout(t));
+  }, []);
 
   useEffect(() => {
     setEtapa({ tipo: "fila" });
