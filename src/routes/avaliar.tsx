@@ -268,31 +268,44 @@ function TelaAvaliar() {
               {alvo.id === pessoa.id ? `${alvo.nome} (você)` : alvo.nome}
             </h2>
             <p className="text-sm font-bold text-muted-foreground">{nomeComPapel(alvo)}</p>
-            {CRITERIOS.map((criterio) => (
-              <div key={criterio.id} className="mt-4">
-                <p className="font-bold">{criterio.nome}</p>
-                <p className="text-sm font-semibold text-muted-foreground">{criterio.ajuda}</p>
-                <div className="mt-2 flex flex-wrap gap-2">
-                  {Array.from({ length: 11 }, (_, valor) => {
-                    const escolhida = nota(alvo.id, criterio.id) === valor;
-                    return (
-                      <button
-                        key={valor}
-                        type="button"
-                        onClick={() => mudarNota(alvo.id, criterio.id, valor)}
-                        className={`size-11 rounded-xl text-lg font-extrabold ${
-                          escolhida
-                            ? "bg-primary text-primary-foreground"
-                            : "bg-muted text-muted-foreground"
-                        }`}
-                      >
-                        {valor}
-                      </button>
-                    );
-                  })}
+            {CRITERIOS.map((criterio) => {
+              const travada = travadas[`${alvo.id}:${criterio.id}`];
+              return travada ? (
+                <div
+                  key={criterio.id}
+                  className="mt-4 flex items-center justify-between rounded-xl bg-muted/50 px-3 py-3"
+                >
+                  <p className="font-bold text-muted-foreground">{criterio.nome}</p>
+                  <p className="flex items-center gap-1 font-extrabold text-muted-foreground">
+                    <CheckCircle2 className="size-4" /> nota registrada
+                  </p>
                 </div>
-              </div>
-            ))}
+              ) : (
+                <div key={criterio.id} className="mt-4">
+                  <p className="font-bold">{criterio.nome}</p>
+                  <p className="text-sm font-semibold text-muted-foreground">{criterio.ajuda}</p>
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    {Array.from({ length: 11 }, (_, valor) => {
+                      const escolhida = nota(alvo.id, criterio.id) === valor;
+                      return (
+                        <button
+                          key={valor}
+                          type="button"
+                          onClick={() => mudarNota(alvo.id, criterio.id, valor)}
+                          className={`size-11 rounded-xl text-lg font-extrabold ${
+                            escolhida
+                              ? "bg-primary text-primary-foreground"
+                              : "bg-muted text-muted-foreground"
+                          }`}
+                        >
+                          {valor}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              );
+            })}
           </section>
         ))}
 
