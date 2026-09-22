@@ -174,6 +174,7 @@ function TelaAvaliar() {
     }
     setErro("");
     setNotas({});
+    setTravadas({});
     setEtapa({ tipo: "notas", pessoa: etapa.pessoa, ra: aluno.ra });
   }
 
@@ -228,6 +229,7 @@ function TelaAvaliar() {
       recarregar();
       setRecado(`Notas de ${etapa.pessoa.nome} guardadas. Ninguém mais consegue vê-las.`);
       setNotas({});
+      setTravadas({});
       setEtapa({ tipo: "fila" });
     } catch {
       setErro("Não deu para guardar agora. Tente de novo.");
@@ -246,6 +248,7 @@ function TelaAvaliar() {
     await apagarAvaliacoesDoAvaliador(rodadaAtual.id, equipeAtual.id, pessoa.id);
     recarregar();
     setNotas({});
+    setTravadas({});
     setRecado(`As notas de ${pessoa.nome} foram apagadas. Ele precisa avaliar tudo de novo.`);
   }
 
