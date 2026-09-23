@@ -74,6 +74,7 @@ function TelaAvaliar() {
   const [gravando, setGravando] = useState(false);
   const [recado, setRecado] = useState("");
   const [travadas, setTravadas] = useState<Record<string, boolean>>({});
+  const [incapaz, setIncapaz] = useState<Record<string, boolean>>({});
   const temporizadores = useRef(new Map<string, number>());
 
   useEffect(() => {
@@ -85,6 +86,7 @@ function TelaAvaliar() {
     setEtapa({ tipo: "fila" });
     setNotas({});
     setTravadas({});
+    setIncapaz({});
     setRecado("");
   }, [rodada?.id]);
 
@@ -175,6 +177,7 @@ function TelaAvaliar() {
     setErro("");
     setNotas({});
     setTravadas({});
+    setIncapaz({});
     setEtapa({ tipo: "notas", pessoa: etapa.pessoa, ra: aluno.ra });
   }
 
@@ -202,7 +205,7 @@ function TelaAvaliar() {
   const completo =
     etapa.tipo === "notas" &&
     equipe.integrantes.every((alvo) =>
-      CRITERIOS.every((c) => nota(alvo.id, c.id) !== null),
+      incapaz[alvo.id] || CRITERIOS.every((c) => nota(alvo.id, c.id) !== null),
     );
 
   async function gravar() {
@@ -212,9 +215,9 @@ function TelaAvaliar() {
       const linhas: NotaNova[] = equipeAtual.integrantes.map((alvo) => ({
         avaliadoId: alvo.id,
         avaliadoNome: alvo.nome,
-        participacao: nota(alvo.id, "participacao") ?? 0,
-        organizacao: nota(alvo.id, "organizacao") ?? 0,
-        colaboracao: nota(alvo.id, "colaboracao") ?? 0,
+        participacao: incapaz[alvo.id] ? null : (nota(alvo.id, "participacao") ?? 0),
+        organizacao: incapaz[alvo.id] ? null : (nota(alvo.id, "organizacao") ?? 0),
+        colaboracao: incapaz[alvo.id] ? null : (nota(alvo.id, "colaboracao") ?? 0),
       }));
       await salvarAvaliacoes({
         rodadaId: rodadaAtual.id,
@@ -230,6 +233,7 @@ function TelaAvaliar() {
       setRecado(`Notas de ${etapa.pessoa.nome} guardadas. Ninguém mais consegue vê-las.`);
       setNotas({});
       setTravadas({});
+      setIncapaz({});
       setEtapa({ tipo: "fila" });
     } catch {
       setErro("Não deu para guardar agora. Tente de novo.");
