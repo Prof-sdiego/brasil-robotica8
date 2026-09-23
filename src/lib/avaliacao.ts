@@ -46,15 +46,22 @@ export type Avaliacao = {
   avaliadorRa: string;
   avaliadoId: string;
   avaliadoNome: string;
-  participacao: number;
-  organizacao: number;
-  colaboracao: number;
+  participacao: number | null;
+  organizacao: number | null;
+  colaboracao: number | null;
 };
 
 export type Falta = { integranteId: string; nome: string };
 
-export function media(av: Pick<Avaliacao, "participacao" | "organizacao" | "colaboracao">): number {
-  return (av.participacao + av.organizacao + av.colaboracao) / 3;
+/** Média dos critérios preenchidos. Se a pessoa não foi avaliada, devolve null. */
+export function media(
+  av: Pick<Avaliacao, "participacao" | "organizacao" | "colaboracao">,
+): number | null {
+  const notas = [av.participacao, av.organizacao, av.colaboracao].filter(
+    (n): n is number => typeof n === "number",
+  );
+  if (notas.length === 0) return null;
+  return notas.reduce((total, valor) => total + valor, 0) / notas.length;
 }
 
 // ---------- lista de alunos (RA, nome, nascimento) ----------
@@ -430,9 +437,9 @@ export function useFaltas(equipeId?: string) {
 export type NotaNova = {
   avaliadoId: string;
   avaliadoNome: string;
-  participacao: number;
-  organizacao: number;
-  colaboracao: number;
+  participacao: number | null;
+  organizacao: number | null;
+  colaboracao: number | null;
 };
 
 export async function salvarAvaliacoes(dados: {
@@ -517,12 +524,16 @@ export function useRecarregarAvaliacoes(equipeId?: string) {
   };
 }
 
-/** Média recebida por pessoa (quanto os colegas deram a ela). */
-export function mediasRecebidas(avaliacoes: Avaliacao[]): Map<string, { media: number; quantas: number }> {
+/** Média recebida por pessoa (quanto os colegas deram a ela). Quem não foi avaliado fica de fora. */
+export function mediasRecebidas(
+  avaliacoes: Avaliacao[],
+): Map<string, { media: number; quantas: number }> {
   const soma = new Map<string, { total: number; quantas: number }>();
   for (const av of avaliacoes) {
+    const valor = media(av);
+    if (valor === null) continue;
     const atual = soma.get(av.avaliadoId) ?? { total: 0, quantas: 0 };
-    soma.set(av.avaliadoId, { total: atual.total + media(av), quantas: atual.quantas + 1 });
+    soma.set(av.avaliadoId, { total: atual.total + valor, quantas: atual.quantas + 1 });
   }
   const saida = new Map<string, { media: number; quantas: number }>();
   for (const [id, { total, quantas }] of soma) {
@@ -542,11 +553,12 @@ export function mediaEntreCheckpoints(
 ): { media: number | null; quantasRodadas: number } {
   const medias: number[] = [];
   for (const rodada of rodadasCheckpoint) {
-    const recebidas = avaliacoes.filter(
-      (a) => a.rodadaId === rodada.id && a.avaliadoId === avaliadoId,
-    );
+    const recebidas = avaliacoes
+      .filter((a) => a.rodadaId === rodada.id && a.avaliadoId === avaliadoId)
+      .map(media)
+      .filter((m): m is number => m !== null);
     if (recebidas.length === 0) continue;
-    medias.push(recebidas.reduce((total, a) => total + media(a), 0) / recebidas.length);
+    medias.push(recebidas.reduce((total, valor) => total + valor, 0) / recebidas.length);
   }
   if (medias.length === 0) return { media: null, quantasRodadas: 0 };
   return {
@@ -577,6 +589,8 @@ export function csvDasAvaliacoes(
   ];
   const linhas = avaliacoes.map((a) => {
     const rodada = rodadas.find((r) => r.id === a.rodadaId);
+    const valor = media(a);
+    const nota = (n: number | null) => (n === null ? "" : String(n));
     return [
       rodada?.nome ?? "",
       rodada?.tipo ?? "",
@@ -586,10 +600,10 @@ export function csvDasAvaliacoes(
       a.avaliadorNome,
       a.avaliadorRa,
       a.avaliadoNome,
-      String(a.participacao),
-      String(a.organizacao),
-      String(a.colaboracao),
-      media(a).toFixed(2),
+      nota(a.participacao),
+      nota(a.organizacao),
+      nota(a.colaboracao),
+      valor === null ? "" : valor.toFixed(2),
     ];
   });
   return [cabecalho, ...linhas]
