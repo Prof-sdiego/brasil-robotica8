@@ -272,17 +272,35 @@ function TelaAvaliar() {
               {alvo.id === pessoa.id ? `${alvo.nome} (você)` : alvo.nome}
             </h2>
             <p className="text-sm font-bold text-muted-foreground">{nomeComPapel(alvo)}</p>
+            <button
+              type="button"
+              onClick={() =>
+                setIncapaz((atual) => ({ ...atual, [alvo.id]: !atual[alvo.id] }))
+              }
+              className={`mt-3 w-full rounded-xl px-4 py-3 text-sm font-extrabold ${
+                incapaz[alvo.id]
+                  ? "bg-alerta text-alerta-foreground"
+                  : "bg-muted text-muted-foreground"
+              }`}
+            >
+              {incapaz[alvo.id]
+                ? "Não vou avaliar esta pessoa (toque para desfazer)"
+                : "Não sou capaz de avaliar"}
+            </button>
             {CRITERIOS.map((criterio) => {
-              const travada = travadas[`${alvo.id}:${criterio.id}`];
+              const travada =
+                travadas[`${alvo.id}:${criterio.id}`] || incapaz[alvo.id] === true;
               return travada ? (
-                <div
-                  key={criterio.id}
-                  className="mt-4 flex items-center justify-between rounded-xl bg-muted/50 px-3 py-3"
-                >
-                  <p className="font-bold text-muted-foreground">{criterio.nome}</p>
-                  <p className="flex items-center gap-1 font-extrabold text-muted-foreground">
-                    <CheckCircle2 className="size-4" /> nota registrada
-                  </p>
+                <div key={criterio.id} className="mt-4">
+                  <p className="font-bold">{criterio.nome}</p>
+                  <p className="text-sm font-semibold text-muted-foreground">{criterio.ajuda}</p>
+                  <div className="mt-2 flex h-11 items-center justify-between rounded-xl bg-muted/50 px-3">
+                    <p className="font-bold text-muted-foreground">{criterio.nome}</p>
+                    <p className="flex items-center gap-1 font-extrabold text-muted-foreground">
+                      <CheckCircle2 className="size-4" />{" "}
+                      {incapaz[alvo.id] ? "não avaliado" : "nota registrada"}
+                    </p>
+                  </div>
                 </div>
               ) : (
                 <div key={criterio.id} className="mt-4">
