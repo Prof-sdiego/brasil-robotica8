@@ -74,6 +74,7 @@ function TelaAvaliar() {
   const [gravando, setGravando] = useState(false);
   const [recado, setRecado] = useState("");
   const [travadas, setTravadas] = useState<Record<string, boolean>>({});
+  const [incapaz, setIncapaz] = useState<Record<string, boolean>>({});
   const temporizadores = useRef(new Map<string, number>());
 
   useEffect(() => {
@@ -85,6 +86,7 @@ function TelaAvaliar() {
     setEtapa({ tipo: "fila" });
     setNotas({});
     setTravadas({});
+    setIncapaz({});
     setRecado("");
   }, [rodada?.id]);
 
@@ -175,6 +177,7 @@ function TelaAvaliar() {
     setErro("");
     setNotas({});
     setTravadas({});
+    setIncapaz({});
     setEtapa({ tipo: "notas", pessoa: etapa.pessoa, ra: aluno.ra });
   }
 
@@ -202,7 +205,7 @@ function TelaAvaliar() {
   const completo =
     etapa.tipo === "notas" &&
     equipe.integrantes.every((alvo) =>
-      CRITERIOS.every((c) => nota(alvo.id, c.id) !== null),
+      incapaz[alvo.id] || CRITERIOS.every((c) => nota(alvo.id, c.id) !== null),
     );
 
   async function gravar() {
@@ -212,9 +215,9 @@ function TelaAvaliar() {
       const linhas: NotaNova[] = equipeAtual.integrantes.map((alvo) => ({
         avaliadoId: alvo.id,
         avaliadoNome: alvo.nome,
-        participacao: nota(alvo.id, "participacao") ?? 0,
-        organizacao: nota(alvo.id, "organizacao") ?? 0,
-        colaboracao: nota(alvo.id, "colaboracao") ?? 0,
+        participacao: incapaz[alvo.id] ? null : (nota(alvo.id, "participacao") ?? 0),
+        organizacao: incapaz[alvo.id] ? null : (nota(alvo.id, "organizacao") ?? 0),
+        colaboracao: incapaz[alvo.id] ? null : (nota(alvo.id, "colaboracao") ?? 0),
       }));
       await salvarAvaliacoes({
         rodadaId: rodadaAtual.id,
@@ -230,6 +233,7 @@ function TelaAvaliar() {
       setRecado(`Notas de ${etapa.pessoa.nome} guardadas. Ninguém mais consegue vê-las.`);
       setNotas({});
       setTravadas({});
+      setIncapaz({});
       setEtapa({ tipo: "fila" });
     } catch {
       setErro("Não deu para guardar agora. Tente de novo.");
@@ -268,17 +272,35 @@ function TelaAvaliar() {
               {alvo.id === pessoa.id ? `${alvo.nome} (você)` : alvo.nome}
             </h2>
             <p className="text-sm font-bold text-muted-foreground">{nomeComPapel(alvo)}</p>
+            <button
+              type="button"
+              onClick={() =>
+                setIncapaz((atual) => ({ ...atual, [alvo.id]: !atual[alvo.id] }))
+              }
+              className={`mt-3 w-full rounded-xl px-4 py-3 text-sm font-extrabold ${
+                incapaz[alvo.id]
+                  ? "bg-alerta text-alerta-foreground"
+                  : "bg-muted text-muted-foreground"
+              }`}
+            >
+              {incapaz[alvo.id]
+                ? "Não vou avaliar esta pessoa (toque para desfazer)"
+                : "Não sou capaz de avaliar"}
+            </button>
             {CRITERIOS.map((criterio) => {
-              const travada = travadas[`${alvo.id}:${criterio.id}`];
+              const travada =
+                travadas[`${alvo.id}:${criterio.id}`] || incapaz[alvo.id] === true;
               return travada ? (
-                <div
-                  key={criterio.id}
-                  className="mt-4 flex items-center justify-between rounded-xl bg-muted/50 px-3 py-3"
-                >
-                  <p className="font-bold text-muted-foreground">{criterio.nome}</p>
-                  <p className="flex items-center gap-1 font-extrabold text-muted-foreground">
-                    <CheckCircle2 className="size-4" /> nota registrada
-                  </p>
+                <div key={criterio.id} className="mt-4">
+                  <p className="font-bold">{criterio.nome}</p>
+                  <p className="text-sm font-semibold text-muted-foreground">{criterio.ajuda}</p>
+                  <div className="mt-2 flex h-11 items-center justify-between rounded-xl bg-muted/50 px-3">
+                    <p className="font-bold text-muted-foreground">{criterio.nome}</p>
+                    <p className="flex items-center gap-1 font-extrabold text-muted-foreground">
+                      <CheckCircle2 className="size-4" />{" "}
+                      {incapaz[alvo.id] ? "não avaliado" : "nota registrada"}
+                    </p>
+                  </div>
                 </div>
               ) : (
                 <div key={criterio.id} className="mt-4">

@@ -166,12 +166,12 @@ export type Database = {
           avaliador_nome: string
           avaliador_ra: string
           bimestre: number
-          colaboracao: number
+          colaboracao: number | null
           created_at: string
           equipe_id: string
           id: string
-          organizacao: number
-          participacao: number
+          organizacao: number | null
+          participacao: number | null
           rodada_id: string | null
           turma: string
         }
@@ -182,12 +182,12 @@ export type Database = {
           avaliador_nome?: string
           avaliador_ra?: string
           bimestre?: number
-          colaboracao?: number
+          colaboracao?: number | null
           created_at?: string
           equipe_id: string
           id?: string
-          organizacao?: number
-          participacao?: number
+          organizacao?: number | null
+          participacao?: number | null
           rodada_id?: string | null
           turma?: string
         }
@@ -198,12 +198,12 @@ export type Database = {
           avaliador_nome?: string
           avaliador_ra?: string
           bimestre?: number
-          colaboracao?: number
+          colaboracao?: number | null
           created_at?: string
           equipe_id?: string
           id?: string
-          organizacao?: number
-          participacao?: number
+          organizacao?: number | null
+          participacao?: number | null
           rodada_id?: string | null
           turma?: string
         }
