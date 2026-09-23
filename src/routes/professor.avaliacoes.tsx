@@ -366,10 +366,20 @@ function Avaliacoes() {
                   <tbody>
                     {equipe.integrantes.map((pessoa) => {
                       const recebidas = daEquipe.filter((a) => a.avaliadoId === pessoa.id);
-                      const n = recebidas.length;
-                      const soma = (campo: "participacao" | "organizacao" | "colaboracao") =>
-                        recebidas.reduce((total, a) => total + a[campo], 0);
                       const entre = mediaEntreCheckpoints(todas, pessoa.id, checkpoints);
+                      const soma = (campo: "participacao" | "organizacao" | "colaboracao") =>
+                        recebidas.reduce((total, a) => total + (a[campo] ?? 0), 0);
+                      const quantas = (campo: "participacao" | "organizacao" | "colaboracao") =>
+                        recebidas.filter((a) => typeof a[campo] === "number").length;
+                      const medias = recebidas
+                        .map(media)
+                        .filter((m): m is number => m !== null);
+                      const coluna = (
+                        campo: "participacao" | "organizacao" | "colaboracao",
+                      ): string => {
+                        const n = quantas(campo);
+                        return n === 0 ? "—" : umaCasa(soma(campo) / n);
+                      };
                       return (
                         <tr key={pessoa.id} className="border-t border-border">
                           <td className="py-2 font-bold">
@@ -385,18 +395,22 @@ function Avaliacoes() {
                                 ? "faltou"
                                 : "não"}
                           </td>
-                          {n === 0 ? (
+                          {recebidas.length === 0 ? (
                             <td colSpan={4} className="py-2 font-bold text-muted-foreground">
                               sem notas ainda
                             </td>
+                          ) : medias.length === 0 ? (
+                            <td colSpan={4} className="py-2 font-bold text-muted-foreground">
+                              ninguém se sentiu capaz de avaliar
+                            </td>
                           ) : (
                             <>
-                              <td className="py-2 font-bold">{umaCasa(soma("participacao") / n)}</td>
-                              <td className="py-2 font-bold">{umaCasa(soma("organizacao") / n)}</td>
-                              <td className="py-2 font-bold">{umaCasa(soma("colaboracao") / n)}</td>
+                              <td className="py-2 font-bold">{coluna("participacao")}</td>
+                              <td className="py-2 font-bold">{coluna("organizacao")}</td>
+                              <td className="py-2 font-bold">{coluna("colaboracao")}</td>
                               <td className="py-2 font-extrabold text-primary">
                                 {umaCasa(
-                                  recebidas.reduce((total, a) => total + media(a), 0) / n,
+                                  medias.reduce((total, valor) => total + valor, 0) / medias.length,
                                 )}
                               </td>
                             </>
