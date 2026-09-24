@@ -248,14 +248,6 @@ function TelaAvaliar() {
     setRecado(`${pessoa.nome} ficou marcado como faltou. Dá para desfazer aqui embaixo.`);
   }
 
-  async function reabrir(pessoa: Integrante) {
-    await apagarAvaliacoesDoAvaliador(rodadaAtual.id, equipeAtual.id, pessoa.id);
-    recarregar();
-    setNotas({});
-    setTravadas({});
-    setRecado(`As notas de ${pessoa.nome} foram apagadas. Ele precisa avaliar tudo de novo.`);
-  }
-
   if (etapa.tipo === "notas") {
     const pessoa = etapa.pessoa;
     return (
