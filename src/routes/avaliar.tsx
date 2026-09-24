@@ -5,7 +5,6 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { nomeComPapel } from "@/lib/acessos";
 import {
   acharAlunoPorRa,
-  apagarAvaliacoesDoAvaliador,
   conferirNascimento,
   CRITERIOS,
   desmarcarFalta,
@@ -246,14 +245,6 @@ function TelaAvaliar() {
     await marcarFalta(rodadaAtual.id, rodadaAtual.bimestre, equipeAtual.id, pessoa.id, pessoa.nome);
     recarregar();
     setRecado(`${pessoa.nome} ficou marcado como faltou. Dá para desfazer aqui embaixo.`);
-  }
-
-  async function reabrir(pessoa: Integrante) {
-    await apagarAvaliacoesDoAvaliador(rodadaAtual.id, equipeAtual.id, pessoa.id);
-    recarregar();
-    setNotas({});
-    setTravadas({});
-    setRecado(`As notas de ${pessoa.nome} foram apagadas. Ele precisa avaliar tudo de novo.`);
   }
 
   if (etapa.tipo === "notas") {
@@ -532,14 +523,6 @@ function TelaAvaliar() {
                   "ainda não avaliou"
                 )}
               </span>
-              {respondeu && (
-                <button
-                  onClick={() => reabrir(pessoa)}
-                  className="rounded-xl bg-muted px-3 py-2 text-sm font-bold text-muted-foreground"
-                >
-                  Editar (apaga as notas)
-                </button>
-              )}
               {faltouAgora && (
                 <button
                   onClick={async () => {
@@ -557,8 +540,7 @@ function TelaAvaliar() {
       </div>
 
       <p className="mt-6 rounded-2xl bg-muted px-4 py-4 text-sm font-bold text-muted-foreground">
-        As notas ficam escondidas assim que são guardadas. Se alguém pedir para editar, as notas
-        antigas são apagadas e ele preenche tudo de novo.
+        As notas ficam escondidas assim que são guardadas e ninguém consegue mudá-las depois.
       </p>
     </main>
   );
