@@ -532,14 +532,6 @@ function TelaAvaliar() {
                   "ainda não avaliou"
                 )}
               </span>
-              {respondeu && (
-                <button
-                  onClick={() => reabrir(pessoa)}
-                  className="rounded-xl bg-muted px-3 py-2 text-sm font-bold text-muted-foreground"
-                >
-                  Editar (apaga as notas)
-                </button>
-              )}
               {faltouAgora && (
                 <button
                   onClick={async () => {
@@ -557,8 +549,7 @@ function TelaAvaliar() {
       </div>
 
       <p className="mt-6 rounded-2xl bg-muted px-4 py-4 text-sm font-bold text-muted-foreground">
-        As notas ficam escondidas assim que são guardadas. Se alguém pedir para editar, as notas
-        antigas são apagadas e ele preenche tudo de novo.
+        As notas ficam escondidas assim que são guardadas e ninguém consegue mudá-las depois.
       </p>
     </main>
   );
