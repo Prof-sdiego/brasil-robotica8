@@ -373,7 +373,7 @@ export async function listarFaltas(
 
 /** Professor: todas as notas. Equipe: só quem já avaliou, sem notas. */
 export function useAvaliacoes(
-  acesso: { senhaProfessor: string | null } | { codigo: string | null; equipeId?: string },
+  acesso: { senhaProfessor: string | null } | { codigo: string | null; equipeId?: string | undefined },
 ) {
   const chave = "senhaProfessor" in acesso ? "todas" : (acesso.equipeId ?? "nenhuma");
   const pronto =
