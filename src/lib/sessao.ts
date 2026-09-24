@@ -20,8 +20,15 @@ export function sairDaEquipe() {
   }
 }
 
-export function entrarComoProfessor() {
-  if (typeof window !== "undefined") localStorage.setItem(CHAVE_PROFESSOR, "1");
+export function entrarComoProfessor(senha: string) {
+  if (typeof window !== "undefined") localStorage.setItem(CHAVE_PROFESSOR, senha.trim());
+}
+
+/** Senha guardada do professor, enviada ao servidor para ler dados pessoais. */
+export function senhaProfessorGuardada(): string | null {
+  if (typeof window === "undefined") return null;
+  const valor = localStorage.getItem(CHAVE_PROFESSOR);
+  return valor && valor !== "1" ? valor : null;
 }
 
 export function sairDoProfessor() {
@@ -73,7 +80,7 @@ export function useProfessorLogado() {
     logado: false,
   });
   useEffect(() => {
-    setEstado({ pronto: true, logado: localStorage.getItem(CHAVE_PROFESSOR) === "1" });
+    setEstado({ pronto: true, logado: senhaProfessorGuardada() !== null });
   }, []);
   return { ...estado, marcarLogado: () => setEstado({ pronto: true, logado: true }) };
 }
