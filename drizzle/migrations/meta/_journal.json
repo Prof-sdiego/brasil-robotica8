@@ -29,6 +29,13 @@
       "when": 1790163747863,
       "tag": "0003_notas_opcionais",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1790262017848,
+      "tag": "0004_proteger_dados_pessoais",
+      "breakpoints": true
     }
   ]
 }
