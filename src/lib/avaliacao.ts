@@ -6,6 +6,13 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { supabase } from "@/integrations/supabase/client";
 
+import {
+  equipeListarAvaliacoes,
+  professorListarAlunos,
+  professorListarAvaliacoes,
+  professorSalvarAlunos,
+} from "./dados-pessoais.functions";
+
 export const BIMESTRE = 3;
 
 export type Criterio = { id: "participacao" | "organizacao" | "colaboracao"; nome: string; ajuda: string };
@@ -66,17 +73,12 @@ export function media(
 
 // ---------- lista de alunos (RA, nome, nascimento) ----------
 
-export async function listarAlunos(): Promise<Aluno[]> {
-  const { data, error } = await supabase
-    .from("alunos")
-    .select("id, ra, nome, nascimento, turma")
-    .order("nome");
-  if (error) throw error;
-  return (data ?? []) as Aluno[];
-}
-
-export function useAlunos() {
-  return useQuery({ queryKey: ["alunos"], queryFn: listarAlunos });
+export function useAlunos(senhaProfessor: string | null) {
+  return useQuery({
+    queryKey: ["alunos"],
+    queryFn: () => professorListarAlunos({ data: { senha: senhaProfessor ?? "" } }),
+    enabled: !!senhaProfessor,
+  });
 }
 
 /** Aceita o RA com ou sem os zeros da frente, e com ou sem o dígito do fim. */
@@ -132,17 +134,9 @@ function paraDataISO(data: string): string | null {
   return `${ano}-${String(mes).padStart(2, "0")}-${String(dia).padStart(2, "0")}`;
 }
 
-export async function salvarAlunos(linhas: LinhaImportada[]) {
+export async function salvarAlunos(senhaProfessor: string, linhas: LinhaImportada[]) {
   if (linhas.length === 0) return;
-  const { error } = await supabase
-    .from("alunos")
-    .upsert(linhas, { onConflict: "ra" });
-  if (error) throw error;
-}
-
-export async function removerAluno(id: string) {
-  const { error } = await supabase.from("alunos").delete().eq("id", id);
-  if (error) throw error;
+  await professorSalvarAlunos({ data: { senha: senhaProfessor, linhas } });
 }
 
 // ---------- conferência de identidade ----------
@@ -353,49 +347,6 @@ export async function liberarEquipe(dados: {
 
 // ---------- avaliações ----------
 
-type LinhaAvaliacao = {
-  id: string;
-  rodada_id: string | null;
-  equipe_id: string;
-  turma: string;
-  avaliador_id: string;
-  avaliador_nome: string;
-  avaliador_ra: string;
-  avaliado_id: string;
-  avaliado_nome: string;
-  participacao: number;
-  organizacao: number;
-  colaboracao: number;
-};
-
-const CAMPOS_AVALIACAO =
-  "id, rodada_id, equipe_id, turma, avaliador_id, avaliador_nome, avaliador_ra, avaliado_id, avaliado_nome, participacao, organizacao, colaboracao";
-
-function paraAvaliacao(linha: LinhaAvaliacao): Avaliacao {
-  return {
-    id: linha.id,
-    rodadaId: linha.rodada_id ?? "",
-    equipeId: linha.equipe_id,
-    turma: linha.turma,
-    avaliadorId: linha.avaliador_id,
-    avaliadorNome: linha.avaliador_nome,
-    avaliadorRa: linha.avaliador_ra,
-    avaliadoId: linha.avaliado_id,
-    avaliadoNome: linha.avaliado_nome,
-    participacao: linha.participacao,
-    organizacao: linha.organizacao,
-    colaboracao: linha.colaboracao,
-  };
-}
-
-export async function listarAvaliacoes(equipeId?: string): Promise<Avaliacao[]> {
-  let consulta = supabase.from("avaliacoes").select(CAMPOS_AVALIACAO);
-  if (equipeId) consulta = consulta.eq("equipe_id", equipeId);
-  const { data, error } = await consulta;
-  if (error) throw error;
-  return ((data ?? []) as LinhaAvaliacao[]).map(paraAvaliacao);
-}
-
 export async function listarFaltas(
   equipeId?: string,
 ): Promise<(Falta & { equipeId: string; rodadaId: string })[]> {
@@ -420,10 +371,22 @@ export async function listarFaltas(
   }));
 }
 
-export function useAvaliacoes(equipeId?: string) {
+/** Professor: todas as notas. Equipe: só quem já avaliou, sem notas. */
+export function useAvaliacoes(
+  acesso: { senhaProfessor: string | null } | { codigo: string | null; equipeId?: string | undefined },
+) {
+  const chave = "senhaProfessor" in acesso ? "todas" : (acesso.equipeId ?? "nenhuma");
+  const pronto =
+    "senhaProfessor" in acesso ? !!acesso.senhaProfessor : !!acesso.codigo && !!acesso.equipeId;
   return useQuery({
-    queryKey: ["avaliacoes", equipeId ?? "todas"],
-    queryFn: () => listarAvaliacoes(equipeId),
+    queryKey: ["avaliacoes", chave],
+    enabled: pronto,
+    queryFn: () =>
+      "senhaProfessor" in acesso
+        ? professorListarAvaliacoes({ data: { senha: acesso.senhaProfessor ?? "" } })
+        : equipeListarAvaliacoes({
+            data: { codigo: acesso.codigo ?? "", equipeId: acesso.equipeId ?? "" },
+          }),
   });
 }
 
@@ -441,51 +404,6 @@ export type NotaNova = {
   organizacao: number | null;
   colaboracao: number | null;
 };
-
-export async function salvarAvaliacoes(dados: {
-  rodadaId: string;
-  bimestre: number;
-  equipeId: string;
-  turma: string;
-  avaliadorId: string;
-  avaliadorNome: string;
-  avaliadorRa: string;
-  notas: NotaNova[];
-}) {
-  const linhas = dados.notas.map((nota) => ({
-    rodada_id: dados.rodadaId,
-    bimestre: dados.bimestre,
-    equipe_id: dados.equipeId,
-    turma: dados.turma,
-    avaliador_id: dados.avaliadorId,
-    avaliador_nome: dados.avaliadorNome,
-    avaliador_ra: dados.avaliadorRa,
-    avaliado_id: nota.avaliadoId,
-    avaliado_nome: nota.avaliadoNome,
-    participacao: nota.participacao,
-    organizacao: nota.organizacao,
-    colaboracao: nota.colaboracao,
-  }));
-  const { error } = await supabase
-    .from("avaliacoes")
-    .upsert(linhas, { onConflict: "rodada_id,equipe_id,avaliador_id,avaliado_id" });
-  if (error) throw error;
-}
-
-/** Ao reabrir para editar, a nota antiga é apagada — ninguém lê o que já foi dado. */
-export async function apagarAvaliacoesDoAvaliador(
-  rodadaId: string,
-  equipeId: string,
-  avaliadorId: string,
-) {
-  const { error } = await supabase
-    .from("avaliacoes")
-    .delete()
-    .eq("rodada_id", rodadaId)
-    .eq("equipe_id", equipeId)
-    .eq("avaliador_id", avaliadorId);
-  if (error) throw error;
-}
 
 export async function marcarFalta(
   rodadaId: string,

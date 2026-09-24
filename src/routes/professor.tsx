@@ -24,7 +24,7 @@ function AreaProfessor() {
     try {
       const resposta = await conferir({ data: { senha } });
       if (resposta.ok) {
-        entrarComoProfessor();
+        entrarComoProfessor(senha);
         marcarLogado();
       } else {
         setErro("Senha incorreta.");

@@ -1,3 +1,4 @@
+import { senhaProfessorGuardada } from "@/lib/sessao";
 import { createFileRoute } from "@tanstack/react-router";
 import { ClipboardList, Download, KeyRound, Lock, Plus, Trash2, Unlock } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
@@ -49,10 +50,11 @@ function umaCasa(valor: number): string {
 function Avaliacoes() {
   const { data: equipes, isLoading } = useEquipes();
   const { data: rodadas } = useRodadas();
-  const { data: avaliacoes } = useAvaliacoes();
+  const senhaProfessor = senhaProfessorGuardada();
+  const { data: avaliacoes } = useAvaliacoes({ senhaProfessor });
   const { data: faltas } = useFaltas();
   const { data: liberacoes } = useLiberacoes();
-  const { data: alunos, refetch: recarregarAlunos } = useAlunos();
+  const { data: alunos, refetch: recarregarAlunos } = useAlunos(senhaProfessor);
   const recarregar = useRecarregarAvaliacoes();
 
   const [texto, setTexto] = useState("");
@@ -100,7 +102,7 @@ function Avaliacoes() {
       setRecado("Não achei nenhuma linha com RA e nome. Cole uma pessoa por linha.");
       return;
     }
-    await salvarAlunos(linhas);
+    await salvarAlunos(senhaProfessor ?? "", linhas);
     await recarregarAlunos();
     setTexto("");
     setRecado(
