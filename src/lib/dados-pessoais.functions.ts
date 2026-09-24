@@ -29,7 +29,7 @@ async function conferirEquipe(codigo: string, equipeId: string) {
     .from("equipes")
     .select("id, integrantes")
     .eq("id", equipeId)
-    .ilike("codigo_acesso", codigo.trim())
+    .eq("codigo_acesso", codigo.trim().toUpperCase())
     .maybeSingle();
   if (!data) throw new Error("Acesso negado");
   return data as { id: string; integrantes: { id: string; nome: string }[] };
