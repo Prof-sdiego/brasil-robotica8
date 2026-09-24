@@ -4,17 +4,12 @@ import { useEffect, useMemo, useRef, useState } from "react";
 
 import { nomeComPapel } from "@/lib/acessos";
 import {
-  acharAlunoPorRa,
-  conferirNascimento,
   CRITERIOS,
   desmarcarFalta,
   liberarEquipe,
   marcarFalta,
   mesmoCodigo,
-  mesmoNome,
-  salvarAvaliacoes,
   sortearPergunta,
-  useAlunos,
   useAvaliacoes,
   useFaltas,
   useLiberacoes,
@@ -26,6 +21,7 @@ import {
 } from "@/lib/avaliacao";
 import type { Integrante } from "@/lib/tipos";
 import { useAluno } from "@/lib/useAluno";
+import { conferirIdentidade, equipeSalvarAvaliacoes } from "@/lib/dados-pessoais.functions";
 
 export const Route = createFileRoute("/avaliar")({
   head: () => ({
@@ -53,9 +49,8 @@ type Etapa =
 
 function TelaAvaliar() {
   const { equipe, carregando } = useAluno({ area: "equipe" });
-  const { data: alunos } = useAlunos();
   const { data: rodadas } = useRodadas();
-  const { data: avaliacoes } = useAvaliacoes(equipe?.id);
+  const { data: avaliacoes } = useAvaliacoes({ codigo: equipe?.codigoAcesso ?? null, equipeId: equipe?.id });
   const { data: faltas } = useFaltas(equipe?.id);
   const { data: liberacoes } = useLiberacoes();
   const recarregar = useRecarregarAvaliacoes(equipe?.id);
@@ -151,17 +146,24 @@ function TelaAvaliar() {
       setErro("Esse código não é o desta avaliação. Peça ao professor.");
       return;
     }
-    const aluno = acharAlunoPorRa(alunos ?? [], ra);
-    if (!aluno) {
-      setErro("Não achei esse RA na lista da escola. Confira os números.");
+    let conferido: Awaited<ReturnType<typeof conferirIdentidade>>;
+    try {
+      conferido = await conferirIdentidade({
+        data: {
+          codigo: equipeAtual.codigoAcesso,
+          equipeId: equipeAtual.id,
+          integranteId: etapa.pessoa.id,
+          ra,
+          tipo: etapa.pergunta.tipo,
+          resposta,
+        },
+      });
+    } catch {
+      setErro("Não deu para conferir agora. Tente de novo.");
       return;
     }
-    if (!mesmoNome(aluno.nome, etapa.pessoa.nome)) {
-      setErro(`Esse RA é de outra pessoa (${aluno.nome}). Digite o seu.`);
-      return;
-    }
-    if (!conferirNascimento(aluno, etapa.pergunta, resposta)) {
-      setErro("A data de nascimento não bate. Tente de novo.");
+    if (!conferido.ok) {
+      setErro(conferido.erro);
       return;
     }
     if (!liberada) {
@@ -177,7 +179,7 @@ function TelaAvaliar() {
     setNotas({});
     setTravadas({});
     setIncapaz({});
-    setEtapa({ tipo: "notas", pessoa: etapa.pessoa, ra: aluno.ra });
+    setEtapa({ tipo: "notas", pessoa: etapa.pessoa, ra: conferido.ra });
   }
 
   function nota(avaliadoId: string, criterio: string): number | null {
@@ -218,15 +220,15 @@ function TelaAvaliar() {
         organizacao: incapaz[alvo.id] ? null : (nota(alvo.id, "organizacao") ?? 0),
         colaboracao: incapaz[alvo.id] ? null : (nota(alvo.id, "colaboracao") ?? 0),
       }));
-      await salvarAvaliacoes({
-        rodadaId: rodadaAtual.id,
-        bimestre: rodadaAtual.bimestre,
-        equipeId: equipeAtual.id,
-        turma: equipeAtual.turma,
-        avaliadorId: etapa.pessoa.id,
-        avaliadorNome: etapa.pessoa.nome,
-        avaliadorRa: etapa.ra,
-        notas: linhas,
+      await equipeSalvarAvaliacoes({
+        data: {
+          codigo: equipeAtual.codigoAcesso,
+          rodadaId: rodadaAtual.id,
+          equipeId: equipeAtual.id,
+          avaliadorId: etapa.pessoa.id,
+          avaliadorRa: etapa.ra,
+          notas: linhas,
+        },
       });
       recarregar();
       setRecado(`Notas de ${etapa.pessoa.nome} guardadas. Ninguém mais consegue vê-las.`);
