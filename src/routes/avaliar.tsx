@@ -5,7 +5,6 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { nomeComPapel } from "@/lib/acessos";
 import {
   acharAlunoPorRa,
-  apagarAvaliacoesDoAvaliador,
   conferirNascimento,
   CRITERIOS,
   desmarcarFalta,
