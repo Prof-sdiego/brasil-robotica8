@@ -5,11 +5,13 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { nomeComPapel } from "@/lib/acessos";
 import {
   CRITERIOS,
+  conferirIdentidadeAluno,
   desmarcarFalta,
   liberarEquipe,
   marcarFalta,
   mesmoCodigo,
   sortearPergunta,
+  salvarAvaliacoesDaEquipe,
   useAvaliacoes,
   useFaltas,
   useLiberacoes,
@@ -21,7 +23,6 @@ import {
 } from "@/lib/avaliacao";
 import type { Integrante } from "@/lib/tipos";
 import { useAluno } from "@/lib/useAluno";
-import { conferirIdentidade, equipeSalvarAvaliacoes } from "@/lib/dados-pessoais.functions";
 
 export const Route = createFileRoute("/avaliar")({
   head: () => ({
@@ -146,17 +147,15 @@ function TelaAvaliar() {
       setErro("Esse código não é o desta avaliação. Peça ao professor.");
       return;
     }
-    let conferido: Awaited<ReturnType<typeof conferirIdentidade>>;
+    let conferido: Awaited<ReturnType<typeof conferirIdentidadeAluno>>;
     try {
-      conferido = await conferirIdentidade({
-        data: {
-          codigo: equipeAtual.codigoAcesso,
-          equipeId: equipeAtual.id,
-          integranteId: etapa.pessoa.id,
-          ra,
-          tipo: etapa.pergunta.tipo,
-          resposta,
-        },
+      conferido = await conferirIdentidadeAluno({
+        codigo: equipeAtual.codigoAcesso,
+        equipeId: equipeAtual.id,
+        integranteId: etapa.pessoa.id,
+        ra,
+        tipo: etapa.pergunta.tipo,
+        resposta,
       });
     } catch (e) {
       const msg = e instanceof Error ? e.message : "";
@@ -225,15 +224,13 @@ function TelaAvaliar() {
         organizacao: incapaz[alvo.id] ? null : (nota(alvo.id, "organizacao") ?? 0),
         colaboracao: incapaz[alvo.id] ? null : (nota(alvo.id, "colaboracao") ?? 0),
       }));
-      await equipeSalvarAvaliacoes({
-        data: {
-          codigo: equipeAtual.codigoAcesso,
-          rodadaId: rodadaAtual.id,
-          equipeId: equipeAtual.id,
-          avaliadorId: etapa.pessoa.id,
-          avaliadorRa: etapa.ra,
-          notas: linhas,
-        },
+      await salvarAvaliacoesDaEquipe({
+        codigo: equipeAtual.codigoAcesso,
+        rodadaId: rodadaAtual.id,
+        equipeId: equipeAtual.id,
+        avaliadorId: etapa.pessoa.id,
+        avaliadorRa: etapa.ra,
+        notas: linhas,
       });
       recarregar();
       setRecado(`Notas de ${etapa.pessoa.nome} guardadas. Ninguém mais consegue vê-las.`);

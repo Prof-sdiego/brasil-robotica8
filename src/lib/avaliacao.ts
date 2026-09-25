@@ -7,7 +7,6 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 
 import {
-  equipeListarAvaliacoes,
   professorListarAlunos,
   professorListarAvaliacoes,
   professorSalvarAlunos,
@@ -183,6 +182,30 @@ export function conferirNascimento(aluno: Aluno, pergunta: Pergunta, resposta: s
   }
   const iso = paraDataISO(limpo);
   return iso === `${ano}-${String(mes).padStart(2, "0")}-${String(dia).padStart(2, "0")}`;
+}
+
+export async function conferirIdentidadeAluno(dados: {
+  codigo: string;
+  equipeId: string;
+  integranteId: string;
+  ra: string;
+  tipo: Pergunta["tipo"];
+  resposta: string;
+}): Promise<{ ok: true; ra: string } | { ok: false; erro: string }> {
+  const { data, error } = await supabase.rpc("aluno_conferir_identidade", {
+    _codigo: dados.codigo,
+    _equipe_id: dados.equipeId,
+    _integrante_id: dados.integranteId,
+    _ra: dados.ra,
+    _tipo: dados.tipo,
+    _resposta: dados.resposta,
+  });
+  if (error) throw error;
+  const resultado = data?.[0];
+  if (!resultado?.ok) {
+    return { ok: false, erro: resultado?.erro ?? "Não deu para conferir agora." };
+  }
+  return { ok: true, ra: resultado.ra };
 }
 
 function simplificar(nome: string): string[] {
@@ -385,10 +408,30 @@ export function useAvaliacoes(
     queryFn: () =>
       "senhaProfessor" in acesso
         ? professorListarAvaliacoes({ data: { senha: acesso.senhaProfessor ?? "" } })
-        : equipeListarAvaliacoes({
-            data: { codigo: acesso.codigo ?? "", equipeId: acesso.equipeId ?? "" },
-          }),
+        : listarAvaliacoesDaEquipe(acesso.codigo ?? "", acesso.equipeId ?? ""),
   });
+}
+
+async function listarAvaliacoesDaEquipe(codigo: string, equipeId: string): Promise<Avaliacao[]> {
+  const { data, error } = await supabase.rpc("aluno_listar_avaliadores", {
+    _codigo: codigo,
+    _equipe_id: equipeId,
+  });
+  if (error) throw error;
+  return (data ?? []).map((linha) => ({
+    id: linha.id,
+    rodadaId: linha.rodada_id ?? "",
+    equipeId: linha.equipe_id,
+    turma: "",
+    avaliadorId: linha.avaliador_id,
+    avaliadorNome: linha.avaliador_nome,
+    avaliadorRa: "",
+    avaliadoId: linha.avaliado_id,
+    avaliadoNome: linha.avaliado_nome,
+    participacao: null,
+    organizacao: null,
+    colaboracao: null,
+  }));
 }
 
 export function useFaltas(equipeId?: string) {
@@ -405,6 +448,30 @@ export type NotaNova = {
   organizacao: number | null;
   colaboracao: number | null;
 };
+
+export async function salvarAvaliacoesDaEquipe(dados: {
+  codigo: string;
+  rodadaId: string;
+  equipeId: string;
+  avaliadorId: string;
+  avaliadorRa: string;
+  notas: NotaNova[];
+}) {
+  const { error } = await supabase.rpc("aluno_salvar_avaliacoes", {
+    _codigo: dados.codigo,
+    _rodada_id: dados.rodadaId,
+    _equipe_id: dados.equipeId,
+    _avaliador_id: dados.avaliadorId,
+    _avaliador_ra: dados.avaliadorRa,
+    _notas: dados.notas.map(({ avaliadoId, participacao, organizacao, colaboracao }) => ({
+      avaliado_id: avaliadoId,
+      participacao,
+      organizacao,
+      colaboracao,
+    })),
+  });
+  if (error) throw error;
+}
 
 export async function marcarFalta(
   rodadaId: string,
