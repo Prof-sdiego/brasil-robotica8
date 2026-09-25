@@ -146,7 +146,7 @@ export const conferirIdentidade = createServerFn({ method: "POST" })
         equipeId: z.string().uuid(),
         integranteId: z.string().min(1).max(100),
         ra: z.string().max(30),
-        tipo: z.enum(["dia", "mes", "completa"]),
+        tipo: z.enum(["dia", "mes", "ano", "completa"]),
         resposta: z.string().max(40),
       })
       .parse(d),
