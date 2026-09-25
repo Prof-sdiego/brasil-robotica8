@@ -75,7 +75,13 @@ export function media(
 export function useAlunos(senhaProfessor: string | null) {
   return useQuery({
     queryKey: ["alunos"],
-    queryFn: () => professorListarAlunos({ data: { senha: senhaProfessor ?? "" } }),
+    queryFn: async (): Promise<Aluno[]> => {
+      const { data, error } = await supabase.rpc("professor_listar_alunos", {
+        _senha: senhaProfessor ?? "",
+      });
+      if (error) throw new Error("Não foi possível ler a lista.");
+      return (data ?? []) as Aluno[];
+    },
     enabled: !!senhaProfessor,
   });
 }
@@ -135,7 +141,30 @@ function paraDataISO(data: string): string | null {
 
 export async function salvarAlunos(senhaProfessor: string, linhas: LinhaImportada[]) {
   if (linhas.length === 0) return;
-  await professorSalvarAlunos({ data: { senha: senhaProfessor, linhas } });
+  const { error } = await supabase.rpc("professor_salvar_alunos", {
+    _senha: senhaProfessor,
+    _linhas: linhas,
+  });
+  if (error) throw new Error("Não foi possível guardar a lista.");
+}
+
+async function listarTodasAvaliacoes(senha: string): Promise<Avaliacao[]> {
+  const { data, error } = await supabase.rpc("professor_listar_avaliacoes", { _senha: senha });
+  if (error) throw new Error("Não foi possível ler as notas.");
+  return (data ?? []).map((l) => ({
+    id: l.id,
+    rodadaId: l.rodada_id ?? "",
+    equipeId: l.equipe_id,
+    turma: l.turma,
+    avaliadorId: l.avaliador_id,
+    avaliadorNome: l.avaliador_nome,
+    avaliadorRa: l.avaliador_ra,
+    avaliadoId: l.avaliado_id,
+    avaliadoNome: l.avaliado_nome,
+    participacao: l.participacao,
+    organizacao: l.organizacao,
+    colaboracao: l.colaboracao,
+  }));
 }
 
 // ---------- conferência de identidade ----------
@@ -407,7 +436,7 @@ export function useAvaliacoes(
     enabled: pronto,
     queryFn: () =>
       "senhaProfessor" in acesso
-        ? professorListarAvaliacoes({ data: { senha: acesso.senhaProfessor ?? "" } })
+        ? listarTodasAvaliacoes(acesso.senhaProfessor ?? "")
         : listarAvaliacoesDaEquipe(acesso.codigo ?? "", acesso.equipeId ?? ""),
   });
 }
