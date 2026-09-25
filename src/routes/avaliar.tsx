@@ -49,7 +49,7 @@ type Etapa =
   | { tipo: "notas"; pessoa: Integrante; ra: string };
 
 function TelaAvaliar() {
-  const { equipe, carregando } = useAluno({ area: "equipe" });
+  const { equipe, carregando } = useAluno({ area: "avaliacao" });
   const { data: rodadas } = useRodadas();
   const { data: avaliacoes } = useAvaliacoes({ codigo: equipe?.codigoAcesso ?? null, equipeId: equipe?.id });
   const { data: faltas } = useFaltas(equipe?.id);

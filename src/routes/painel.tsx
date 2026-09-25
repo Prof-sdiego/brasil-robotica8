@@ -120,7 +120,7 @@ const CARTOES = [
   },
   {
     para: "/avaliar" as const,
-    area: "equipe" as Area,
+    area: "avaliacao" as Area,
     titulo: "Avaliar a equipe",
     descricao: "3º bimestre, um por vez",
     icone: ClipboardList,
