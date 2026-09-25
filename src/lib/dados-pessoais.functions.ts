@@ -146,13 +146,18 @@ export const conferirIdentidade = createServerFn({ method: "POST" })
         equipeId: z.string().uuid(),
         integranteId: z.string().min(1).max(100),
         ra: z.string().max(30),
-        tipo: z.enum(["dia", "mes", "completa"]),
+        tipo: z.enum(["dia", "mes", "ano", "completa"]),
         resposta: z.string().max(40),
       })
       .parse(d),
   )
   .handler(async ({ data }) => {
-    const equipe = await conferirEquipe(data.codigo, data.equipeId);
+    let equipe: Awaited<ReturnType<typeof conferirEquipe>>;
+    try {
+      equipe = await conferirEquipe(data.codigo, data.equipeId);
+    } catch {
+      return { ok: false as const, erro: "Não achei esta equipe. Saiam e entrem de novo com o código da equipe." };
+    }
     const pessoa = (equipe.integrantes ?? []).find((i) => i.id === data.integranteId);
     if (!pessoa) return { ok: false as const, erro: "Essa pessoa não é desta equipe." };
     const db = await admin();

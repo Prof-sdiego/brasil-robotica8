@@ -141,7 +141,7 @@ export async function salvarAlunos(senhaProfessor: string, linhas: LinhaImportad
 
 // ---------- conferência de identidade ----------
 
-export type Pergunta = { tipo: "dia" | "mes" | "completa"; texto: string };
+export type Pergunta = { tipo: "dia" | "mes" | "ano" | "completa"; texto: string };
 
 const MESES = [
   "janeiro",
@@ -159,11 +159,11 @@ const MESES = [
 ];
 
 export function sortearPergunta(): Pergunta {
-  const tipos: Pergunta["tipo"][] = ["dia", "mes", "completa"];
+  const tipos: Pergunta["tipo"][] = ["dia", "mes", "ano"];
   const tipo = tipos[Math.floor(Math.random() * tipos.length)]!;
   if (tipo === "dia") return { tipo, texto: "Em que dia do mês você nasceu? (só o número)" };
   if (tipo === "mes") return { tipo, texto: "Em que mês você nasceu? (nome ou número)" };
-  return { tipo, texto: "Qual é a sua data de nascimento completa? (dd/mm/aaaa)" };
+  return { tipo, texto: "Em que ano você nasceu? (quatro números, ex.: 2012)" };
 }
 
 export function conferirNascimento(aluno: Aluno, pergunta: Pergunta, resposta: string): boolean {
@@ -171,6 +171,7 @@ export function conferirNascimento(aluno: Aluno, pergunta: Pergunta, resposta: s
   const [ano, mes, dia] = aluno.nascimento.split("-").map((p) => Number(p));
   const limpo = resposta.trim().toLowerCase();
   if (pergunta.tipo === "dia") return Number(soDigitos(limpo)) === dia;
+  if (pergunta.tipo === "ano") return Number(soDigitos(limpo)) === ano;
   if (pergunta.tipo === "mes") {
     const numero = Number(soDigitos(limpo));
     if (numero) return numero === mes;
