@@ -35,7 +35,7 @@ async function conferirEquipe(codigo: string, equipeId: string) {
   if (!data || normalizarCodigo(data.codigo_acesso) !== normalizarCodigo(codigo)) {
     throw new Error("Acesso negado");
   }
-  return data as { id: string; integrantes: { id: string; nome: string }[] };
+  return data as unknown as { id: string; integrantes: { id: string; nome: string }[] };
 }
 
 type LinhaAvaliacao = {
