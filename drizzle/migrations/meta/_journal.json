@@ -36,6 +36,13 @@
       "when": 1790262017848,
       "tag": "0004_proteger_dados_pessoais",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1790334844221,
+      "tag": "0005_avaliacao_alunos_em_site_estatico",
+      "breakpoints": true
     }
   ]
 }
