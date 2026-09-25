@@ -152,7 +152,12 @@ export const conferirIdentidade = createServerFn({ method: "POST" })
       .parse(d),
   )
   .handler(async ({ data }) => {
-    const equipe = await conferirEquipe(data.codigo, data.equipeId);
+    let equipe: Awaited<ReturnType<typeof conferirEquipe>>;
+    try {
+      equipe = await conferirEquipe(data.codigo, data.equipeId);
+    } catch {
+      return { ok: false as const, erro: "Não achei esta equipe. Saiam e entrem de novo com o código da equipe." };
+    }
     const pessoa = (equipe.integrantes ?? []).find((i) => i.id === data.integranteId);
     if (!pessoa) return { ok: false as const, erro: "Essa pessoa não é desta equipe." };
     const db = await admin();
