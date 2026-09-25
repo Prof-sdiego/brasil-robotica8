@@ -6,11 +6,6 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { supabase } from "@/integrations/supabase/client";
 
-import {
-  professorListarAlunos,
-  professorListarAvaliacoes,
-  professorSalvarAlunos,
-} from "./dados-pessoais.functions";
 
 export const BIMESTRE = 3;
 
