@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowLeft, CheckCircle2, ClipboardList, KeyRound, Lock, UserX } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 
-import { nomeComPapel } from "@/lib/acessos";
+import { especialidadeDe, nomeComPapel } from "@/lib/acessos";
 import {
   CRITERIOS,
   conferirIdentidadeAluno,
@@ -127,9 +127,10 @@ function TelaAvaliar() {
     (i) => !jaAvaliaram.has(i.id) && !faltaram.has(i.id),
   );
   const soOProgramador = !liberada;
-  const fila = soOProgramador
-    ? pendentes.filter((i) => i.papel === "Programador")
-    : pendentes;
+  const podeComecar = (i: Integrante) =>
+    i.papel === "Programador" ||
+    (i.papel === "Ajudante" && especialidadeDe(i) === "programacao");
+  const fila = soOProgramador ? pendentes.filter(podeComecar) : pendentes;
   const proxima = fila[0] ?? null;
 
   function comecar(pessoa: Integrante) {
@@ -469,8 +470,8 @@ function TelaAvaliar() {
         <p className="mt-4 flex items-start gap-2 rounded-2xl bg-alerta px-4 py-4 font-bold text-alerta-foreground">
           <KeyRound className="mt-1 size-5 shrink-0" />
           {programador
-            ? `${programador.nome} começa: o programador digita o código desta avaliação uma vez e libera a equipe.`
-            : "A equipe ainda não tem programador cadastrado. Ele precisa começar."}
+            ? `${programador.nome} começa: o programador (ou um ajudante de Programação, se ele faltou) digita o código desta avaliação uma vez e libera a equipe.`
+            : "Um ajudante de Programação começa: ele digita o código desta avaliação uma vez e libera a equipe."}
         </p>
       )}
 
