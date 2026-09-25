@@ -10,7 +10,8 @@ export type Area =
   | "checklist"
   | "engenharia"
   | "design"
-  | "ajustes";
+  | "ajustes"
+  | "avaliacao";
 
 const TODAS: Area[] = [
   "equipe",
@@ -21,6 +22,7 @@ const TODAS: Area[] = [
   "engenharia",
   "design",
   "ajustes",
+  "avaliacao",
 ];
 
 export const ESPECIALIDADES: { id: Especialidade; nome: string; icone: string; descricao: string }[] =
