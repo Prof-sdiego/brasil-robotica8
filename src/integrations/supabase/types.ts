@@ -316,7 +316,44 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      aluno_conferir_identidade: {
+        Args: {
+          _codigo: string
+          _equipe_id: string
+          _integrante_id: string
+          _ra: string
+          _resposta: string
+          _tipo: string
+        }
+        Returns: {
+          erro: string
+          ok: boolean
+          ra: string
+        }[]
+      }
+      aluno_listar_avaliadores: {
+        Args: { _codigo: string; _equipe_id: string }
+        Returns: {
+          avaliado_id: string
+          avaliado_nome: string
+          avaliador_id: string
+          avaliador_nome: string
+          equipe_id: string
+          id: string
+          rodada_id: string
+        }[]
+      }
+      aluno_salvar_avaliacoes: {
+        Args: {
+          _avaliador_id: string
+          _avaliador_ra: string
+          _codigo: string
+          _equipe_id: string
+          _notas: Json
+          _rodada_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
       [_ in never]: never
