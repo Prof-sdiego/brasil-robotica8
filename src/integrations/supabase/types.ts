@@ -354,6 +354,45 @@ export type Database = {
         }
         Returns: boolean
       }
+      professor_listar_alunos: {
+        Args: { _senha: string }
+        Returns: {
+          id: string
+          nascimento: string
+          nome: string
+          ra: string
+          turma: string
+        }[]
+      }
+      professor_listar_avaliacoes: {
+        Args: { _senha: string }
+        Returns: {
+          avaliado_id: string
+          avaliado_nome: string
+          avaliador_id: string
+          avaliador_nome: string
+          avaliador_ra: string
+          bimestre: number
+          colaboracao: number | null
+          created_at: string
+          equipe_id: string
+          id: string
+          organizacao: number | null
+          participacao: number | null
+          rodada_id: string | null
+          turma: string
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "avaliacoes"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
+      professor_salvar_alunos: {
+        Args: { _linhas: Json; _senha: string }
+        Returns: boolean
+      }
     }
     Enums: {
       [_ in never]: never

@@ -43,6 +43,13 @@
       "when": 1790334844221,
       "tag": "0005_avaliacao_alunos_em_site_estatico",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1790335935050,
+      "tag": "0006_professor_rpcs",
+      "breakpoints": true
     }
   ]
 }
