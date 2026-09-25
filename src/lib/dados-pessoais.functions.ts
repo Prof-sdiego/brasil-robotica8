@@ -24,18 +24,30 @@ async function admin() {
 }
 
 async function conferirEquipe(codigo: string, equipeId: string) {
-  const db = await admin();
-  const { data, error } = await db
-    .from("equipes")
-    .select("id, codigo_acesso, integrantes")
-    .eq("id", equipeId)
-    .maybeSingle();
-  if (error) throw new Error("Não foi possível conferir a equipe");
   const normalizarCodigo = (valor: string) => valor.trim().toUpperCase();
+  const supabaseUrl = process.env["SUPABASE_URL"];
+  const chavePublica = process.env["SUPABASE_ANON_KEY"] || process.env["SUPABASE_PUBLISHABLE_KEY"];
+  if (!supabaseUrl || !chavePublica) throw new Error("Não foi possível conferir a equipe");
+
+  const parametros = new URLSearchParams({
+    select: "id,codigo_acesso,integrantes",
+    id: `eq.${equipeId}`,
+    limit: "1",
+  });
+  const resposta = await fetch(`${supabaseUrl}/rest/v1/equipes?${parametros}`, {
+    headers: { apikey: chavePublica },
+  });
+  if (!resposta.ok) throw new Error("Não foi possível conferir a equipe");
+  const linhas = (await resposta.json()) as {
+    id: string;
+    codigo_acesso: string;
+    integrantes: { id: string; nome: string }[];
+  }[];
+  const data = linhas[0];
   if (!data || normalizarCodigo(data.codigo_acesso) !== normalizarCodigo(codigo)) {
     throw new Error("Acesso negado");
   }
-  return data as unknown as { id: string; integrantes: { id: string; nome: string }[] };
+  return data;
 }
 
 type LinhaAvaliacao = {
