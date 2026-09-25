@@ -158,8 +158,13 @@ function TelaAvaliar() {
           resposta,
         },
       });
-    } catch {
-      setErro("Não deu para conferir agora. Tente de novo.");
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : "";
+      setErro(
+        msg === "Acesso negado"
+          ? "Não achei esta equipe. Saiam e entrem de novo com o código da equipe."
+          : "Não deu para conferir agora. Confiram a internet e tentem de novo.",
+      );
       return;
     }
     if (!conferido.ok) {
