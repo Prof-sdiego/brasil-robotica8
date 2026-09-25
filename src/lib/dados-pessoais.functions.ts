@@ -25,13 +25,16 @@ async function admin() {
 
 async function conferirEquipe(codigo: string, equipeId: string) {
   const db = await admin();
-  const { data } = await db
+  const { data, error } = await db
     .from("equipes")
-    .select("id, integrantes")
+    .select("id, codigo_acesso, integrantes")
     .eq("id", equipeId)
-    .eq("codigo_acesso", codigo.trim().toUpperCase())
     .maybeSingle();
-  if (!data) throw new Error("Acesso negado");
+  if (error) throw new Error("Não foi possível conferir a equipe");
+  const normalizarCodigo = (valor: string) => valor.trim().toUpperCase();
+  if (!data || normalizarCodigo(data.codigo_acesso) !== normalizarCodigo(codigo)) {
+    throw new Error("Acesso negado");
+  }
   return data as { id: string; integrantes: { id: string; nome: string }[] };
 }
 
