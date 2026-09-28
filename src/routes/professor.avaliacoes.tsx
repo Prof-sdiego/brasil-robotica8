@@ -302,24 +302,40 @@ function Avaliacoes() {
         </div>
       </section>
 
-      <div className="mt-6 flex flex-wrap items-center gap-3">
-        <select
-          value={turma}
-          onChange={(e) => setTurma(e.target.value)}
-          className="rounded-xl border-2 border-input bg-card px-4 py-3 font-bold"
-          aria-label="Filtrar por turma"
-        >
-          <option value="todas">Todas as turmas</option>
+      <section className="mt-6 cartao-toque p-4">
+        <h2 className="text-xl">Ver a avaliação de qual turma?</h2>
+        <div className="mt-3 flex flex-wrap gap-2">
+          <button
+            onClick={() => setTurma("todas")}
+            className={`rounded-xl border-2 px-4 py-3 font-bold ${
+              turma === "todas"
+                ? "border-primary bg-primary text-primary-foreground"
+                : "border-input bg-card"
+            }`}
+          >
+            Todas as turmas
+          </button>
           {turmas.map((t) => (
-            <option key={t} value={t}>
+            <button
+              key={t}
+              onClick={() => setTurma(t)}
+              className={`rounded-xl border-2 px-4 py-3 font-bold ${
+                turma === t
+                  ? "border-primary bg-primary text-primary-foreground"
+                  : "border-input bg-card"
+              }`}
+            >
               Turma {t}
-            </option>
+            </button>
           ))}
-        </select>
-        <span className="font-bold text-muted-foreground">
+        </div>
+        <p className="mt-3 text-sm font-bold text-muted-foreground">
+          Mostrando {equipesFiltradas.length} equipe(s) ·{" "}
+          {turma === "todas" ? "todas as turmas" : `turma ${turma}`} ·{" "}
           {alunos?.length ?? 0} alunos na lista da escola · {todas.length} notas guardadas
-        </span>
-      </div>
+        </p>
+      </section>
+
 
       {rodada && (
         <h2 className="mt-5 text-xl">
