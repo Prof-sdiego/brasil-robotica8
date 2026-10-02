@@ -7,7 +7,7 @@ import { Cabecalho } from "@/components/Cabecalho";
 import { Deslizante } from "@/components/Deslizante";
 import { EtiquetaIntensidade } from "@/components/Etiqueta";
 import { AJUSTES_MELHORIAS, valorDe, type CampoAjuste } from "@/lib/ajustes";
-import { quantasCoreografias } from "@/lib/botoes";
+import { AVISO_DUAS_DE_BOTAO, MELHORIAS_DE_BOTAO, quantasCoreografias, temBotaoDemais } from "@/lib/botoes";
 import { MAXIMO_MELHORIAS, MELHORIAS, MELODIAS } from "@/lib/catalogo";
 import { tocarNotas } from "@/lib/tocar";
 import { useAluno } from "@/lib/useAluno";
@@ -67,6 +67,10 @@ function TelaMelhorias() {
       setAviso("Vocês já escolheram 3. Desmarquem uma antes de escolher outra.");
       return;
     }
+    if (MELHORIAS_DE_BOTAO.includes(id) && novas.some((m) => MELHORIAS_DE_BOTAO.includes(m))) {
+      setAviso(AVISO_DUAS_DE_BOTAO);
+      return;
+    }
     const brigaEsquiva =
       (id === "esquiva" && novas.includes("arranque_suave")) ||
       (id === "arranque_suave" && novas.includes("esquiva"));
@@ -110,6 +114,13 @@ function TelaMelhorias() {
               Entendi
             </button>
           </div>
+        )}
+
+        {temBotaoDemais(escolhidas) && (
+          <p className="mb-4 flex items-start gap-2 rounded-2xl bg-destructive px-4 py-3 font-extrabold text-destructive-foreground">
+            <AlertTriangle className="mt-0.5 size-5 shrink-0" /> Erro: {AVISO_DUAS_DE_BOTAO} Desmarquem uma para
+            continuar.
+          </p>
         )}
 
         {aviso && (

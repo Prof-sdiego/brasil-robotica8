@@ -16,6 +16,20 @@ export const NOME_BOTAO: Record<Botao, string> = {
 /** Melhorias que ocupam um botão. */
 export const MELHORIAS_DE_BOTAO = ["turbo", "marcha_lenta", "esquiva"];
 
+/** O código do robô só aceita UMA melhoria de botão. */
+export const MAXIMO_MELHORIAS_BOTAO = 1;
+
+export const AVISO_DUAS_DE_BOTAO =
+  "O código não aceita duas melhorias que usam botão (Turbo, Marcha Lenta, Esquiva). Deixem só uma delas.";
+
+export function melhoriasDeBotaoEscolhidas(melhorias: string[]): string[] {
+  return MELHORIAS_DE_BOTAO.filter((id) => melhorias.includes(id));
+}
+
+export function temBotaoDemais(melhorias: string[]): boolean {
+  return melhoriasDeBotaoEscolhidas(melhorias).length > MAXIMO_MELHORIAS_BOTAO;
+}
+
 export const VALOR_COREOGRAFIA = "coreografia";
 
 /** Quantas coreografias a equipe monta, conforme as melhorias de botão escolhidas. */

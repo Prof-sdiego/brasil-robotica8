@@ -26,6 +26,7 @@ import { Route as ProfessorRouteImport } from './routes/professor'
 import { Route as ProgramadorRouteImport } from './routes/programador'
 import { Route as TutorialRouteImport } from './routes/tutorial'
 import { Route as ProfessorIndexRouteImport } from './routes/professor.index'
+import { Route as ProfessorAcompanhamentoRouteImport } from './routes/professor.acompanhamento'
 import { Route as ProfessorAvaliacoesRouteImport } from './routes/professor.avaliacoes'
 import { Route as ProfessorCadastroRouteImport } from './routes/professor.cadastro'
 import { Route as ProfessorPilotarRouteImport } from './routes/professor.pilotar'
@@ -116,6 +117,11 @@ const ProfessorIndexRoute = ProfessorIndexRouteImport.update({
   path: '/',
   getParentRoute: () => ProfessorRoute,
 } as any)
+const ProfessorAcompanhamentoRoute = ProfessorAcompanhamentoRouteImport.update({
+  id: '/acompanhamento',
+  path: '/acompanhamento',
+  getParentRoute: () => ProfessorRoute,
+} as any)
 const ProfessorAvaliacoesRoute = ProfessorAvaliacoesRouteImport.update({
   id: '/avaliacoes',
   path: '/avaliacoes',
@@ -154,6 +160,7 @@ export interface FileRoutesByFullPath {
   '/professor': typeof ProfessorRouteWithChildren
   '/programador': typeof ProgramadorRoute
   '/tutorial': typeof TutorialRoute
+  '/professor/acompanhamento': typeof ProfessorAcompanhamentoRoute
   '/professor/avaliacoes': typeof ProfessorAvaliacoesRoute
   '/professor/cadastro': typeof ProfessorCadastroRoute
   '/professor/pilotar': typeof ProfessorPilotarRoute
@@ -176,6 +183,7 @@ export interface FileRoutesByTo {
   '/pilotar': typeof PilotarRoute
   '/programador': typeof ProgramadorRoute
   '/tutorial': typeof TutorialRoute
+  '/professor/acompanhamento': typeof ProfessorAcompanhamentoRoute
   '/professor/avaliacoes': typeof ProfessorAvaliacoesRoute
   '/professor/cadastro': typeof ProfessorCadastroRoute
   '/professor/pilotar': typeof ProfessorPilotarRoute
@@ -200,6 +208,7 @@ export interface FileRoutesById {
   '/professor': typeof ProfessorRouteWithChildren
   '/programador': typeof ProgramadorRoute
   '/tutorial': typeof TutorialRoute
+  '/professor/acompanhamento': typeof ProfessorAcompanhamentoRoute
   '/professor/avaliacoes': typeof ProfessorAvaliacoesRoute
   '/professor/cadastro': typeof ProfessorCadastroRoute
   '/professor/pilotar': typeof ProfessorPilotarRoute
@@ -225,6 +234,7 @@ export interface FileRouteTypes {
     | '/professor'
     | '/programador'
     | '/tutorial'
+    | '/professor/acompanhamento'
     | '/professor/avaliacoes'
     | '/professor/cadastro'
     | '/professor/pilotar'
@@ -247,6 +257,7 @@ export interface FileRouteTypes {
     | '/pilotar'
     | '/programador'
     | '/tutorial'
+    | '/professor/acompanhamento'
     | '/professor/avaliacoes'
     | '/professor/cadastro'
     | '/professor/pilotar'
@@ -270,6 +281,7 @@ export interface FileRouteTypes {
     | '/professor'
     | '/programador'
     | '/tutorial'
+    | '/professor/acompanhamento'
     | '/professor/avaliacoes'
     | '/professor/cadastro'
     | '/professor/pilotar'
@@ -417,6 +429,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProfessorIndexRouteImport
       parentRoute: typeof ProfessorRoute
     }
+    '/professor/acompanhamento': {
+      id: '/professor/acompanhamento'
+      path: '/acompanhamento'
+      fullPath: '/professor/acompanhamento'
+      preLoaderRoute: typeof ProfessorAcompanhamentoRouteImport
+      parentRoute: typeof ProfessorRoute
+    }
     '/professor/avaliacoes': {
       id: '/professor/avaliacoes'
       path: '/avaliacoes'
@@ -449,6 +468,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface ProfessorRouteChildren {
+  ProfessorAcompanhamentoRoute: typeof ProfessorAcompanhamentoRoute
   ProfessorAvaliacoesRoute: typeof ProfessorAvaliacoesRoute
   ProfessorCadastroRoute: typeof ProfessorCadastroRoute
   ProfessorPilotarRoute: typeof ProfessorPilotarRoute
@@ -457,6 +477,7 @@ interface ProfessorRouteChildren {
 }
 
 const ProfessorRouteChildren: ProfessorRouteChildren = {
+  ProfessorAcompanhamentoRoute: ProfessorAcompanhamentoRoute,
   ProfessorAvaliacoesRoute: ProfessorAvaliacoesRoute,
   ProfessorCadastroRoute: ProfessorCadastroRoute,
   ProfessorPilotarRoute: ProfessorPilotarRoute,

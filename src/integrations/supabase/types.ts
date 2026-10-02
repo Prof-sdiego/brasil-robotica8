@@ -311,6 +311,53 @@ export type Database = {
         }
         Relationships: []
       }
+      professor_registros: {
+        Row: {
+          ciclo: number | null
+          created_at: string
+          dados: Json
+          equipe_id: string
+          id: string
+          integrante_id: string | null
+          integrante_nome: string
+          texto: string
+          tipo: string
+          turma: string
+        }
+        Insert: {
+          ciclo?: number | null
+          created_at?: string
+          dados?: Json
+          equipe_id: string
+          id?: string
+          integrante_id?: string | null
+          integrante_nome?: string
+          texto?: string
+          tipo: string
+          turma?: string
+        }
+        Update: {
+          ciclo?: number | null
+          created_at?: string
+          dados?: Json
+          equipe_id?: string
+          id?: string
+          integrante_id?: string | null
+          integrante_nome?: string
+          texto?: string
+          tipo?: string
+          turma?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "professor_registros_equipe_id_fkey"
+            columns: ["equipe_id"]
+            isOneToOne: false
+            referencedRelation: "equipes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
@@ -354,6 +401,10 @@ export type Database = {
         }
         Returns: boolean
       }
+      professor_apagar_registro: {
+        Args: { _id: string; _senha: string }
+        Returns: boolean
+      }
       professor_listar_alunos: {
         Args: { _senha: string }
         Returns: {
@@ -389,7 +440,32 @@ export type Database = {
           isSetofReturn: true
         }
       }
+      professor_listar_registros: {
+        Args: { _senha: string }
+        Returns: {
+          ciclo: number | null
+          created_at: string
+          dados: Json
+          equipe_id: string
+          id: string
+          integrante_id: string | null
+          integrante_nome: string
+          texto: string
+          tipo: string
+          turma: string
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "professor_registros"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
       professor_salvar_alunos: {
+        Args: { _linhas: Json; _senha: string }
+        Returns: boolean
+      }
+      professor_salvar_registros: {
         Args: { _linhas: Json; _senha: string }
         Returns: boolean
       }
