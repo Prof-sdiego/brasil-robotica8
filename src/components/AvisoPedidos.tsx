@@ -1,14 +1,40 @@
-import { Link } from "@tanstack/react-router";
+import { Link, useLocation } from "@tanstack/react-router";
 import { Bell } from "lucide-react";
+import { useEffect, useRef } from "react";
 
-import { marcarTodosVistos, usePedidos, useRecarregarMateriais } from "@/lib/materiais";
+import { marcarTodosVistos, tocarCampainha, usePedidos, useRecarregarMateriais } from "@/lib/materiais";
 
-/** Janela que avisa o professor dos pedidos de material ainda não vistos (inclusive os feitos enquanto estava fora). */
+/** Avisa o professor dos pedidos novos: toca a campainha e abre a janela (menos na aba Materiais). */
 export function AvisoPedidos() {
   const { data: pedidos } = usePedidos();
   const recarregar = useRecarregarMateriais();
+  const local = useLocation();
+  const naAbaMateriais = local.pathname.startsWith("/professor/materiais");
   const novos = (pedidos ?? []).filter((p) => !p.visto && p.status === "pendente");
-  if (novos.length === 0) return null;
+
+  // Campainha quando chega um pedido que ainda não tínhamos visto nesta tela.
+  const conhecidos = useRef<Set<string> | null>(null);
+  useEffect(() => {
+    if (!pedidos) return;
+    const pendentes = pedidos.filter((p) => p.status === "pendente").map((p) => p.id);
+    if (conhecidos.current === null) {
+      conhecidos.current = new Set(pendentes);
+      if (novos.length > 0) tocarCampainha();
+      return;
+    }
+    const chegou = pendentes.some((id) => !conhecidos.current!.has(id));
+    pendentes.forEach((id) => conhecidos.current!.add(id));
+    if (chegou) tocarCampainha();
+  }, [pedidos]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Na aba Materiais o pedido já aparece na lista: marca como visto sem janela.
+  useEffect(() => {
+    if (naAbaMateriais && novos.length > 0) {
+      void marcarTodosVistos().then(() => recarregar());
+    }
+  }, [naAbaMateriais, novos.length]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  if (novos.length === 0 || naAbaMateriais) return null;
 
   async function fechar() {
     await marcarTodosVistos();
@@ -27,6 +53,11 @@ export function AvisoPedidos() {
               <b>{p.turma} · {p.nome_equipe}</b> — {p.quantidade > 1 ? `${p.quantidade} × ` : ""}
               {p.material_nome}
               {p.cor && ` · ${p.cor}`}
+              {p.devolve_cor && (
+                <span className="mt-1 block font-extrabold text-alerta-foreground">
+                  Troca: entregar mediante devolução de {p.devolve_cor}
+                </span>
+              )}
             </li>
           ))}
         </ul>
