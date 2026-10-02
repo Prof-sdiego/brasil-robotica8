@@ -35,6 +35,7 @@ import { Route as ProfessorBanheiroRouteImport } from './routes/professor.banhei
 import { Route as ProfessorCadastroRouteImport } from './routes/professor.cadastro'
 import { Route as ProfessorMateriaisRouteImport } from './routes/professor.materiais'
 import { Route as ProfessorPilotarRouteImport } from './routes/professor.pilotar'
+import { Route as ProfessorPresencaRouteImport } from './routes/professor.presenca'
 import { Route as ProfessorEquipeIdRouteImport } from './routes/professor.equipe.$id'
 
 const IndexRoute = IndexRouteImport.update({
@@ -167,6 +168,11 @@ const ProfessorPilotarRoute = ProfessorPilotarRouteImport.update({
   path: '/pilotar',
   getParentRoute: () => ProfessorRoute,
 } as any)
+const ProfessorPresencaRoute = ProfessorPresencaRouteImport.update({
+  id: '/presenca',
+  path: '/presenca',
+  getParentRoute: () => ProfessorRoute,
+} as any)
 const ProfessorEquipeIdRoute = ProfessorEquipeIdRouteImport.update({
   id: '/equipe/$id',
   path: '/equipe/$id',
@@ -199,6 +205,7 @@ export interface FileRoutesByFullPath {
   '/professor/cadastro': typeof ProfessorCadastroRoute
   '/professor/materiais': typeof ProfessorMateriaisRoute
   '/professor/pilotar': typeof ProfessorPilotarRoute
+  '/professor/presenca': typeof ProfessorPresencaRoute
   '/professor/': typeof ProfessorIndexRoute
   '/professor/equipe/$id': typeof ProfessorEquipeIdRoute
 }
@@ -227,6 +234,7 @@ export interface FileRoutesByTo {
   '/professor/cadastro': typeof ProfessorCadastroRoute
   '/professor/materiais': typeof ProfessorMateriaisRoute
   '/professor/pilotar': typeof ProfessorPilotarRoute
+  '/professor/presenca': typeof ProfessorPresencaRoute
   '/professor': typeof ProfessorIndexRoute
   '/professor/equipe/$id': typeof ProfessorEquipeIdRoute
 }
@@ -257,6 +265,7 @@ export interface FileRoutesById {
   '/professor/cadastro': typeof ProfessorCadastroRoute
   '/professor/materiais': typeof ProfessorMateriaisRoute
   '/professor/pilotar': typeof ProfessorPilotarRoute
+  '/professor/presenca': typeof ProfessorPresencaRoute
   '/professor/': typeof ProfessorIndexRoute
   '/professor/equipe/$id': typeof ProfessorEquipeIdRoute
 }
@@ -288,6 +297,7 @@ export interface FileRouteTypes {
     | '/professor/cadastro'
     | '/professor/materiais'
     | '/professor/pilotar'
+    | '/professor/presenca'
     | '/professor/'
     | '/professor/equipe/$id'
   fileRoutesByTo: FileRoutesByTo
@@ -316,6 +326,7 @@ export interface FileRouteTypes {
     | '/professor/cadastro'
     | '/professor/materiais'
     | '/professor/pilotar'
+    | '/professor/presenca'
     | '/professor'
     | '/professor/equipe/$id'
   id:
@@ -345,6 +356,7 @@ export interface FileRouteTypes {
     | '/professor/cadastro'
     | '/professor/materiais'
     | '/professor/pilotar'
+    | '/professor/presenca'
     | '/professor/'
     | '/professor/equipe/$id'
   fileRoutesById: FileRoutesById
@@ -555,6 +567,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProfessorPilotarRouteImport
       parentRoute: typeof ProfessorRoute
     }
+    '/professor/presenca': {
+      id: '/professor/presenca'
+      path: '/presenca'
+      fullPath: '/professor/presenca'
+      preLoaderRoute: typeof ProfessorPresencaRouteImport
+      parentRoute: typeof ProfessorRoute
+    }
     '/professor/equipe/$id': {
       id: '/professor/equipe/$id'
       path: '/equipe/$id'
@@ -572,6 +591,7 @@ interface ProfessorRouteChildren {
   ProfessorCadastroRoute: typeof ProfessorCadastroRoute
   ProfessorMateriaisRoute: typeof ProfessorMateriaisRoute
   ProfessorPilotarRoute: typeof ProfessorPilotarRoute
+  ProfessorPresencaRoute: typeof ProfessorPresencaRoute
   ProfessorIndexRoute: typeof ProfessorIndexRoute
   ProfessorEquipeIdRoute: typeof ProfessorEquipeIdRoute
 }
@@ -583,6 +603,7 @@ const ProfessorRouteChildren: ProfessorRouteChildren = {
   ProfessorCadastroRoute: ProfessorCadastroRoute,
   ProfessorMateriaisRoute: ProfessorMateriaisRoute,
   ProfessorPilotarRoute: ProfessorPilotarRoute,
+  ProfessorPresencaRoute: ProfessorPresencaRoute,
   ProfessorIndexRoute: ProfessorIndexRoute,
   ProfessorEquipeIdRoute: ProfessorEquipeIdRoute,
 }
