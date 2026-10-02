@@ -11,6 +11,9 @@ import {
   NOME_STATUS,
   salvarMaterial,
   useMateriais,
+  usePedidosBloqueados,
+  definirPedidosBloqueados,
+  ficaForaDoHistorico,
   usePedidos,
   useRecarregarMateriais,
   type Pedido,
@@ -45,6 +48,15 @@ function Materiais() {
   const [cores, setCores] = useState("");
 
   const { data: equipes } = useEquipes();
+  const { data: bloqueado } = usePedidosBloqueados();
+  async function alternarBloqueio() {
+    try {
+      await definirPedidosBloqueados(!bloqueado);
+      await recarregar();
+    } catch {
+      toast.error("Não deu para mudar.");
+    }
+  }
   async function acao(p: Pedido, status: StatusPedido) {
     try {
       await mudarPedido(p.id, { status, visto: true });
@@ -74,7 +86,7 @@ function Materiais() {
   }
 
   const lista = (pedidos ?? []).filter((p) => (filtro === "todos" ? p.status !== "entregue" : p.status === "pendente"));
-  const entregues = (pedidos ?? []).filter((p) => p.status === "entregue");
+  const entregues = (pedidos ?? []).filter((p) => p.status === "entregue" && !ficaForaDoHistorico(p.material_nome));
   const porEquipe = new Map<string, Pedido[]>();
   for (const p of entregues) porEquipe.set(p.equipe_id, [...(porEquipe.get(p.equipe_id) ?? []), p]);
   const grupos = Array.from(porEquipe.entries())
@@ -88,6 +100,16 @@ function Materiais() {
 
   return (
     <main className="mx-auto max-w-5xl space-y-6 px-4 py-6 pb-16">
+      <section className={`cartao-toque flex flex-wrap items-center gap-3 p-5 ${bloqueado ? "bg-alerta text-alerta-foreground" : ""}`}>
+        <div className="flex-1">
+          <h2 className="text-xl">Bloquear novos pedidos</h2>
+          <p className="text-sm font-bold">{bloqueado ? "Ligado: nenhuma equipe consegue pedir." : "Desligado: as equipes podem pedir."}</p>
+        </div>
+        <button role="switch" aria-checked={!!bloqueado} onClick={() => void alternarBloqueio()}
+          className={`rounded-full px-6 py-3 text-lg font-extrabold ${bloqueado ? "bg-destructive text-destructive-foreground" : "bg-muted"}`}>
+          {bloqueado ? "Ligado" : "Desligado"}
+        </button>
+      </section>
       <section className="cartao-toque p-5">
         <div className="flex flex-wrap items-center gap-2">
           <h2 className="flex flex-1 items-center gap-2 text-2xl">

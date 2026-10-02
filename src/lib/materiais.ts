@@ -90,6 +90,7 @@ export function useRecarregarMateriais() {
     Promise.all([
       qc.invalidateQueries({ queryKey: ["materiais"] }),
       qc.invalidateQueries({ queryKey: ["pedidos"] }),
+      qc.invalidateQueries({ queryKey: ["pedidos-bloqueados"] }),
     ]);
 }
 
@@ -181,4 +182,38 @@ export function tocarCampainha() {
   } catch {
     /* sem som disponível */
   }
+}
+
+/** Interruptor do professor: quando ligado, nenhuma equipe faz pedidos novos. */
+export function usePedidosBloqueados() {
+  const qc = useQueryClient();
+  useEffect(() => {
+    const canal = db
+      .channel(`config-${Math.random().toString(36).slice(2)}`)
+      .on("postgres_changes", { event: "*", schema: "public", table: "configuracoes" }, () => {
+        void qc.invalidateQueries({ queryKey: ["pedidos-bloqueados"] });
+      })
+      .subscribe();
+    return () => {
+      void db.removeChannel(canal);
+    };
+  }, [qc]);
+  return useQuery({
+    queryKey: ["pedidos-bloqueados"],
+    queryFn: async (): Promise<boolean> => {
+      const { data } = await db.from("configuracoes").select("valor").eq("chave", "bloquear_pedidos").maybeSingle();
+      return data?.valor === true;
+    },
+    refetchInterval: 15000,
+  });
+}
+
+export async function definirPedidosBloqueados(valor: boolean) {
+  const { error } = await db.from("configuracoes").upsert({ chave: "bloquear_pedidos", valor, updated_at: new Date().toISOString() });
+  if (error) throw error;
+}
+
+/** Materiais que não entram na lista "com as equipes" (gastam e não voltam). */
+export function ficaForaDoHistorico(nome: string) {
+  return nome.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().includes("papelao");
 }
