@@ -33,6 +33,9 @@ export type Pedido = {
   status: StatusPedido;
   visto: boolean;
   created_at: string;
+  /** Troca: pedido (cor) que a equipe vai devolver ao receber este. */
+  devolve_pedido_id?: string | null;
+  devolve_cor?: string | null;
 };
 
 export const NOME_STATUS: Record<StatusPedido, string> = {
@@ -144,4 +147,38 @@ export async function salvarMaterial(dados: Partial<Material> & { nome: string }
 export async function apagarMaterial(id: string) {
   const { error } = await db.from("materiais").delete().eq("id", id);
   if (error) throw error;
+}
+
+/** Cores já entregues à equipe que ainda não estão em troca pendente. */
+export function coresParaDevolver(material: Material, pedidos: Pedido[]): Pedido[] {
+  const emTroca = new Set(
+    pedidos.filter((p) => p.status === "pendente" && p.devolve_pedido_id).map((p) => p.devolve_pedido_id),
+  );
+  return pedidos.filter((p) => p.material_id === material.id && p.status === "entregue" && p.cor && !emTroca.has(p.id));
+}
+
+/** Toca uma campainha alta (ding-dong) duas vezes. */
+export function tocarCampainha() {
+  try {
+    const Ctx = window.AudioContext ?? (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+    const ctx = new Ctx();
+    const nota = (freq: number, inicio: number) => {
+      for (const [mult, vol] of [[1, 1], [2, 0.4], [3, 0.2]] as const) {
+        const o = ctx.createOscillator();
+        const g = ctx.createGain();
+        o.type = "sine";
+        o.frequency.value = freq * mult;
+        g.gain.setValueAtTime(0.0001, ctx.currentTime + inicio);
+        g.gain.exponentialRampToValueAtTime(vol, ctx.currentTime + inicio + 0.01);
+        g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + inicio + 1.2);
+        o.connect(g).connect(ctx.destination);
+        o.start(ctx.currentTime + inicio);
+        o.stop(ctx.currentTime + inicio + 1.3);
+      }
+    };
+    nota(880, 0); nota(698, 0.5); nota(880, 1.4); nota(698, 1.9);
+    setTimeout(() => void ctx.close(), 3500);
+  } catch {
+    /* sem som disponível */
+  }
 }
