@@ -8,3 +8,5 @@
 > Commits you push to the connected branch sync back to Lovable and show up in
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
+
+- Shared classroom pauses use boolean rows in `configuracoes`; this keeps teacher toggles persistent and live across student screens.
