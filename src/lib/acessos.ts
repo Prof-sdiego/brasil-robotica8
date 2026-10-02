@@ -11,7 +11,8 @@ export type Area =
   | "engenharia"
   | "design"
   | "ajustes"
-  | "avaliacao";
+  | "avaliacao"
+  | "material";
 
 const TODAS: Area[] = [
   "equipe",
@@ -23,6 +24,7 @@ const TODAS: Area[] = [
   "design",
   "ajustes",
   "avaliacao",
+  "material",
 ];
 
 export const ESPECIALIDADES: { id: Especialidade; nome: string; icone: string; descricao: string }[] =
@@ -67,6 +69,11 @@ export function nomeComPapel(integrante: Integrante): string {
 
 /** Áreas liberadas para este integrante. */
 export function areasDoIntegrante(integrante: Integrante | null): Area[] {
+  const base = areasBase(integrante);
+  return base.includes("material") ? base : [...base, "material"];
+}
+
+function areasBase(integrante: Integrante | null): Area[] {
   if (!integrante) return TODAS; // programador provisório, antes de se cadastrar
   switch (integrante.papel) {
     case "Programador":
