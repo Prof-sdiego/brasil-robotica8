@@ -401,6 +401,8 @@ export type Database = {
         Row: {
           cor: string | null
           created_at: string
+          devolve_cor: string | null
+          devolve_pedido_id: string | null
           equipe_id: string
           id: string
           material_id: string
@@ -415,6 +417,8 @@ export type Database = {
         Insert: {
           cor?: string | null
           created_at?: string
+          devolve_cor?: string | null
+          devolve_pedido_id?: string | null
           equipe_id: string
           id?: string
           material_id: string
@@ -429,6 +433,8 @@ export type Database = {
         Update: {
           cor?: string | null
           created_at?: string
+          devolve_cor?: string | null
+          devolve_pedido_id?: string | null
           equipe_id?: string
           id?: string
           material_id?: string

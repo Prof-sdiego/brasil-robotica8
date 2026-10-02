@@ -69,12 +69,13 @@ export function useFila() {
   });
 }
 
-export function usePresencas() {
+export function usePresencas(dia?: string) {
   useTempoReal("presencas", "presencas");
+  const d = dia ?? hoje();
   return useQuery({
-    queryKey: ["presencas", hoje()],
+    queryKey: ["presencas", d],
     queryFn: async (): Promise<Presenca[]> => {
-      const { data, error } = await db.from("presencas").select("*").eq("dia", hoje());
+      const { data, error } = await db.from("presencas").select("*").eq("dia", d);
       if (error) throw error;
       return (data ?? []) as Presenca[];
     },

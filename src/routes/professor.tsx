@@ -1,6 +1,6 @@
 import { createFileRoute, Link, Outlet } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { ClipboardList, GraduationCap, ListPlus, LayoutGrid, LogOut, Lock, Gamepad2, NotebookPen, Package, DoorOpen } from "lucide-react";
+import { ClipboardList, GraduationCap, ListPlus, LayoutGrid, LogOut, Lock, Gamepad2, NotebookPen, Package, DoorOpen, UserCheck } from "lucide-react";
 import { useState } from "react";
 
 import { AvisoBanheiroProfessor } from "@/components/AvisoBanheiro";
@@ -135,6 +135,13 @@ function AreaProfessor() {
             activeProps={{ className: "bg-card text-secondary" }}
           >
             <DoorOpen className="size-4" /> Banheiro
+          </Link>
+          <Link
+            to="/professor/presenca"
+            className="flex items-center gap-1 rounded-full bg-card/25 px-3 py-2 text-sm font-bold"
+            activeProps={{ className: "bg-card text-secondary" }}
+          >
+            <UserCheck className="size-4" /> Presença
           </Link>
           <button
             onClick={() => {

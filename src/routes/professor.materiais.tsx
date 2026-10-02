@@ -1,6 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Package, Trash2 } from "lucide-react";
 import { useState } from "react";
+
+import { useEquipes } from "@/lib/equipes";
 import { toast } from "sonner";
 
 import {
@@ -42,9 +44,11 @@ function Materiais() {
   const [devolver, setDevolver] = useState(false);
   const [cores, setCores] = useState("");
 
+  const { data: equipes } = useEquipes();
   async function acao(p: Pedido, status: StatusPedido) {
     try {
       await mudarPedido(p.id, { status, visto: true });
+      if (status === "entregue" && p.devolve_pedido_id) await mudarPedido(p.devolve_pedido_id, { status: "devolvido" });
       await recarregar();
     } catch {
       toast.error("Não deu para mudar o pedido.");
@@ -69,9 +73,17 @@ function Materiais() {
     }
   }
 
-  const lista = (pedidos ?? []).filter(
-    (p) => filtro === "todos" || p.status === "pendente" || (p.status === "entregue" && materiais?.find((m) => m.id === p.material_id)?.precisa_devolver),
-  );
+  const lista = (pedidos ?? []).filter((p) => (filtro === "todos" ? p.status !== "entregue" : p.status === "pendente"));
+  const entregues = (pedidos ?? []).filter((p) => p.status === "entregue");
+  const porEquipe = new Map<string, Pedido[]>();
+  for (const p of entregues) porEquipe.set(p.equipe_id, [...(porEquipe.get(p.equipe_id) ?? []), p]);
+  const grupos = Array.from(porEquipe.entries())
+    .map(([id, ps]) => {
+      const eq = equipes?.find((e) => e.id === id);
+      const prog = eq?.integrantes.filter((i) => i.papel === "Programador").map((i) => i.nome).join(", ");
+      return { id, ps, turma: ps[0]!.turma, nome: ps[0]!.nome_equipe, prog: prog || "sem programador" };
+    })
+    .sort((a, b) => (a.turma + a.nome).localeCompare(b.turma + b.nome));
   const campo = "rounded-xl border-2 border-input bg-background px-3 py-2 font-bold";
 
   return (
@@ -83,7 +95,7 @@ function Materiais() {
           </h2>
           {(["abertos", "todos"] as const).map((f) => (
             <button key={f} onClick={() => setFiltro(f)} className={`rounded-full px-4 py-2 font-bold ${filtro === f ? "bg-secondary text-secondary-foreground" : "bg-muted"}`}>
-              {f === "abertos" ? "Pendentes e emprestados" : "Todos"}
+              {f === "abertos" ? "Pendentes" : "Histórico"}
             </button>
           ))}
         </div>
@@ -93,6 +105,11 @@ function Materiais() {
               <span className="flex-1">
                 <b>{p.turma} · {p.nome_equipe}</b> — {p.quantidade > 1 ? `${p.quantidade} × ` : ""}{p.material_nome}
                 {p.cor && ` · ${p.cor}`}
+                {p.devolve_cor && p.status === "pendente" && (
+                  <span className="mt-1 block rounded-lg bg-alerta px-2 py-1 text-sm font-extrabold text-alerta-foreground">
+                    Entrega mediante devolução de {p.devolve_cor}
+                  </span>
+                )}
                 <span className="block text-xs text-muted-foreground">
                   {p.pedido_por && `${p.pedido_por} · `}
                   {new Date(p.created_at).toLocaleString("pt-BR", { dateStyle: "short", timeStyle: "short" })} · {NOME_STATUS[p.status]}
@@ -111,6 +128,34 @@ function Materiais() {
           ))}
           {lista.length === 0 && <li className="font-bold text-muted-foreground">Nenhum pedido aqui.</li>}
         </ul>
+      </section>
+
+      <section className="cartao-toque p-5">
+        <h2 className="text-2xl">Com as equipes (já entregue)</h2>
+        <div className="mt-4 grid gap-3 sm:grid-cols-2">
+          {grupos.map((g) => (
+            <div key={g.id} className="rounded-2xl bg-muted/50 p-3">
+              <h3 className="text-lg">{g.turma} · {g.nome}</h3>
+              <p className="text-sm font-bold text-muted-foreground">Programador: {g.prog}</p>
+              <ul className="mt-2 space-y-1">
+                {g.ps.map((p) => {
+                  const devolve = materiais?.find((m) => m.id === p.material_id)?.precisa_devolver;
+                  return (
+                    <li key={p.id} className="flex items-center gap-2 text-sm">
+                      <span className="flex-1 font-bold">
+                        {p.quantidade > 1 ? `${p.quantidade} × ` : ""}{p.material_nome}{p.cor && ` · ${p.cor}`}
+                      </span>
+                      {devolve && (
+                        <button onClick={() => void acao(p, "devolvido")} className="rounded-full bg-info px-3 py-1 text-xs font-bold text-info-foreground">Devolveram</button>
+                      )}
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          ))}
+          {grupos.length === 0 && <p className="font-bold text-muted-foreground">Nada entregue ainda.</p>}
+        </div>
       </section>
 
       <section className="cartao-toque space-y-3 p-5">
