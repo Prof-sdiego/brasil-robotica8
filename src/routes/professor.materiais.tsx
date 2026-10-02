@@ -81,7 +81,7 @@ function Materiais() {
     .map(([id, ps]) => {
       const eq = equipes?.find((e) => e.id === id);
       const prog = eq?.integrantes.filter((i) => i.papel === "Programador").map((i) => i.nome).join(", ");
-      return { id, ps, turma: ps[0].turma, nome: ps[0].nome_equipe, prog: prog || "sem programador" };
+      return { id, ps, turma: ps[0]!.turma, nome: ps[0]!.nome_equipe, prog: prog || "sem programador" };
     })
     .sort((a, b) => (a.turma + a.nome).localeCompare(b.turma + b.nome));
   const campo = "rounded-xl border-2 border-input bg-background px-3 py-2 font-bold";

@@ -64,7 +64,7 @@ function TelaMaterial() {
                   pedido_por: integrante?.nome ?? "",
                 };
                 const linhas = devolve
-                  ? [{ ...base, cor: cores[0], quantidade: 1, devolve_pedido_id: devolve.id, devolve_cor: devolve.cor }]
+                  ? [{ ...base, cor: cores[0] ?? null, quantidade: 1, devolve_pedido_id: devolve.id, devolve_cor: devolve.cor }]
                   : cores.length
                     ? cores.map((cor) => ({ ...base, cor, quantidade: 1 }))
                     : [{ ...base, cor: null, quantidade }];
