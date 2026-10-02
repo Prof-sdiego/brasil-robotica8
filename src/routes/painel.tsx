@@ -17,6 +17,8 @@ import {
   Joystick,
   Smartphone,
   Package,
+  DoorOpen,
+  UserCheck,
 } from "lucide-react";
 import { useEffect } from "react";
 
@@ -49,6 +51,22 @@ export const Route = createFileRoute("/painel")({
 });
 
 const CARTOES = [
+  {
+    para: "/presenca" as const,
+    area: "presenca" as Area,
+    titulo: "Presença",
+    descricao: "Quem veio hoje",
+    icone: UserCheck,
+    cor: "bg-sucesso text-sucesso-foreground",
+  },
+  {
+    para: "/banheiro" as const,
+    area: "banheiro" as Area,
+    titulo: "Banheiro",
+    descricao: "Fila, uma pessoa por vez",
+    icone: DoorOpen,
+    cor: "bg-alerta text-alerta-foreground",
+  },
   {
     para: "/material" as const,
     area: "material" as Area,
