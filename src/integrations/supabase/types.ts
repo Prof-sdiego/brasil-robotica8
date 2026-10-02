@@ -311,6 +311,56 @@ export type Database = {
         }
         Relationships: []
       }
+      fila_banheiro: {
+        Row: {
+          created_at: string
+          dia: string
+          equipe_id: string
+          id: string
+          integrante_id: string
+          nome: string
+          nome_equipe: string
+          saiu_em: string | null
+          status: string
+          turma: string
+          voltou_em: string | null
+        }
+        Insert: {
+          created_at?: string
+          dia: string
+          equipe_id: string
+          id?: string
+          integrante_id: string
+          nome?: string
+          nome_equipe?: string
+          saiu_em?: string | null
+          status?: string
+          turma?: string
+          voltou_em?: string | null
+        }
+        Update: {
+          created_at?: string
+          dia?: string
+          equipe_id?: string
+          id?: string
+          integrante_id?: string
+          nome?: string
+          nome_equipe?: string
+          saiu_em?: string | null
+          status?: string
+          turma?: string
+          voltou_em?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fila_banheiro_equipe_id_fkey"
+            columns: ["equipe_id"]
+            isOneToOne: false
+            referencedRelation: "equipes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       materiais: {
         Row: {
           ativo: boolean
@@ -403,6 +453,50 @@ export type Database = {
             columns: ["material_id"]
             isOneToOne: false
             referencedRelation: "materiais"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      presencas: {
+        Row: {
+          created_at: string
+          dia: string
+          equipe_id: string
+          id: string
+          integrante_id: string
+          marcado_por: string
+          nome: string
+          presente: boolean
+          turma: string
+        }
+        Insert: {
+          created_at?: string
+          dia: string
+          equipe_id: string
+          id?: string
+          integrante_id: string
+          marcado_por?: string
+          nome?: string
+          presente?: boolean
+          turma?: string
+        }
+        Update: {
+          created_at?: string
+          dia?: string
+          equipe_id?: string
+          id?: string
+          integrante_id?: string
+          marcado_por?: string
+          nome?: string
+          presente?: boolean
+          turma?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "presencas_equipe_id_fkey"
+            columns: ["equipe_id"]
+            isOneToOne: false
+            referencedRelation: "equipes"
             referencedColumns: ["id"]
           },
         ]

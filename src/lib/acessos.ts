@@ -12,7 +12,9 @@ export type Area =
   | "design"
   | "ajustes"
   | "avaliacao"
-  | "material";
+  | "material"
+  | "banheiro"
+  | "presenca";
 
 const TODAS: Area[] = [
   "equipe",
@@ -25,6 +27,8 @@ const TODAS: Area[] = [
   "ajustes",
   "avaliacao",
   "material",
+  "banheiro",
+  "presenca",
 ];
 
 export const ESPECIALIDADES: { id: Especialidade; nome: string; icone: string; descricao: string }[] =
@@ -70,7 +74,14 @@ export function nomeComPapel(integrante: Integrante): string {
 /** Áreas liberadas para este integrante. */
 export function areasDoIntegrante(integrante: Integrante | null): Area[] {
   const base = areasBase(integrante);
-  return base.includes("material") ? base : [...base, "material"];
+  const extras: Area[] = ["material", "banheiro"];
+  if (eCoordenador(integrante)) extras.push("presenca");
+  return [...base, ...extras.filter((a) => !base.includes(a))];
+}
+
+/** Programador e ajudantes (staff): marcam presença e "voltou" do banheiro. */
+export function eCoordenador(integrante: Integrante | null): boolean {
+  return !integrante || integrante.papel === "Programador" || integrante.papel === "Ajudante";
 }
 
 function areasBase(integrante: Integrante | null): Area[] {
