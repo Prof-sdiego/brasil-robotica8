@@ -1,8 +1,9 @@
 import { createFileRoute, Link, Outlet } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { ClipboardList, GraduationCap, ListPlus, LayoutGrid, LogOut, Lock, Gamepad2, NotebookPen } from "lucide-react";
+import { ClipboardList, GraduationCap, ListPlus, LayoutGrid, LogOut, Lock, Gamepad2, NotebookPen, Package } from "lucide-react";
 import { useState } from "react";
 
+import { AvisoPedidos } from "@/components/AvisoPedidos";
 import { conferirSenhaProfessor } from "@/lib/professor.functions";
 import { entrarComoProfessor, sairDoProfessor, useProfessorLogado } from "@/lib/sessao";
 
@@ -120,6 +121,13 @@ function AreaProfessor() {
           >
             <NotebookPen className="size-4" /> Minha avaliação
           </Link>
+          <Link
+            to="/professor/materiais"
+            className="flex items-center gap-1 rounded-full bg-card/25 px-3 py-2 text-sm font-bold"
+            activeProps={{ className: "bg-card text-secondary" }}
+          >
+            <Package className="size-4" /> Materiais
+          </Link>
           <button
             onClick={() => {
               sairDoProfessor();
@@ -131,6 +139,7 @@ function AreaProfessor() {
           </button>
         </div>
       </header>
+      <AvisoPedidos />
       <Outlet />
     </div>
   );

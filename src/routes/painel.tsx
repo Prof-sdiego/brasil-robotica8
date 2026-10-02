@@ -16,6 +16,7 @@ import {
   ClipboardList,
   Joystick,
   Smartphone,
+  Package,
 } from "lucide-react";
 import { useEffect } from "react";
 
@@ -48,6 +49,14 @@ export const Route = createFileRoute("/painel")({
 });
 
 const CARTOES = [
+  {
+    para: "/material" as const,
+    area: "material" as Area,
+    titulo: "Pedir material",
+    descricao: "Tinta, pincéis, papelão, motores...",
+    icone: Package,
+    cor: "bg-info text-info-foreground",
+  },
   {
     para: "/equipe" as const,
     area: "equipe" as Area,

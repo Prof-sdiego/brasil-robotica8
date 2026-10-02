@@ -19,6 +19,7 @@ import { Route as CoreografiasRouteImport } from './routes/coreografias'
 import { Route as DesignRouteImport } from './routes/design'
 import { Route as EngenhariaRouteImport } from './routes/engenharia'
 import { Route as EquipeRouteImport } from './routes/equipe'
+import { Route as MaterialRouteImport } from './routes/material'
 import { Route as MelhoriasRouteImport } from './routes/melhorias'
 import { Route as PainelRouteImport } from './routes/painel'
 import { Route as PilotarRouteImport } from './routes/pilotar'
@@ -80,6 +81,11 @@ const EngenhariaRoute = EngenhariaRouteImport.update({
 const EquipeRoute = EquipeRouteImport.update({
   id: '/equipe',
   path: '/equipe',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MaterialRoute = MaterialRouteImport.update({
+  id: '/material',
+  path: '/material',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MelhoriasRoute = MelhoriasRouteImport.update({
@@ -154,6 +160,7 @@ export interface FileRoutesByFullPath {
   '/design': typeof DesignRoute
   '/engenharia': typeof EngenhariaRoute
   '/equipe': typeof EquipeRoute
+  '/material': typeof MaterialRoute
   '/melhorias': typeof MelhoriasRoute
   '/painel': typeof PainelRoute
   '/pilotar': typeof PilotarRoute
@@ -178,6 +185,7 @@ export interface FileRoutesByTo {
   '/design': typeof DesignRoute
   '/engenharia': typeof EngenhariaRoute
   '/equipe': typeof EquipeRoute
+  '/material': typeof MaterialRoute
   '/melhorias': typeof MelhoriasRoute
   '/painel': typeof PainelRoute
   '/pilotar': typeof PilotarRoute
@@ -202,6 +210,7 @@ export interface FileRoutesById {
   '/design': typeof DesignRoute
   '/engenharia': typeof EngenhariaRoute
   '/equipe': typeof EquipeRoute
+  '/material': typeof MaterialRoute
   '/melhorias': typeof MelhoriasRoute
   '/painel': typeof PainelRoute
   '/pilotar': typeof PilotarRoute
@@ -228,6 +237,7 @@ export interface FileRouteTypes {
     | '/design'
     | '/engenharia'
     | '/equipe'
+    | '/material'
     | '/melhorias'
     | '/painel'
     | '/pilotar'
@@ -252,6 +262,7 @@ export interface FileRouteTypes {
     | '/design'
     | '/engenharia'
     | '/equipe'
+    | '/material'
     | '/melhorias'
     | '/painel'
     | '/pilotar'
@@ -275,6 +286,7 @@ export interface FileRouteTypes {
     | '/design'
     | '/engenharia'
     | '/equipe'
+    | '/material'
     | '/melhorias'
     | '/painel'
     | '/pilotar'
@@ -300,6 +312,7 @@ export interface RootRouteChildren {
   DesignRoute: typeof DesignRoute
   EngenhariaRoute: typeof EngenhariaRoute
   EquipeRoute: typeof EquipeRoute
+  MaterialRoute: typeof MaterialRoute
   MelhoriasRoute: typeof MelhoriasRoute
   PainelRoute: typeof PainelRoute
   PilotarRoute: typeof PilotarRoute
@@ -378,6 +391,13 @@ declare module '@tanstack/react-router' {
       path: '/equipe'
       fullPath: '/equipe'
       preLoaderRoute: typeof EquipeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/material': {
+      id: '/material'
+      path: '/material'
+      fullPath: '/material'
+      preLoaderRoute: typeof MaterialRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/melhorias': {
@@ -500,6 +520,7 @@ const rootRouteChildren: RootRouteChildren = {
   DesignRoute: DesignRoute,
   EngenhariaRoute: EngenhariaRoute,
   EquipeRoute: EquipeRoute,
+  MaterialRoute: MaterialRoute,
   MelhoriasRoute: MelhoriasRoute,
   PainelRoute: PainelRoute,
   PilotarRoute: PilotarRoute,
