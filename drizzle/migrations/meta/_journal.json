@@ -85,6 +85,13 @@
       "when": 1790944921949,
       "tag": "0011_pedido_troca",
       "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1790946086023,
+      "tag": "0012_configuracoes",
+      "breakpoints": true
     }
   ]
 }
