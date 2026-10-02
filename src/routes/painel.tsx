@@ -26,6 +26,8 @@ import { listarFaltantes, papeisFaltantes } from "@/lib/equipeStatus";
 import { AVISO_MODO_MUDOU } from "@/lib/modos";
 import { sairDaEquipe, useTutorialVisto } from "@/lib/sessao";
 import { useAluno } from "@/lib/useAluno";
+import { temBotaoDemais } from "@/lib/botoes";
+import { ErroBotoes } from "@/components/ErroBotoes";
 
 export const Route = createFileRoute("/painel")({
   head: () => ({
@@ -217,6 +219,12 @@ function Painel() {
             <span className="mt-1 block text-sm">Toque para esconder este aviso.</span>
           </span>
         </button>
+      )}
+
+      {areas.includes("programa") && temBotaoDemais(equipe.melhorias) && (
+        <div className="mt-4">
+          <ErroBotoes />
+        </div>
       )}
 
       {equipe.avisoVelocidade && (

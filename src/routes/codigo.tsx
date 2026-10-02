@@ -8,6 +8,8 @@ import { INSTRUCOES_INSTALACAO } from "@/lib/catalogo";
 import { montarCodigo } from "@/lib/gerador-codigo";
 import { AVISO_ANDROID, AVISO_PASSO_DOIS, enderecoDoPainel, PASSOS_CELULAR } from "@/lib/modos";
 import { useAluno } from "@/lib/useAluno";
+import { temBotaoDemais } from "@/lib/botoes";
+import { ErroBotoes } from "@/components/ErroBotoes";
 
 export const Route = createFileRoute("/codigo")({
   head: () => ({
@@ -88,6 +90,17 @@ function TelaCodigo() {
 
   if (carregando || !equipe || !codigos) {
     return <p className="p-8 text-center text-lg font-bold">Carregando...</p>;
+  }
+
+  if (temBotaoDemais(equipe.melhorias)) {
+    return (
+      <>
+        <Cabecalho titulo="Meu código" icone={<Code2 className="size-6" />} salvando={salvando} />
+        <main className="mx-auto max-w-3xl px-4 py-5">
+          <ErroBotoes />
+        </main>
+      </>
+    );
   }
 
   const painel = enderecoDoPainel(equipe);
