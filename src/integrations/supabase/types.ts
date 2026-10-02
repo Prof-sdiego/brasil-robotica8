@@ -311,6 +311,102 @@ export type Database = {
         }
         Relationships: []
       }
+      materiais: {
+        Row: {
+          ativo: boolean
+          cores: Json
+          created_at: string
+          id: string
+          limite_ativo: number | null
+          nome: string
+          precisa_devolver: boolean
+          quantidade_padrao: number
+          uma_vez: boolean
+        }
+        Insert: {
+          ativo?: boolean
+          cores?: Json
+          created_at?: string
+          id?: string
+          limite_ativo?: number | null
+          nome: string
+          precisa_devolver?: boolean
+          quantidade_padrao?: number
+          uma_vez?: boolean
+        }
+        Update: {
+          ativo?: boolean
+          cores?: Json
+          created_at?: string
+          id?: string
+          limite_ativo?: number | null
+          nome?: string
+          precisa_devolver?: boolean
+          quantidade_padrao?: number
+          uma_vez?: boolean
+        }
+        Relationships: []
+      }
+      pedidos_material: {
+        Row: {
+          cor: string | null
+          created_at: string
+          equipe_id: string
+          id: string
+          material_id: string
+          material_nome: string
+          nome_equipe: string
+          pedido_por: string
+          quantidade: number
+          status: string
+          turma: string
+          visto: boolean
+        }
+        Insert: {
+          cor?: string | null
+          created_at?: string
+          equipe_id: string
+          id?: string
+          material_id: string
+          material_nome?: string
+          nome_equipe?: string
+          pedido_por?: string
+          quantidade?: number
+          status?: string
+          turma?: string
+          visto?: boolean
+        }
+        Update: {
+          cor?: string | null
+          created_at?: string
+          equipe_id?: string
+          id?: string
+          material_id?: string
+          material_nome?: string
+          nome_equipe?: string
+          pedido_por?: string
+          quantidade?: number
+          status?: string
+          turma?: string
+          visto?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pedidos_material_equipe_id_fkey"
+            columns: ["equipe_id"]
+            isOneToOne: false
+            referencedRelation: "equipes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pedidos_material_material_id_fkey"
+            columns: ["material_id"]
+            isOneToOne: false
+            referencedRelation: "materiais"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       professor_registros: {
         Row: {
           ciclo: number | null

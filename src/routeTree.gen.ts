@@ -19,6 +19,7 @@ import { Route as CoreografiasRouteImport } from './routes/coreografias'
 import { Route as DesignRouteImport } from './routes/design'
 import { Route as EngenhariaRouteImport } from './routes/engenharia'
 import { Route as EquipeRouteImport } from './routes/equipe'
+import { Route as MaterialRouteImport } from './routes/material'
 import { Route as MelhoriasRouteImport } from './routes/melhorias'
 import { Route as PainelRouteImport } from './routes/painel'
 import { Route as PilotarRouteImport } from './routes/pilotar'
@@ -29,6 +30,7 @@ import { Route as ProfessorIndexRouteImport } from './routes/professor.index'
 import { Route as ProfessorAcompanhamentoRouteImport } from './routes/professor.acompanhamento'
 import { Route as ProfessorAvaliacoesRouteImport } from './routes/professor.avaliacoes'
 import { Route as ProfessorCadastroRouteImport } from './routes/professor.cadastro'
+import { Route as ProfessorMateriaisRouteImport } from './routes/professor.materiais'
 import { Route as ProfessorPilotarRouteImport } from './routes/professor.pilotar'
 import { Route as ProfessorEquipeIdRouteImport } from './routes/professor.equipe.$id'
 
@@ -82,6 +84,11 @@ const EquipeRoute = EquipeRouteImport.update({
   path: '/equipe',
   getParentRoute: () => rootRouteImport,
 } as any)
+const MaterialRoute = MaterialRouteImport.update({
+  id: '/material',
+  path: '/material',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const MelhoriasRoute = MelhoriasRouteImport.update({
   id: '/melhorias',
   path: '/melhorias',
@@ -132,6 +139,11 @@ const ProfessorCadastroRoute = ProfessorCadastroRouteImport.update({
   path: '/cadastro',
   getParentRoute: () => ProfessorRoute,
 } as any)
+const ProfessorMateriaisRoute = ProfessorMateriaisRouteImport.update({
+  id: '/materiais',
+  path: '/materiais',
+  getParentRoute: () => ProfessorRoute,
+} as any)
 const ProfessorPilotarRoute = ProfessorPilotarRouteImport.update({
   id: '/pilotar',
   path: '/pilotar',
@@ -154,6 +166,7 @@ export interface FileRoutesByFullPath {
   '/design': typeof DesignRoute
   '/engenharia': typeof EngenhariaRoute
   '/equipe': typeof EquipeRoute
+  '/material': typeof MaterialRoute
   '/melhorias': typeof MelhoriasRoute
   '/painel': typeof PainelRoute
   '/pilotar': typeof PilotarRoute
@@ -163,6 +176,7 @@ export interface FileRoutesByFullPath {
   '/professor/acompanhamento': typeof ProfessorAcompanhamentoRoute
   '/professor/avaliacoes': typeof ProfessorAvaliacoesRoute
   '/professor/cadastro': typeof ProfessorCadastroRoute
+  '/professor/materiais': typeof ProfessorMateriaisRoute
   '/professor/pilotar': typeof ProfessorPilotarRoute
   '/professor/': typeof ProfessorIndexRoute
   '/professor/equipe/$id': typeof ProfessorEquipeIdRoute
@@ -178,6 +192,7 @@ export interface FileRoutesByTo {
   '/design': typeof DesignRoute
   '/engenharia': typeof EngenhariaRoute
   '/equipe': typeof EquipeRoute
+  '/material': typeof MaterialRoute
   '/melhorias': typeof MelhoriasRoute
   '/painel': typeof PainelRoute
   '/pilotar': typeof PilotarRoute
@@ -186,6 +201,7 @@ export interface FileRoutesByTo {
   '/professor/acompanhamento': typeof ProfessorAcompanhamentoRoute
   '/professor/avaliacoes': typeof ProfessorAvaliacoesRoute
   '/professor/cadastro': typeof ProfessorCadastroRoute
+  '/professor/materiais': typeof ProfessorMateriaisRoute
   '/professor/pilotar': typeof ProfessorPilotarRoute
   '/professor': typeof ProfessorIndexRoute
   '/professor/equipe/$id': typeof ProfessorEquipeIdRoute
@@ -202,6 +218,7 @@ export interface FileRoutesById {
   '/design': typeof DesignRoute
   '/engenharia': typeof EngenhariaRoute
   '/equipe': typeof EquipeRoute
+  '/material': typeof MaterialRoute
   '/melhorias': typeof MelhoriasRoute
   '/painel': typeof PainelRoute
   '/pilotar': typeof PilotarRoute
@@ -211,6 +228,7 @@ export interface FileRoutesById {
   '/professor/acompanhamento': typeof ProfessorAcompanhamentoRoute
   '/professor/avaliacoes': typeof ProfessorAvaliacoesRoute
   '/professor/cadastro': typeof ProfessorCadastroRoute
+  '/professor/materiais': typeof ProfessorMateriaisRoute
   '/professor/pilotar': typeof ProfessorPilotarRoute
   '/professor/': typeof ProfessorIndexRoute
   '/professor/equipe/$id': typeof ProfessorEquipeIdRoute
@@ -228,6 +246,7 @@ export interface FileRouteTypes {
     | '/design'
     | '/engenharia'
     | '/equipe'
+    | '/material'
     | '/melhorias'
     | '/painel'
     | '/pilotar'
@@ -237,6 +256,7 @@ export interface FileRouteTypes {
     | '/professor/acompanhamento'
     | '/professor/avaliacoes'
     | '/professor/cadastro'
+    | '/professor/materiais'
     | '/professor/pilotar'
     | '/professor/'
     | '/professor/equipe/$id'
@@ -252,6 +272,7 @@ export interface FileRouteTypes {
     | '/design'
     | '/engenharia'
     | '/equipe'
+    | '/material'
     | '/melhorias'
     | '/painel'
     | '/pilotar'
@@ -260,6 +281,7 @@ export interface FileRouteTypes {
     | '/professor/acompanhamento'
     | '/professor/avaliacoes'
     | '/professor/cadastro'
+    | '/professor/materiais'
     | '/professor/pilotar'
     | '/professor'
     | '/professor/equipe/$id'
@@ -275,6 +297,7 @@ export interface FileRouteTypes {
     | '/design'
     | '/engenharia'
     | '/equipe'
+    | '/material'
     | '/melhorias'
     | '/painel'
     | '/pilotar'
@@ -284,6 +307,7 @@ export interface FileRouteTypes {
     | '/professor/acompanhamento'
     | '/professor/avaliacoes'
     | '/professor/cadastro'
+    | '/professor/materiais'
     | '/professor/pilotar'
     | '/professor/'
     | '/professor/equipe/$id'
@@ -300,6 +324,7 @@ export interface RootRouteChildren {
   DesignRoute: typeof DesignRoute
   EngenhariaRoute: typeof EngenhariaRoute
   EquipeRoute: typeof EquipeRoute
+  MaterialRoute: typeof MaterialRoute
   MelhoriasRoute: typeof MelhoriasRoute
   PainelRoute: typeof PainelRoute
   PilotarRoute: typeof PilotarRoute
@@ -380,6 +405,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EquipeRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/material': {
+      id: '/material'
+      path: '/material'
+      fullPath: '/material'
+      preLoaderRoute: typeof MaterialRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/melhorias': {
       id: '/melhorias'
       path: '/melhorias'
@@ -450,6 +482,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProfessorCadastroRouteImport
       parentRoute: typeof ProfessorRoute
     }
+    '/professor/materiais': {
+      id: '/professor/materiais'
+      path: '/materiais'
+      fullPath: '/professor/materiais'
+      preLoaderRoute: typeof ProfessorMateriaisRouteImport
+      parentRoute: typeof ProfessorRoute
+    }
     '/professor/pilotar': {
       id: '/professor/pilotar'
       path: '/pilotar'
@@ -471,6 +510,7 @@ interface ProfessorRouteChildren {
   ProfessorAcompanhamentoRoute: typeof ProfessorAcompanhamentoRoute
   ProfessorAvaliacoesRoute: typeof ProfessorAvaliacoesRoute
   ProfessorCadastroRoute: typeof ProfessorCadastroRoute
+  ProfessorMateriaisRoute: typeof ProfessorMateriaisRoute
   ProfessorPilotarRoute: typeof ProfessorPilotarRoute
   ProfessorIndexRoute: typeof ProfessorIndexRoute
   ProfessorEquipeIdRoute: typeof ProfessorEquipeIdRoute
@@ -480,6 +520,7 @@ const ProfessorRouteChildren: ProfessorRouteChildren = {
   ProfessorAcompanhamentoRoute: ProfessorAcompanhamentoRoute,
   ProfessorAvaliacoesRoute: ProfessorAvaliacoesRoute,
   ProfessorCadastroRoute: ProfessorCadastroRoute,
+  ProfessorMateriaisRoute: ProfessorMateriaisRoute,
   ProfessorPilotarRoute: ProfessorPilotarRoute,
   ProfessorIndexRoute: ProfessorIndexRoute,
   ProfessorEquipeIdRoute: ProfessorEquipeIdRoute,
@@ -500,6 +541,7 @@ const rootRouteChildren: RootRouteChildren = {
   DesignRoute: DesignRoute,
   EngenhariaRoute: EngenhariaRoute,
   EquipeRoute: EquipeRoute,
+  MaterialRoute: MaterialRoute,
   MelhoriasRoute: MelhoriasRoute,
   PainelRoute: PainelRoute,
   PilotarRoute: PilotarRoute,

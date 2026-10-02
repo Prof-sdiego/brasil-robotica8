@@ -1,0 +1,147 @@
+// Pedidos de material: o professor cadastra os materiais, as equipes pedem.
+
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useEffect } from "react";
+
+import { supabase } from "@/integrations/supabase/client";
+
+export type Material = {
+  id: string;
+  nome: string;
+  quantidade_padrao: number;
+  /** Quantos a equipe pode ter ao mesmo tempo (null = sem limite). */
+  limite_ativo: number | null;
+  uma_vez: boolean;
+  precisa_devolver: boolean;
+  cores: string[];
+  ativo: boolean;
+  created_at: string;
+};
+
+export type StatusPedido = "pendente" | "entregue" | "recusado" | "devolvido";
+
+export type Pedido = {
+  id: string;
+  material_id: string;
+  material_nome: string;
+  equipe_id: string;
+  turma: string;
+  nome_equipe: string;
+  pedido_por: string;
+  quantidade: number;
+  cor: string | null;
+  status: StatusPedido;
+  visto: boolean;
+  created_at: string;
+};
+
+export const NOME_STATUS: Record<StatusPedido, string> = {
+  pendente: "Esperando o professor",
+  entregue: "Entregue",
+  recusado: "Recusado",
+  devolvido: "Devolvido",
+};
+
+const db = supabase as unknown as { from: (t: string) => any; channel: typeof supabase.channel; removeChannel: typeof supabase.removeChannel };
+
+export function useMateriais() {
+  return useQuery({
+    queryKey: ["materiais"],
+    queryFn: async (): Promise<Material[]> => {
+      const { data, error } = await db.from("materiais").select("*").order("created_at");
+      if (error) throw error;
+      return (data ?? []) as Material[];
+    },
+  });
+}
+
+export function usePedidos(equipeId?: string) {
+  const qc = useQueryClient();
+  useEffect(() => {
+    const canal = db
+      .channel(`pedidos-${equipeId ?? "todos"}-${Math.random().toString(36).slice(2)}`)
+      .on("postgres_changes", { event: "*", schema: "public", table: "pedidos_material" }, () => {
+        void qc.invalidateQueries({ queryKey: ["pedidos"] });
+      })
+      .subscribe();
+    return () => {
+      void db.removeChannel(canal);
+    };
+  }, [qc, equipeId]);
+  return useQuery({
+    queryKey: ["pedidos", equipeId ?? "todos"],
+    queryFn: async (): Promise<Pedido[]> => {
+      let q = db.from("pedidos_material").select("*").order("created_at", { ascending: false });
+      if (equipeId) q = q.eq("equipe_id", equipeId);
+      const { data, error } = await q;
+      if (error) throw error;
+      return (data ?? []) as Pedido[];
+    },
+    refetchInterval: 15000,
+  });
+}
+
+export function useRecarregarMateriais() {
+  const qc = useQueryClient();
+  return () =>
+    Promise.all([
+      qc.invalidateQueries({ queryKey: ["materiais"] }),
+      qc.invalidateQueries({ queryKey: ["pedidos"] }),
+    ]);
+}
+
+/** Pedidos que ainda contam (não recusados nem devolvidos). */
+function ativos(pedidos: Pedido[], materialId: string) {
+  return pedidos.filter(
+    (p) => p.material_id === materialId && (p.status === "pendente" || p.status === "entregue"),
+  );
+}
+
+/** Por que a equipe não pode pedir agora (ou null se pode). */
+export function bloqueioDoPedido(material: Material, pedidos: Pedido[], quantas = 1): string | null {
+  const daEquipe = pedidos.filter((p) => p.material_id === material.id);
+  if (material.uma_vez && daEquipe.some((p) => p.status !== "recusado")) {
+    return "Este material só pode ser pedido uma vez.";
+  }
+  if (material.limite_ativo !== null) {
+    const emUso = ativos(pedidos, material.id).reduce((s, p) => s + (material.cores.length ? 1 : p.quantidade), 0);
+    if (emUso + quantas > material.limite_ativo) {
+      return material.precisa_devolver
+        ? `Vocês já têm ${emUso} de ${material.limite_ativo}. Devolvam ao professor para pedir mais.`
+        : `O limite é ${material.limite_ativo}.`;
+    }
+  }
+  return null;
+}
+
+export function quantosEmUso(material: Material, pedidos: Pedido[]): number {
+  return ativos(pedidos, material.id).reduce((s, p) => s + (material.cores.length ? 1 : p.quantidade), 0);
+}
+
+export async function fazerPedidos(linhas: Omit<Pedido, "id" | "status" | "visto" | "created_at">[]) {
+  const { error } = await db.from("pedidos_material").insert(linhas);
+  if (error) throw error;
+}
+
+export async function mudarPedido(id: string, dados: Partial<Pick<Pedido, "status" | "visto">>) {
+  const { error } = await db.from("pedidos_material").update(dados).eq("id", id);
+  if (error) throw error;
+}
+
+export async function marcarTodosVistos() {
+  const { error } = await db.from("pedidos_material").update({ visto: true }).eq("visto", false);
+  if (error) throw error;
+}
+
+export async function salvarMaterial(dados: Partial<Material> & { nome: string }) {
+  const { id, created_at: _c, ...resto } = dados;
+  const { error } = id
+    ? await db.from("materiais").update(resto).eq("id", id)
+    : await db.from("materiais").insert(resto);
+  if (error) throw error;
+}
+
+export async function apagarMaterial(id: string) {
+  const { error } = await db.from("materiais").delete().eq("id", id);
+  if (error) throw error;
+}
