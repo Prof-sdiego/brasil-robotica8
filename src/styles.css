@@ -203,3 +203,30 @@
     var(--color-accent) 100%
   );
 }
+
+@keyframes aviso-banheiro-tremor {
+  0%, 100% { transform: translateX(0); }
+  12%, 36%, 60%, 84% { transform: translateX(-10px); }
+  24%, 48%, 72% { transform: translateX(10px); }
+}
+
+@keyframes aviso-banheiro-pulso {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.025); }
+}
+
+.aviso-banheiro-tremor body {
+  animation: aviso-banheiro-tremor 180ms ease-in-out 7;
+  overflow-x: hidden;
+}
+
+.aviso-banheiro-pulso {
+  animation: aviso-banheiro-pulso 700ms ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .aviso-banheiro-tremor body,
+  .aviso-banheiro-pulso {
+    animation: none;
+  }
+}

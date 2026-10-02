@@ -31,6 +31,7 @@ import { sairDaEquipe, useTutorialVisto } from "@/lib/sessao";
 import { useAluno } from "@/lib/useAluno";
 import { temBotaoDemais } from "@/lib/botoes";
 import { ErroBotoes } from "@/components/ErroBotoes";
+import { ResumoBanheiroEquipe } from "@/components/AvisoBanheiro";
 
 export const Route = createFileRoute("/painel")({
   head: () => ({
@@ -157,6 +158,8 @@ const CARTOES = [
   },
 ];
 
+const ACOES_DO_DIA = new Set(["/presenca", "/banheiro", "/material"]);
+
 function Painel() {
   const navigate = useNavigate();
   const { equipe, integrante, areas, carregando, codigo, salvar } = useAluno();
@@ -235,6 +238,8 @@ function Painel() {
         <BarraProgresso feitos={feitos} total={equipe.checklist.length} />
       </div>
 
+      <ResumoBanheiroEquipe />
+
       {equipe.avisoModo && (
         <button
           onClick={() => salvar({ avisoModo: false })}
@@ -273,8 +278,9 @@ function Painel() {
         </p>
       )}
 
-      <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2">
-        {CARTOES.filter((cartao) => areas.includes(cartao.area)).map((cartao) => {
+      <h2 className="mt-6 text-2xl">Para fazer hoje</h2>
+      <div className="mt-3 grid grid-cols-1 gap-4 sm:grid-cols-2">
+        {CARTOES.filter((cartao) => areas.includes(cartao.area) && ACOES_DO_DIA.has(cartao.para)).map((cartao) => {
           const bloqueado = travado && cartao.para !== "/equipe";
           if (bloqueado) {
             return (
@@ -310,6 +316,27 @@ function Painel() {
                   {cartao.descricao}
                 </span>
               </span>
+            </Link>
+          );
+        })}
+      </div>
+
+      <h2 className="mt-7 text-2xl">Trabalho da equipe</h2>
+      <div className="mt-3 grid grid-cols-1 gap-4 sm:grid-cols-2">
+        {CARTOES.filter((cartao) => areas.includes(cartao.area) && !ACOES_DO_DIA.has(cartao.para)).map((cartao) => {
+          const bloqueado = travado && cartao.para !== "/equipe";
+          if (bloqueado) {
+            return (
+              <div key={cartao.para} aria-disabled className="cartao-toque flex items-center gap-4 p-5 opacity-50 grayscale">
+                <span className="flex size-16 items-center justify-center rounded-2xl bg-muted text-muted-foreground"><Lock className="size-8" /></span>
+                <span><span className="block font-display text-2xl font-bold">{cartao.titulo}</span><span className="block text-sm font-semibold text-muted-foreground">Bloqueado até a equipe estar completa</span></span>
+              </div>
+            );
+          }
+          return (
+            <Link key={cartao.para} to={cartao.para} className="cartao-toque flex items-center gap-4 p-5 active:cartao-toque-ativo">
+              <span className={`flex size-16 items-center justify-center rounded-2xl ${cartao.cor}`}><cartao.icone className="size-8" /></span>
+              <span><span className="block font-display text-2xl font-bold">{cartao.titulo}</span><span className="block text-sm font-semibold text-muted-foreground">{cartao.descricao}</span></span>
             </Link>
           );
         })}
