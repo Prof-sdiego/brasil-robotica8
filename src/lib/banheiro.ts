@@ -88,7 +88,30 @@ export function useRecarregarFila() {
     Promise.all([
       qc.invalidateQueries({ queryKey: ["fila-banheiro"] }),
       qc.invalidateQueries({ queryKey: ["presencas"] }),
+      qc.invalidateQueries({ queryKey: ["banheiro-bloqueado"] }),
     ]);
+}
+
+/** Interruptor do professor: quando ligado, ninguém entra na fila. */
+export function useBanheiroBloqueado() {
+  useTempoReal("configuracoes", "banheiro-bloqueado");
+  return useQuery({
+    queryKey: ["banheiro-bloqueado"],
+    queryFn: async (): Promise<boolean> => {
+      const { data } = await db.from("configuracoes").select("valor").eq("chave", "bloquear_banheiro").maybeSingle();
+      return data?.valor === true;
+    },
+    refetchInterval: 15000,
+  });
+}
+
+export async function definirBanheiroBloqueado(valor: boolean) {
+  const { error } = await db.from("configuracoes").upsert({
+    chave: "bloquear_banheiro",
+    valor,
+    updated_at: new Date().toISOString(),
+  });
+  if (error) throw error;
 }
 
 /**
@@ -143,6 +166,8 @@ async function avancar(turma: string) {
 }
 
 export async function entrarNaFila(dados: Pick<ItemFila, "equipe_id" | "turma" | "nome_equipe" | "integrante_id" | "nome">) {
+  const { data: config } = await db.from("configuracoes").select("valor").eq("chave", "bloquear_banheiro").maybeSingle();
+  if (config?.valor === true) throw new Error("O professor pausou as idas ao banheiro.");
   const { error } = await db.from("fila_banheiro").insert({ ...dados, dia: hoje() });
   if (error) {
     if (String(error.code) === "23505") throw new Error("Essa pessoa já foi (ou está na fila) hoje.");

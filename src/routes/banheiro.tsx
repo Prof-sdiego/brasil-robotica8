@@ -10,6 +10,7 @@ import {
   ordemDaFila,
   quemEstaFora,
   tirarDaFila,
+  useBanheiroBloqueado,
   useFila,
   usePresencas,
   useRecarregarFila,
@@ -34,6 +35,7 @@ function TelaBanheiro() {
   const { equipe, integrante, carregando } = useAluno({ area: "banheiro" });
   const { data: fila } = useFila();
   const { data: presencas } = usePresencas();
+  const { data: bloqueado } = useBanheiroBloqueado();
   const recarregar = useRecarregarFila();
 
   if (carregando || !equipe) {
@@ -66,6 +68,11 @@ function TelaBanheiro() {
     <>
       <Cabecalho titulo="Banheiro" icone={<DoorOpen className="size-6" />} />
       <main className="mx-auto max-w-3xl space-y-4 px-4 py-5 pb-16">
+        {bloqueado && (
+          <p className="rounded-2xl bg-alerta px-4 py-3 text-lg font-extrabold text-alerta-foreground">
+            O professor pausou as idas ao banheiro. A fila atual continua visível.
+          </p>
+        )}
         <section className="cartao-toque p-5">
           <h2 className="text-xl">Quem está fora agora · {equipe.turma}</h2>
           {fora ? (
@@ -108,9 +115,10 @@ function TelaBanheiro() {
                   ) : !registro ? (
                     <button
                       onClick={() => void adicionar(i.id, i.nome)}
+                      disabled={bloqueado}
                       className="rounded-full bg-primary px-4 py-2 text-sm font-extrabold text-primary-foreground"
                     >
-                      Colocar na fila
+                      {bloqueado ? "Pausado" : "Colocar na fila"}
                     </button>
                   ) : registro.status === "fila" ? (
                     <>
