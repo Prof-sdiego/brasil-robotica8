@@ -11,6 +11,7 @@ import {
   NOME_STATUS,
   quantosEmUso,
   useMateriais,
+  usePedidosBloqueados,
   usePedidos,
   type Material,
   type Pedido,
@@ -35,6 +36,7 @@ function TelaMaterial() {
   const { equipe, integrante, carregando } = useAluno({ area: "material" });
   const { data: materiais } = useMateriais();
   const { data: pedidos } = usePedidos(equipe?.id);
+  const { data: bloqueado } = usePedidosBloqueados();
 
   if (carregando || !equipe) {
     return <p className="p-8 text-center text-lg font-bold">Carregando...</p>;
@@ -45,7 +47,12 @@ function TelaMaterial() {
     <>
       <Cabecalho titulo="Pedir material" icone={<Package className="size-6" />} />
       <main className="mx-auto max-w-3xl space-y-4 px-4 py-5 pb-16">
-        {(materiais ?? [])
+        {bloqueado && (
+          <p className="rounded-2xl bg-alerta px-4 py-3 text-lg font-extrabold text-alerta-foreground">
+            O professor pausou os pedidos. Esperem ele liberar.
+          </p>
+        )}
+        {!bloqueado && (materiais ?? [])
           .filter((m) => m.ativo)
           .map((m) => (
             <CartaoMaterial
