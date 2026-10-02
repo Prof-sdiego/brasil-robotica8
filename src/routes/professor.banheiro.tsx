@@ -1,13 +1,17 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { DoorOpen } from "lucide-react";
 import { useMemo, useState } from "react";
+import { toast } from "sonner";
 
+import { Switch } from "@/components/ui/switch";
 import {
+  definirBanheiroBloqueado,
   mandarAgora,
   marcarVoltou,
   ordemDaFila,
   quemEstaFora,
   tirarDaFila,
+  useBanheiroBloqueado,
   useFila,
   usePresencas,
   useRecarregarFila,
@@ -34,6 +38,7 @@ function ProfessorBanheiro() {
   const { data: fila } = useFila();
   const { data: presencas } = usePresencas();
   const recarregar = useRecarregarFila();
+  const { data: bloqueado } = useBanheiroBloqueado();
   const turmas = useMemo(
     () => ordenarTurmas(Array.from(new Set((equipes ?? []).map((e) => e.turma)))),
     [equipes],
@@ -50,8 +55,32 @@ function ProfessorBanheiro() {
     await recarregar();
   }
 
+  async function alternarBloqueio() {
+    try {
+      await definirBanheiroBloqueado(!bloqueado);
+      await recarregar();
+      toast.success(!bloqueado ? "Novas idas bloqueadas." : "Novas idas liberadas.");
+    } catch {
+      toast.error("Não deu para mudar o bloqueio.");
+    }
+  }
+
   return (
     <main className="mx-auto max-w-5xl space-y-6 px-4 py-6 pb-16">
+      <section className={`cartao-toque flex items-center gap-4 p-5 ${bloqueado ? "bg-alerta text-alerta-foreground" : ""}`}>
+        <div className="flex-1">
+          <h2 className="text-xl">Bloquear novas idas ao banheiro</h2>
+          <p className="text-sm font-bold">
+            {bloqueado ? "Bloqueado: ninguém entra na fila." : "Liberado: as equipes podem usar a fila."}
+          </p>
+        </div>
+        <Switch
+          checked={!!bloqueado}
+          onCheckedChange={() => void alternarBloqueio()}
+          aria-label="Bloquear novas idas ao banheiro"
+          className="scale-125"
+        />
+      </section>
       <section className="cartao-toque p-5">
         <h2 className="flex items-center gap-2 text-2xl">
           <DoorOpen className="size-6 text-secondary" /> Banheiro de hoje

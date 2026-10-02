@@ -1,12 +1,15 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Package, Trash2 } from "lucide-react";
+import { CheckCheck, Package, Trash2 } from "lucide-react";
 import { useState } from "react";
 
 import { useEquipes } from "@/lib/equipes";
+import { ordenarTurmas } from "@/lib/registros";
+import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 
 import {
   apagarMaterial,
+  marcarTudoDevolvido,
   mudarPedido,
   NOME_STATUS,
   salvarMaterial,
@@ -84,6 +87,17 @@ function Materiais() {
     }
   }
 
+  async function devolverTudo(grupo: { nome: string; ps: Pedido[] }) {
+    if (!confirm(`Marcar tudo que está com ${grupo.nome} como devolvido?`)) return;
+    try {
+      await marcarTudoDevolvido(grupo.ps.map((p) => p.id));
+      await recarregar();
+      toast.success("Tudo marcado como devolvido.");
+    } catch {
+      toast.error("Não deu para registrar as devoluções.");
+    }
+  }
+
   const lista = (pedidos ?? []).filter((p) => (filtro === "todos" ? p.status !== "entregue" : p.status === "pendente"));
   const entregues = (pedidos ?? []).filter(
     (p) => p.status === "entregue" && materiais?.find((m) => m.id === p.material_id)?.precisa_devolver,
@@ -97,6 +111,8 @@ function Materiais() {
       return { id, ps, turma: ps[0]!.turma, nome: ps[0]!.nome_equipe, prog: prog || "sem programador" };
     })
     .sort((a, b) => (a.turma + a.nome).localeCompare(b.turma + b.nome));
+  const turmasPedidos = ordenarTurmas(Array.from(new Set(lista.map((p) => p.turma))));
+  const turmasEntregas = ordenarTurmas(Array.from(new Set(grupos.map((g) => g.turma))));
   const campo = "rounded-xl border-2 border-input bg-background px-3 py-2 font-bold";
 
   return (
@@ -122,8 +138,12 @@ function Materiais() {
             </button>
           ))}
         </div>
-        <ul className="mt-4 space-y-2">
-          {lista.map((p) => (
+        <div className="mt-4 space-y-5">
+          {turmasPedidos.map((nomeTurma) => (
+            <div key={nomeTurma}>
+              <h3 className="mb-2 border-b-2 border-secondary pb-1 text-xl">Turma {nomeTurma}</h3>
+              <ul className="space-y-2">
+          {lista.filter((p) => p.turma === nomeTurma).map((p) => (
             <li key={p.id} className="flex flex-wrap items-center gap-2 rounded-xl bg-muted/50 px-3 py-2">
               <span className="flex-1">
                 <b>{p.turma} · {p.nome_equipe}</b> — {p.quantidade > 1 ? `${p.quantidade} × ` : ""}{p.material_nome}
@@ -149,17 +169,31 @@ function Materiais() {
               )}
             </li>
           ))}
-          {lista.length === 0 && <li className="font-bold text-muted-foreground">Nenhum pedido aqui.</li>}
-        </ul>
+              </ul>
+            </div>
+          ))}
+          {lista.length === 0 && <p className="font-bold text-muted-foreground">Nenhum pedido aqui.</p>}
+        </div>
       </section>
 
       <section className="cartao-toque p-5">
         <h2 className="text-2xl">Com as equipes (já entregue)</h2>
-        <div className="mt-4 grid gap-3 sm:grid-cols-2">
-          {grupos.map((g) => (
+        <div className="mt-4 space-y-6">
+          {turmasEntregas.map((nomeTurma) => (
+            <div key={nomeTurma}>
+              <h3 className="mb-3 border-b-2 border-secondary pb-1 text-xl">Turma {nomeTurma}</h3>
+              <div className="grid gap-3 sm:grid-cols-2">
+          {grupos.filter((g) => g.turma === nomeTurma).map((g) => (
             <div key={g.id} className="rounded-2xl bg-muted/50 p-3">
-              <h3 className="text-lg">{g.turma} · {g.nome}</h3>
+              <div className="flex flex-wrap items-start gap-2">
+                <div className="flex-1">
+                  <h4 className="text-lg font-bold">{g.nome}</h4>
               <p className="text-sm font-bold text-muted-foreground">Programador: {g.prog}</p>
+                </div>
+                <Button size="sm" variant="secondary" onClick={() => void devolverTudo(g)}>
+                  <CheckCheck /> Tudo devolvido
+                </Button>
+              </div>
               <ul className="mt-2 space-y-1">
                 {g.ps.map((p) => {
                   const devolve = materiais?.find((m) => m.id === p.material_id)?.precisa_devolver;
@@ -175,6 +209,9 @@ function Materiais() {
                   );
                 })}
               </ul>
+            </div>
+          ))}
+              </div>
             </div>
           ))}
           {grupos.length === 0 && <p className="font-bold text-muted-foreground">Nada entregue ainda.</p>}

@@ -132,6 +132,12 @@ export async function mudarPedido(id: string, dados: Partial<Pick<Pedido, "statu
   if (error) throw error;
 }
 
+export async function marcarTudoDevolvido(ids: string[]) {
+  if (ids.length === 0) return;
+  const { error } = await db.from("pedidos_material").update({ status: "devolvido" }).in("id", ids).eq("status", "entregue");
+  if (error) throw error;
+}
+
 export async function marcarTodosVistos() {
   const { error } = await db.from("pedidos_material").update({ visto: true }).eq("visto", false);
   if (error) throw error;
