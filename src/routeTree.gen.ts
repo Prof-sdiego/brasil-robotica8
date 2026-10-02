@@ -30,6 +30,7 @@ import { Route as ProfessorIndexRouteImport } from './routes/professor.index'
 import { Route as ProfessorAcompanhamentoRouteImport } from './routes/professor.acompanhamento'
 import { Route as ProfessorAvaliacoesRouteImport } from './routes/professor.avaliacoes'
 import { Route as ProfessorCadastroRouteImport } from './routes/professor.cadastro'
+import { Route as ProfessorMateriaisRouteImport } from './routes/professor.materiais'
 import { Route as ProfessorPilotarRouteImport } from './routes/professor.pilotar'
 import { Route as ProfessorEquipeIdRouteImport } from './routes/professor.equipe.$id'
 
@@ -138,6 +139,11 @@ const ProfessorCadastroRoute = ProfessorCadastroRouteImport.update({
   path: '/cadastro',
   getParentRoute: () => ProfessorRoute,
 } as any)
+const ProfessorMateriaisRoute = ProfessorMateriaisRouteImport.update({
+  id: '/materiais',
+  path: '/materiais',
+  getParentRoute: () => ProfessorRoute,
+} as any)
 const ProfessorPilotarRoute = ProfessorPilotarRouteImport.update({
   id: '/pilotar',
   path: '/pilotar',
@@ -170,6 +176,7 @@ export interface FileRoutesByFullPath {
   '/professor/acompanhamento': typeof ProfessorAcompanhamentoRoute
   '/professor/avaliacoes': typeof ProfessorAvaliacoesRoute
   '/professor/cadastro': typeof ProfessorCadastroRoute
+  '/professor/materiais': typeof ProfessorMateriaisRoute
   '/professor/pilotar': typeof ProfessorPilotarRoute
   '/professor/': typeof ProfessorIndexRoute
   '/professor/equipe/$id': typeof ProfessorEquipeIdRoute
@@ -194,6 +201,7 @@ export interface FileRoutesByTo {
   '/professor/acompanhamento': typeof ProfessorAcompanhamentoRoute
   '/professor/avaliacoes': typeof ProfessorAvaliacoesRoute
   '/professor/cadastro': typeof ProfessorCadastroRoute
+  '/professor/materiais': typeof ProfessorMateriaisRoute
   '/professor/pilotar': typeof ProfessorPilotarRoute
   '/professor': typeof ProfessorIndexRoute
   '/professor/equipe/$id': typeof ProfessorEquipeIdRoute
@@ -220,6 +228,7 @@ export interface FileRoutesById {
   '/professor/acompanhamento': typeof ProfessorAcompanhamentoRoute
   '/professor/avaliacoes': typeof ProfessorAvaliacoesRoute
   '/professor/cadastro': typeof ProfessorCadastroRoute
+  '/professor/materiais': typeof ProfessorMateriaisRoute
   '/professor/pilotar': typeof ProfessorPilotarRoute
   '/professor/': typeof ProfessorIndexRoute
   '/professor/equipe/$id': typeof ProfessorEquipeIdRoute
@@ -247,6 +256,7 @@ export interface FileRouteTypes {
     | '/professor/acompanhamento'
     | '/professor/avaliacoes'
     | '/professor/cadastro'
+    | '/professor/materiais'
     | '/professor/pilotar'
     | '/professor/'
     | '/professor/equipe/$id'
@@ -271,6 +281,7 @@ export interface FileRouteTypes {
     | '/professor/acompanhamento'
     | '/professor/avaliacoes'
     | '/professor/cadastro'
+    | '/professor/materiais'
     | '/professor/pilotar'
     | '/professor'
     | '/professor/equipe/$id'
@@ -296,6 +307,7 @@ export interface FileRouteTypes {
     | '/professor/acompanhamento'
     | '/professor/avaliacoes'
     | '/professor/cadastro'
+    | '/professor/materiais'
     | '/professor/pilotar'
     | '/professor/'
     | '/professor/equipe/$id'
@@ -470,6 +482,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProfessorCadastroRouteImport
       parentRoute: typeof ProfessorRoute
     }
+    '/professor/materiais': {
+      id: '/professor/materiais'
+      path: '/materiais'
+      fullPath: '/professor/materiais'
+      preLoaderRoute: typeof ProfessorMateriaisRouteImport
+      parentRoute: typeof ProfessorRoute
+    }
     '/professor/pilotar': {
       id: '/professor/pilotar'
       path: '/pilotar'
@@ -491,6 +510,7 @@ interface ProfessorRouteChildren {
   ProfessorAcompanhamentoRoute: typeof ProfessorAcompanhamentoRoute
   ProfessorAvaliacoesRoute: typeof ProfessorAvaliacoesRoute
   ProfessorCadastroRoute: typeof ProfessorCadastroRoute
+  ProfessorMateriaisRoute: typeof ProfessorMateriaisRoute
   ProfessorPilotarRoute: typeof ProfessorPilotarRoute
   ProfessorIndexRoute: typeof ProfessorIndexRoute
   ProfessorEquipeIdRoute: typeof ProfessorEquipeIdRoute
@@ -500,6 +520,7 @@ const ProfessorRouteChildren: ProfessorRouteChildren = {
   ProfessorAcompanhamentoRoute: ProfessorAcompanhamentoRoute,
   ProfessorAvaliacoesRoute: ProfessorAvaliacoesRoute,
   ProfessorCadastroRoute: ProfessorCadastroRoute,
+  ProfessorMateriaisRoute: ProfessorMateriaisRoute,
   ProfessorPilotarRoute: ProfessorPilotarRoute,
   ProfessorIndexRoute: ProfessorIndexRoute,
   ProfessorEquipeIdRoute: ProfessorEquipeIdRoute,
