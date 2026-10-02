@@ -10,3 +10,4 @@
 <!-- LOVABLE:END -->
 
 - Shared classroom pauses use boolean rows in `configuracoes`; this keeps teacher toggles persistent and live across student screens.
+- Student-wide time-sensitive alerts render from the root layout so every allowed student screen receives them.
