@@ -78,6 +78,13 @@
       "when": 1790941088605,
       "tag": "0010_banheiro_presenca",
       "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1790944921949,
+      "tag": "0011_pedido_troca",
+      "breakpoints": true
     }
   ]
 }

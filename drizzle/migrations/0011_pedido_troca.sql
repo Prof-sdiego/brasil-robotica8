@@ -1,0 +1,1 @@
+ALTER TABLE public.pedidos_material ADD COLUMN IF NOT EXISTS devolve_pedido_id uuid, ADD COLUMN IF NOT EXISTS devolve_cor text;
