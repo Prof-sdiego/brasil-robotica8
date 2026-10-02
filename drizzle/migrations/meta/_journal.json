@@ -57,6 +57,13 @@
       "when": 1790352779168,
       "tag": "0007_corrigir_nome_yasmin",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1790939668332,
+      "tag": "0008_professor_registros",
+      "breakpoints": true
     }
   ]
 }
