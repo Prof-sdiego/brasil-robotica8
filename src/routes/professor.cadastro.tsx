@@ -13,6 +13,7 @@ import {
   useEquipes,
   type CadastroEquipe,
 } from "@/lib/equipes";
+import { ordenarTurmas } from "@/lib/registros";
 
 export const Route = createFileRoute("/professor/cadastro")({
   head: () => ({
@@ -37,6 +38,7 @@ function Cadastro() {
   const queryClient = useQueryClient();
   const [texto, setTexto] = useState("");
   const [salvandoId, setSalvandoId] = useState<string | null>(null);
+  const turmas = ordenarTurmas(Array.from(new Set((equipes ?? []).map((e) => e.turma))));
 
   function recarregar() {
     queryClient.invalidateQueries({ queryKey: ["equipes"] });
@@ -144,9 +146,13 @@ function Cadastro() {
         </div>
       </section>
 
-      <h2 className="mt-6 mb-3 text-xl">Equipes cadastradas ({equipes?.length ?? 0})</h2>
-      <div className="space-y-3">
-        {(equipes ?? []).map((equipe) => (
+      <h2 className="mt-6 text-xl">Equipes cadastradas ({equipes?.length ?? 0})</h2>
+      <div className="mt-3 space-y-7">
+        {turmas.map((nomeTurma) => (
+          <section key={nomeTurma}>
+            <h3 className="mb-3 border-b-2 border-secondary pb-1 text-xl">Turma {nomeTurma}</h3>
+            <div className="space-y-3">
+        {(equipes ?? []).filter((equipe) => equipe.turma === nomeTurma).map((equipe) => (
           <LinhaCadastro
             key={equipe.id}
             id={equipe.id}
@@ -176,6 +182,9 @@ function Cadastro() {
               recarregar();
             }}
           />
+        ))}
+            </div>
+          </section>
         ))}
       </div>
     </main>

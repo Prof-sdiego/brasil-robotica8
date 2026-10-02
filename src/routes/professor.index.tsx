@@ -6,6 +6,7 @@ import { BarraProgresso } from "@/components/BarraProgresso";
 import { Etiqueta } from "@/components/Etiqueta";
 import { ITEM_CELULAR_TESTADO, MELHORIAS, PAPEIS, PAPEIS_OBRIGATORIOS } from "@/lib/catalogo";
 import { useEquipes } from "@/lib/equipes";
+import { ordenarTurmas } from "@/lib/registros";
 import type { Equipe } from "@/lib/tipos";
 
 export const Route = createFileRoute("/professor/")({
@@ -47,7 +48,7 @@ function VisaoGeral() {
   const [porProgresso, setPorProgresso] = useState(false);
 
   const turmas = useMemo(
-    () => Array.from(new Set((equipes ?? []).map((e) => e.turma))).sort(),
+    () => ordenarTurmas(Array.from(new Set((equipes ?? []).map((e) => e.turma)))),
     [equipes],
   );
 
@@ -67,9 +68,14 @@ function VisaoGeral() {
         (a, b) =>
           a.checklist.filter((i) => i.marcado).length - b.checklist.filter((i) => i.marcado).length,
       );
+    } else {
+      resultado.sort((a, b) => {
+        const porTurma = turmas.indexOf(a.turma) - turmas.indexOf(b.turma);
+        return porTurma || a.nomeEquipe.localeCompare(b.nomeEquipe);
+      });
     }
     return resultado;
-  }, [equipes, turma, porProgresso]);
+  }, [equipes, turma, porProgresso, turmas]);
 
   const resumo = useMemo(() => {
     const todas = equipes ?? [];
@@ -161,6 +167,8 @@ function VisaoGeral() {
 
       <div className="mt-4 space-y-3">
         {lista.map((equipe) => {
+          const indice = lista.indexOf(equipe);
+          const mostrarTurma = turma === "todas" && !porProgresso && (indice === 0 || lista[indice - 1]?.turma !== equipe.turma);
           const feitos = equipe.checklist.filter((i) => i.marcado).length;
           const vagos = papeisVagos(equipe);
           const parada = paradaHaUmaSemana(equipe);
@@ -168,8 +176,9 @@ function VisaoGeral() {
           const temDesigner = equipe.integrantes.some((i) => i.papel === "Designer");
           const problema = vagos.length > 0 || parada || radioRepetido;
           return (
+            <div key={equipe.id} className="space-y-3">
+              {mostrarTurma && <h2 className="border-b-2 border-secondary pb-1 pt-3 text-xl">Turma {equipe.turma}</h2>}
             <Link
-              key={equipe.id}
               to="/professor/equipe/$id"
               params={{ id: equipe.id }}
               className={`cartao-toque block p-4 active:cartao-toque-ativo ${
@@ -258,6 +267,7 @@ function VisaoGeral() {
                 })}
               </p>
             </Link>
+            </div>
           );
         })}
       </div>
