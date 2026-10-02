@@ -13,7 +13,6 @@ import {
   useMateriais,
   usePedidosBloqueados,
   definirPedidosBloqueados,
-  ficaForaDoHistorico,
   usePedidos,
   useRecarregarMateriais,
   type Pedido,
