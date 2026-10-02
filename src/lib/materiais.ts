@@ -212,8 +212,3 @@ export async function definirPedidosBloqueados(valor: boolean) {
   const { error } = await db.from("configuracoes").upsert({ chave: "bloquear_pedidos", valor, updated_at: new Date().toISOString() });
   if (error) throw error;
 }
-
-/** Materiais que não entram na lista "com as equipes" (gastam e não voltam). */
-export function ficaForaDoHistorico(nome: string) {
-  return nome.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().includes("papelao");
-}

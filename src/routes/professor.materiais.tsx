@@ -13,7 +13,6 @@ import {
   useMateriais,
   usePedidosBloqueados,
   definirPedidosBloqueados,
-  ficaForaDoHistorico,
   usePedidos,
   useRecarregarMateriais,
   type Pedido,
@@ -86,7 +85,9 @@ function Materiais() {
   }
 
   const lista = (pedidos ?? []).filter((p) => (filtro === "todos" ? p.status !== "entregue" : p.status === "pendente"));
-  const entregues = (pedidos ?? []).filter((p) => p.status === "entregue" && !ficaForaDoHistorico(p.material_nome));
+  const entregues = (pedidos ?? []).filter(
+    (p) => p.status === "entregue" && materiais?.find((m) => m.id === p.material_id)?.precisa_devolver,
+  );
   const porEquipe = new Map<string, Pedido[]>();
   for (const p of entregues) porEquipe.set(p.equipe_id, [...(porEquipe.get(p.equipe_id) ?? []), p]);
   const grupos = Array.from(porEquipe.entries())
