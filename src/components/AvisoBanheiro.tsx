@@ -126,7 +126,7 @@ export function AvisoBanheiroEquipe() {
   const coordena = eCoordenador(integrante);
 
   function fechar() {
-    const lista = [...vistos, vez.id].slice(-50);
+    const lista = [...vistos, vez!.id].slice(-50);
     localStorage.setItem(CHAVE, JSON.stringify(lista));
     setVistos(lista);
   }
