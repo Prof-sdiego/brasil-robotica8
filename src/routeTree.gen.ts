@@ -33,6 +33,7 @@ import { Route as ProfessorAcompanhamentoRouteImport } from './routes/professor.
 import { Route as ProfessorAvaliacoesRouteImport } from './routes/professor.avaliacoes'
 import { Route as ProfessorBanheiroRouteImport } from './routes/professor.banheiro'
 import { Route as ProfessorCadastroRouteImport } from './routes/professor.cadastro'
+import { Route as ProfessorFinalRouteImport } from './routes/professor.final'
 import { Route as ProfessorMateriaisRouteImport } from './routes/professor.materiais'
 import { Route as ProfessorPilotarRouteImport } from './routes/professor.pilotar'
 import { Route as ProfessorPresencaRouteImport } from './routes/professor.presenca'
@@ -158,6 +159,11 @@ const ProfessorCadastroRoute = ProfessorCadastroRouteImport.update({
   path: '/cadastro',
   getParentRoute: () => ProfessorRoute,
 } as any)
+const ProfessorFinalRoute = ProfessorFinalRouteImport.update({
+  id: '/final',
+  path: '/final',
+  getParentRoute: () => ProfessorRoute,
+} as any)
 const ProfessorMateriaisRoute = ProfessorMateriaisRouteImport.update({
   id: '/materiais',
   path: '/materiais',
@@ -203,6 +209,7 @@ export interface FileRoutesByFullPath {
   '/professor/avaliacoes': typeof ProfessorAvaliacoesRoute
   '/professor/banheiro': typeof ProfessorBanheiroRoute
   '/professor/cadastro': typeof ProfessorCadastroRoute
+  '/professor/final': typeof ProfessorFinalRoute
   '/professor/materiais': typeof ProfessorMateriaisRoute
   '/professor/pilotar': typeof ProfessorPilotarRoute
   '/professor/presenca': typeof ProfessorPresencaRoute
@@ -232,6 +239,7 @@ export interface FileRoutesByTo {
   '/professor/avaliacoes': typeof ProfessorAvaliacoesRoute
   '/professor/banheiro': typeof ProfessorBanheiroRoute
   '/professor/cadastro': typeof ProfessorCadastroRoute
+  '/professor/final': typeof ProfessorFinalRoute
   '/professor/materiais': typeof ProfessorMateriaisRoute
   '/professor/pilotar': typeof ProfessorPilotarRoute
   '/professor/presenca': typeof ProfessorPresencaRoute
@@ -263,6 +271,7 @@ export interface FileRoutesById {
   '/professor/avaliacoes': typeof ProfessorAvaliacoesRoute
   '/professor/banheiro': typeof ProfessorBanheiroRoute
   '/professor/cadastro': typeof ProfessorCadastroRoute
+  '/professor/final': typeof ProfessorFinalRoute
   '/professor/materiais': typeof ProfessorMateriaisRoute
   '/professor/pilotar': typeof ProfessorPilotarRoute
   '/professor/presenca': typeof ProfessorPresencaRoute
@@ -295,6 +304,7 @@ export interface FileRouteTypes {
     | '/professor/avaliacoes'
     | '/professor/banheiro'
     | '/professor/cadastro'
+    | '/professor/final'
     | '/professor/materiais'
     | '/professor/pilotar'
     | '/professor/presenca'
@@ -324,6 +334,7 @@ export interface FileRouteTypes {
     | '/professor/avaliacoes'
     | '/professor/banheiro'
     | '/professor/cadastro'
+    | '/professor/final'
     | '/professor/materiais'
     | '/professor/pilotar'
     | '/professor/presenca'
@@ -354,6 +365,7 @@ export interface FileRouteTypes {
     | '/professor/avaliacoes'
     | '/professor/banheiro'
     | '/professor/cadastro'
+    | '/professor/final'
     | '/professor/materiais'
     | '/professor/pilotar'
     | '/professor/presenca'
@@ -553,6 +565,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProfessorCadastroRouteImport
       parentRoute: typeof ProfessorRoute
     }
+    '/professor/final': {
+      id: '/professor/final'
+      path: '/final'
+      fullPath: '/professor/final'
+      preLoaderRoute: typeof ProfessorFinalRouteImport
+      parentRoute: typeof ProfessorRoute
+    }
     '/professor/materiais': {
       id: '/professor/materiais'
       path: '/materiais'
@@ -589,6 +608,7 @@ interface ProfessorRouteChildren {
   ProfessorAvaliacoesRoute: typeof ProfessorAvaliacoesRoute
   ProfessorBanheiroRoute: typeof ProfessorBanheiroRoute
   ProfessorCadastroRoute: typeof ProfessorCadastroRoute
+  ProfessorFinalRoute: typeof ProfessorFinalRoute
   ProfessorMateriaisRoute: typeof ProfessorMateriaisRoute
   ProfessorPilotarRoute: typeof ProfessorPilotarRoute
   ProfessorPresencaRoute: typeof ProfessorPresencaRoute
@@ -601,6 +621,7 @@ const ProfessorRouteChildren: ProfessorRouteChildren = {
   ProfessorAvaliacoesRoute: ProfessorAvaliacoesRoute,
   ProfessorBanheiroRoute: ProfessorBanheiroRoute,
   ProfessorCadastroRoute: ProfessorCadastroRoute,
+  ProfessorFinalRoute: ProfessorFinalRoute,
   ProfessorMateriaisRoute: ProfessorMateriaisRoute,
   ProfessorPilotarRoute: ProfessorPilotarRoute,
   ProfessorPresencaRoute: ProfessorPresencaRoute,

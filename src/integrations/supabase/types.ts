@@ -86,6 +86,41 @@ export type Database = {
           },
         ]
       }
+      avaliacao_final: {
+        Row: {
+          dados: Json
+          equipe_id: string
+          finalizada: boolean
+          media: number | null
+          notas: Json
+          updated_at: string
+        }
+        Insert: {
+          dados?: Json
+          equipe_id: string
+          finalizada?: boolean
+          media?: number | null
+          notas?: Json
+          updated_at?: string
+        }
+        Update: {
+          dados?: Json
+          equipe_id?: string
+          finalizada?: boolean
+          media?: number | null
+          notas?: Json
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "avaliacao_final_equipe_id_fkey"
+            columns: ["equipe_id"]
+            isOneToOne: true
+            referencedRelation: "equipes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       avaliacao_liberacoes: {
         Row: {
           created_at: string
@@ -604,6 +639,13 @@ export type Database = {
           rodada_id: string
         }[]
       }
+      aluno_nota_final: {
+        Args: { _codigo: string }
+        Returns: {
+          media: number
+          notas: Json
+        }[]
+      }
       aluno_salvar_avaliacoes: {
         Args: {
           _avaliador_id: string
@@ -654,6 +696,23 @@ export type Database = {
           isSetofReturn: true
         }
       }
+      professor_listar_final: {
+        Args: { _senha: string }
+        Returns: {
+          dados: Json
+          equipe_id: string
+          finalizada: boolean
+          media: number | null
+          notas: Json
+          updated_at: string
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "avaliacao_final"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
       professor_listar_registros: {
         Args: { _senha: string }
         Returns: {
@@ -677,6 +736,17 @@ export type Database = {
       }
       professor_salvar_alunos: {
         Args: { _linhas: Json; _senha: string }
+        Returns: boolean
+      }
+      professor_salvar_final: {
+        Args: {
+          _dados: Json
+          _equipe_id: string
+          _finalizada: boolean
+          _media: number
+          _notas: Json
+          _senha: string
+        }
         Returns: boolean
       }
       professor_salvar_registros: {

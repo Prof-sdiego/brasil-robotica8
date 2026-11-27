@@ -32,6 +32,7 @@ import { useAluno } from "@/lib/useAluno";
 import { temBotaoDemais } from "@/lib/botoes";
 import { ErroBotoes } from "@/components/ErroBotoes";
 import { ResumoBanheiroEquipe } from "@/components/AvisoBanheiro";
+import { formatar, useNotaFinalEquipe } from "@/lib/avaliacaoFinal";
 
 export const Route = createFileRoute("/painel")({
   head: () => ({
@@ -163,6 +164,7 @@ const ACOES_DO_DIA = new Set(["/presenca", "/banheiro", "/material"]);
 function Painel() {
   const navigate = useNavigate();
   const { equipe, integrante, areas, carregando, codigo, salvar } = useAluno();
+  const { data: notaFinal } = useNotaFinalEquipe(codigo);
   const { pronto: tutorialPronto, visto: tutorialVisto } = useTutorialVisto(codigo);
 
   useEffect(() => {
@@ -237,6 +239,18 @@ function Painel() {
         <h2 className="mb-2 text-xl">Nosso progresso</h2>
         <BarraProgresso feitos={feitos} total={equipe.checklist.length} />
       </div>
+
+      {notaFinal && (
+        <section className="mt-4 rounded-2xl border-2 border-sucesso bg-sucesso/15 p-5">
+          <h2 className="text-xl">Nota da avaliação final: {formatar(notaFinal.media)}</h2>
+          <div className="mt-2 grid grid-cols-2 gap-2 text-sm font-bold sm:grid-cols-4">
+            <span>Desenvolvimento: {formatar(notaFinal.notas.desenvolvimento)}</span>
+            <span>Acabamento: {formatar(notaFinal.notas.acabamento)}</span>
+            <span>Engenharia: {formatar(notaFinal.notas.engenharia)}</span>
+            <span>Equipe: {formatar(notaFinal.notas.equipe)}</span>
+          </div>
+        </section>
+      )}
 
       <ResumoBanheiroEquipe />
 

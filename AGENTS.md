@@ -11,3 +11,4 @@
 
 - Shared classroom pauses use boolean rows in `configuracoes`; this keeps teacher toggles persistent and live across student screens.
 - Student-wide time-sensitive alerts render from the root layout so every allowed student screen receives them.
+- Final evaluation scoring rules live in one shared module with tests; the group only reads its result through a code-checked function after the teacher finalizes.
