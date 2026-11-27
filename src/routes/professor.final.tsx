@@ -57,7 +57,14 @@ function AvaliacaoFinal() {
               const n = f ? calcularNotas(f.dados) : null;
               return (
                 <tr key={e.id} className="border-t font-bold">
-                  <td className="py-2">{e.nomeEquipe}</td>
+                  <td className="py-2">
+                    <div className="font-extrabold">{e.nomeEquipe}</div>
+                    {e.integrantes.length > 0 && (
+                      <div className="mt-0.5 max-w-72 text-xs font-semibold text-muted-foreground">
+                        {e.integrantes.map((i) => i.nome).join(" · ")}
+                      </div>
+                    )}
+                  </td>
                   <td>{formatar(n?.desenvolvimento)}</td><td>{formatar(n?.acabamento)}</td>
                   <td>{formatar(n?.engenharia)}</td><td>{formatar(n?.equipe)}</td>
                   <td className="text-lg font-extrabold">{formatar(f?.media)}</td>
@@ -107,6 +114,23 @@ function Formulario({ equipe, senha, inicial, finalizada, onPronto }: { equipe: 
   return (
     <section className="cartao-toque space-y-5 p-5">
       <h2 className="text-2xl">{equipe.nomeEquipe} · {equipe.turma}</h2>
+
+      <div>
+        <p className="text-sm font-extrabold text-muted-foreground">
+          Integrantes ({equipe.integrantes.length})
+        </p>
+        {equipe.integrantes.length === 0 ? (
+          <p className="mt-1 text-sm font-bold text-muted-foreground">Nenhum integrante cadastrado.</p>
+        ) : (
+          <div className="mt-1 flex flex-wrap gap-1">
+            {equipe.integrantes.map((i) => (
+              <span key={i.id} className="rounded-full bg-muted px-3 py-1 text-sm font-bold">
+                {i.nome} <span className="text-muted-foreground">· {i.papel}</span>
+              </span>
+            ))}
+          </div>
+        )}
+      </div>
 
       <div>
         <h3 className="text-xl">Medidas do carrinho <span className="text-base text-muted-foreground">· em cm</span></h3>
