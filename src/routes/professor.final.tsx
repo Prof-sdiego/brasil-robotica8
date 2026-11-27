@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 
 import {
-  DADOS_VAZIOS, ITEM_EQUIPE, ITENS_ACABAMENTO, ITENS_DESENVOLVIMENTO, ITENS_ENGENHARIA, NIVEIS_ENGENHARIA,
+  DADOS_VAZIOS, ITEM_EQUIPE, MEDIDAS, ITENS_ACABAMENTO, ITENS_DESENVOLVIMENTO, ITENS_ENGENHARIA, NIVEIS_ENGENHARIA,
   calcularNotas, completo, formatar, mediaGeral, salvarFinal, useAvaliacoesFinais, useRecarregarFinais,
   type DadosFinal,
 } from "@/lib/avaliacaoFinal";
@@ -107,6 +107,20 @@ function Formulario({ equipe, senha, inicial, finalizada, onPronto }: { equipe: 
   return (
     <section className="cartao-toque space-y-5 p-5">
       <h2 className="text-2xl">{equipe.nomeEquipe} · {equipe.turma}</h2>
+
+      <div>
+        <h3 className="text-xl">Medidas do carrinho <span className="text-base text-muted-foreground">· em cm</span></h3>
+        <div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-5">
+          {MEDIDAS.map((m) => (
+            <label key={m.id} className="rounded-xl bg-muted/50 p-2 text-sm font-bold">
+              {m.nome}
+              <input inputMode="decimal" value={d.medidas?.[m.id] ?? ""} placeholder="cm"
+                onChange={(ev) => setD({ ...d, medidas: { ...d.medidas, [m.id]: ev.target.value } })}
+                className="mt-1 w-full rounded-lg border-2 border-input bg-background px-2 py-1 text-base outline-none focus:border-ring" />
+            </label>
+          ))}
+        </div>
+      </div>
 
       <div>
         <h3 className="text-xl">Desenvolvimento <span className="text-base text-muted-foreground">· {formatar(n.desenvolvimento)} pts</span></h3>

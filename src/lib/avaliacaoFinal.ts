@@ -48,7 +48,16 @@ export const NIVEIS_ENGENHARIA = [
 
 export const ITEM_EQUIPE = "A equipe trabalhou de forma coesa e objetiva, sem desperdiçar tempo";
 
+export const MEDIDAS = [
+  { id: "altura", nome: "Altura" },
+  { id: "largura_traseira", nome: "Largura traseira" },
+  { id: "largura_meio", nome: "Largura do meio" },
+  { id: "largura_dianteira", nome: "Largura dianteira" },
+  { id: "comprimento", nome: "Comprimento" },
+] as const;
+
 export type DadosFinal = {
+  medidas?: Record<string, string>;
   desenvolvimento: Record<string, boolean>;
   acabamento: Record<string, number | null>;
   engenharia: Record<string, number | null>;
