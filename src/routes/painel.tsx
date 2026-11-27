@@ -33,6 +33,7 @@ import { temBotaoDemais } from "@/lib/botoes";
 import { ErroBotoes } from "@/components/ErroBotoes";
 import { ResumoBanheiroEquipe } from "@/components/AvisoBanheiro";
 import { formatar, useNotaFinalEquipe } from "@/lib/avaliacaoFinal";
+import { useAvaliacaoAulasEnviada } from "@/lib/avaliacaoAulas";
 
 export const Route = createFileRoute("/painel")({
   head: () => ({
@@ -165,6 +166,7 @@ function Painel() {
   const navigate = useNavigate();
   const { equipe, integrante, areas, carregando, codigo, salvar } = useAluno();
   const { data: notaFinal } = useNotaFinalEquipe(codigo);
+  const { data: aulasEnviada } = useAvaliacaoAulasEnviada(codigo);
   const { pronto: tutorialPronto, visto: tutorialVisto } = useTutorialVisto(codigo);
 
   useEffect(() => {
@@ -290,6 +292,16 @@ function Painel() {
         <p className="mt-4 flex items-start gap-2 rounded-2xl bg-alerta px-4 py-4 font-bold text-alerta-foreground">
           <Lock className="mt-0.5 size-5 shrink-0" /> {avisoTrava}
         </p>
+      )}
+
+      {aulasEnviada === false && (
+        <Link to="/avaliar-aulas" className="cartao-toque mt-4 flex items-center gap-4 border-primary p-5 active:cartao-toque-ativo">
+          <span className="flex size-16 shrink-0 items-center justify-center rounded-2xl bg-primary text-3xl">💬</span>
+          <span>
+            <span className="block font-display text-2xl font-bold">Avaliar as aulas</span>
+            <span className="block text-sm font-semibold text-muted-foreground">Contem ao professor o que o grupo acha das aulas</span>
+          </span>
+        </Link>
       )}
 
       <h2 className="mt-6 text-2xl">Para fazer hoje</h2>

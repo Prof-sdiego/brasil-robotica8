@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AjustesRouteImport } from './routes/ajustes'
 import { Route as AvaliarRouteImport } from './routes/avaliar'
+import { Route as AvaliarAulasRouteImport } from './routes/avaliar-aulas'
 import { Route as BanheiroRouteImport } from './routes/banheiro'
 import { Route as BotoesRouteImport } from './routes/botoes'
 import { Route as ChecklistRouteImport } from './routes/checklist'
@@ -30,6 +31,7 @@ import { Route as ProgramadorRouteImport } from './routes/programador'
 import { Route as TutorialRouteImport } from './routes/tutorial'
 import { Route as ProfessorIndexRouteImport } from './routes/professor.index'
 import { Route as ProfessorAcompanhamentoRouteImport } from './routes/professor.acompanhamento'
+import { Route as ProfessorAulasRouteImport } from './routes/professor.aulas'
 import { Route as ProfessorAvaliacoesRouteImport } from './routes/professor.avaliacoes'
 import { Route as ProfessorBanheiroRouteImport } from './routes/professor.banheiro'
 import { Route as ProfessorCadastroRouteImport } from './routes/professor.cadastro'
@@ -52,6 +54,11 @@ const AjustesRoute = AjustesRouteImport.update({
 const AvaliarRoute = AvaliarRouteImport.update({
   id: '/avaliar',
   path: '/avaliar',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AvaliarAulasRoute = AvaliarAulasRouteImport.update({
+  id: '/avaliar-aulas',
+  path: '/avaliar-aulas',
   getParentRoute: () => rootRouteImport,
 } as any)
 const BanheiroRoute = BanheiroRouteImport.update({
@@ -144,6 +151,11 @@ const ProfessorAcompanhamentoRoute = ProfessorAcompanhamentoRouteImport.update({
   path: '/acompanhamento',
   getParentRoute: () => ProfessorRoute,
 } as any)
+const ProfessorAulasRoute = ProfessorAulasRouteImport.update({
+  id: '/aulas',
+  path: '/aulas',
+  getParentRoute: () => ProfessorRoute,
+} as any)
 const ProfessorAvaliacoesRoute = ProfessorAvaliacoesRouteImport.update({
   id: '/avaliacoes',
   path: '/avaliacoes',
@@ -189,6 +201,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/ajustes': typeof AjustesRoute
   '/avaliar': typeof AvaliarRoute
+  '/avaliar-aulas': typeof AvaliarAulasRoute
   '/banheiro': typeof BanheiroRoute
   '/botoes': typeof BotoesRoute
   '/checklist': typeof ChecklistRoute
@@ -206,6 +219,7 @@ export interface FileRoutesByFullPath {
   '/programador': typeof ProgramadorRoute
   '/tutorial': typeof TutorialRoute
   '/professor/acompanhamento': typeof ProfessorAcompanhamentoRoute
+  '/professor/aulas': typeof ProfessorAulasRoute
   '/professor/avaliacoes': typeof ProfessorAvaliacoesRoute
   '/professor/banheiro': typeof ProfessorBanheiroRoute
   '/professor/cadastro': typeof ProfessorCadastroRoute
@@ -220,6 +234,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/ajustes': typeof AjustesRoute
   '/avaliar': typeof AvaliarRoute
+  '/avaliar-aulas': typeof AvaliarAulasRoute
   '/banheiro': typeof BanheiroRoute
   '/botoes': typeof BotoesRoute
   '/checklist': typeof ChecklistRoute
@@ -236,6 +251,7 @@ export interface FileRoutesByTo {
   '/programador': typeof ProgramadorRoute
   '/tutorial': typeof TutorialRoute
   '/professor/acompanhamento': typeof ProfessorAcompanhamentoRoute
+  '/professor/aulas': typeof ProfessorAulasRoute
   '/professor/avaliacoes': typeof ProfessorAvaliacoesRoute
   '/professor/banheiro': typeof ProfessorBanheiroRoute
   '/professor/cadastro': typeof ProfessorCadastroRoute
@@ -251,6 +267,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/ajustes': typeof AjustesRoute
   '/avaliar': typeof AvaliarRoute
+  '/avaliar-aulas': typeof AvaliarAulasRoute
   '/banheiro': typeof BanheiroRoute
   '/botoes': typeof BotoesRoute
   '/checklist': typeof ChecklistRoute
@@ -268,6 +285,7 @@ export interface FileRoutesById {
   '/programador': typeof ProgramadorRoute
   '/tutorial': typeof TutorialRoute
   '/professor/acompanhamento': typeof ProfessorAcompanhamentoRoute
+  '/professor/aulas': typeof ProfessorAulasRoute
   '/professor/avaliacoes': typeof ProfessorAvaliacoesRoute
   '/professor/banheiro': typeof ProfessorBanheiroRoute
   '/professor/cadastro': typeof ProfessorCadastroRoute
@@ -284,6 +302,7 @@ export interface FileRouteTypes {
     | '/'
     | '/ajustes'
     | '/avaliar'
+    | '/avaliar-aulas'
     | '/banheiro'
     | '/botoes'
     | '/checklist'
@@ -301,6 +320,7 @@ export interface FileRouteTypes {
     | '/programador'
     | '/tutorial'
     | '/professor/acompanhamento'
+    | '/professor/aulas'
     | '/professor/avaliacoes'
     | '/professor/banheiro'
     | '/professor/cadastro'
@@ -315,6 +335,7 @@ export interface FileRouteTypes {
     | '/'
     | '/ajustes'
     | '/avaliar'
+    | '/avaliar-aulas'
     | '/banheiro'
     | '/botoes'
     | '/checklist'
@@ -331,6 +352,7 @@ export interface FileRouteTypes {
     | '/programador'
     | '/tutorial'
     | '/professor/acompanhamento'
+    | '/professor/aulas'
     | '/professor/avaliacoes'
     | '/professor/banheiro'
     | '/professor/cadastro'
@@ -345,6 +367,7 @@ export interface FileRouteTypes {
     | '/'
     | '/ajustes'
     | '/avaliar'
+    | '/avaliar-aulas'
     | '/banheiro'
     | '/botoes'
     | '/checklist'
@@ -362,6 +385,7 @@ export interface FileRouteTypes {
     | '/programador'
     | '/tutorial'
     | '/professor/acompanhamento'
+    | '/professor/aulas'
     | '/professor/avaliacoes'
     | '/professor/banheiro'
     | '/professor/cadastro'
@@ -377,6 +401,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AjustesRoute: typeof AjustesRoute
   AvaliarRoute: typeof AvaliarRoute
+  AvaliarAulasRoute: typeof AvaliarAulasRoute
   BanheiroRoute: typeof BanheiroRoute
   BotoesRoute: typeof BotoesRoute
   ChecklistRoute: typeof ChecklistRoute
@@ -416,6 +441,13 @@ declare module '@tanstack/react-router' {
       path: '/avaliar'
       fullPath: '/avaliar'
       preLoaderRoute: typeof AvaliarRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/avaliar-aulas': {
+      id: '/avaliar-aulas'
+      path: '/avaliar-aulas'
+      fullPath: '/avaliar-aulas'
+      preLoaderRoute: typeof AvaliarAulasRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/banheiro': {
@@ -544,6 +576,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProfessorAcompanhamentoRouteImport
       parentRoute: typeof ProfessorRoute
     }
+    '/professor/aulas': {
+      id: '/professor/aulas'
+      path: '/aulas'
+      fullPath: '/professor/aulas'
+      preLoaderRoute: typeof ProfessorAulasRouteImport
+      parentRoute: typeof ProfessorRoute
+    }
     '/professor/avaliacoes': {
       id: '/professor/avaliacoes'
       path: '/avaliacoes'
@@ -605,6 +644,7 @@ declare module '@tanstack/react-router' {
 
 interface ProfessorRouteChildren {
   ProfessorAcompanhamentoRoute: typeof ProfessorAcompanhamentoRoute
+  ProfessorAulasRoute: typeof ProfessorAulasRoute
   ProfessorAvaliacoesRoute: typeof ProfessorAvaliacoesRoute
   ProfessorBanheiroRoute: typeof ProfessorBanheiroRoute
   ProfessorCadastroRoute: typeof ProfessorCadastroRoute
@@ -618,6 +658,7 @@ interface ProfessorRouteChildren {
 
 const ProfessorRouteChildren: ProfessorRouteChildren = {
   ProfessorAcompanhamentoRoute: ProfessorAcompanhamentoRoute,
+  ProfessorAulasRoute: ProfessorAulasRoute,
   ProfessorAvaliacoesRoute: ProfessorAvaliacoesRoute,
   ProfessorBanheiroRoute: ProfessorBanheiroRoute,
   ProfessorCadastroRoute: ProfessorCadastroRoute,
@@ -637,6 +678,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AjustesRoute: AjustesRoute,
   AvaliarRoute: AvaliarRoute,
+  AvaliarAulasRoute: AvaliarAulasRoute,
   BanheiroRoute: BanheiroRoute,
   BotoesRoute: BotoesRoute,
   ChecklistRoute: ChecklistRoute,

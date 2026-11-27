@@ -41,6 +41,41 @@ export type Database = {
         }
         Relationships: []
       }
+      avaliacao_aulas: {
+        Row: {
+          created_at: string
+          equipe_id: string
+          nome_equipe: string
+          notas: Json
+          textos: Json
+          turma: string
+        }
+        Insert: {
+          created_at?: string
+          equipe_id: string
+          nome_equipe?: string
+          notas?: Json
+          textos?: Json
+          turma?: string
+        }
+        Update: {
+          created_at?: string
+          equipe_id?: string
+          nome_equipe?: string
+          notas?: Json
+          textos?: Json
+          turma?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "avaliacao_aulas_equipe_id_fkey"
+            columns: ["equipe_id"]
+            isOneToOne: true
+            referencedRelation: "equipes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       avaliacao_faltas: {
         Row: {
           bimestre: number
@@ -612,6 +647,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      aluno_avaliacao_aulas_enviada: {
+        Args: { _codigo: string }
+        Returns: boolean
+      }
       aluno_conferir_identidade: {
         Args: {
           _codigo: string
@@ -626,6 +665,10 @@ export type Database = {
           ok: boolean
           ra: string
         }[]
+      }
+      aluno_enviar_avaliacao_aulas: {
+        Args: { _codigo: string; _notas: Json; _textos: Json }
+        Returns: boolean
       }
       aluno_listar_avaliadores: {
         Args: { _codigo: string; _equipe_id: string }
@@ -670,6 +713,23 @@ export type Database = {
           ra: string
           turma: string
         }[]
+      }
+      professor_listar_avaliacao_aulas: {
+        Args: { _senha: string }
+        Returns: {
+          created_at: string
+          equipe_id: string
+          nome_equipe: string
+          notas: Json
+          textos: Json
+          turma: string
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "avaliacao_aulas"
+          isOneToOne: false
+          isSetofReturn: true
+        }
       }
       professor_listar_avaliacoes: {
         Args: { _senha: string }
